@@ -16,7 +16,6 @@ export default function TeacherTable({ items, onDeleted, onEdit }: Props) {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        {/* <TableHead className="w-12">No.</TableHead> */}
                         <TableHead>Nama</TableHead>
                         <TableHead>Nip</TableHead>
                         <TableHead>Tempat, Tanggal Lahir</TableHead>

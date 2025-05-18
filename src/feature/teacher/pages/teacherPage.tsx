@@ -11,6 +11,7 @@ import { useTeacher } from "../hook/useTeacher";
 
 import LoadingOverlay from "@/core/components/ui/loading_screen";
 import TeacherForm from "../forms/teacherForm";
+import { useConfirm } from "@/core/components/confirmDialog";
 
 
 
@@ -19,6 +20,7 @@ export default function TeacherPage() {
     const { data, loading, loadingOverlay, remove, create, update } = useTeacher();
     const [showModal, setShowModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState<Teacher | null>(null);
+    const { confirm, ConfirmDialog } = useConfirm();
 
 
 
@@ -26,6 +28,19 @@ export default function TeacherPage() {
         setUser(null);
         return <Navigate to="/login" />;
     }
+
+    const handleRemove = async (item: Teacher) => {
+        const isConfirmed = await confirm({
+            title: "Hapus Data",
+            message: `Apakah Anda yakin ingin mengahpus guru ini?`,
+            confirmText: "Ya, Lanjutkan",
+            cancelText: "Batal",
+        });
+        if (isConfirmed) {
+            remove(item.id);
+        }
+    };
+
 
     return (
         <BaseLayout>
@@ -53,10 +68,7 @@ export default function TeacherPage() {
                             <TeacherTableSkeleton />
                         ) : <Table
                             items={data}
-                            onDeleted={(item) => {
-                                // setLoadingPage(true);
-                                remove(item.id)
-                            }}
+                            onDeleted={handleRemove}
                             onEdit={(item) => {
                                 setSelectedItem(item);
                                 setShowModal(true);
@@ -71,7 +83,6 @@ export default function TeacherPage() {
                                     setSelectedItem(null);
                                 }}
                                 onSuccess={(item) => {
-                                    // setLoadingPage(true);
                                     if (selectedItem) {
                                         update(item);
                                     } else {
@@ -82,6 +93,7 @@ export default function TeacherPage() {
                                 }}
                             />}
                     </main>
+                    {ConfirmDialog}
                 </div>
             </div>
 
