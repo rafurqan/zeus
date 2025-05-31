@@ -1,10 +1,15 @@
 type FormInputProps = {
-    label: string
+    label: string | JSX.Element
     name: string
-    value: string
+    value: string | number
     type?: string
     placeholder?: string
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void // Tipe yang lebih fleksibel
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
+    required?: boolean
+    icon?: React.ReactNode
+    disabled?: boolean
+    className?: string
+    textarea?: boolean
 }
 
 const inputClass = "w-full border border-gray-300 focus:border-blue-500 focus:outline-none p-2 rounded-md text-sm appearance-none bg-white";
@@ -17,16 +22,44 @@ export const FormInput = ({
     onChange,
     type = "text",
     placeholder = "",
+    required = false,
+    icon,
+    disabled = false,
+    className = "",
+    textarea = false
 }: FormInputProps) => (
     <div>
-        <label className={labelClass}>{label}</label>
-        <input
-            name={name}
-            value={value}
-            onChange={onChange} // Menggunakan onChange yang lebih fleksibel
-            type={type}
-            placeholder={placeholder}
-            className={inputClass}
-        />
+        <label className={labelClass}>
+            {label}
+        </label>
+        <div className="relative flex items-center">
+            {icon && (
+                <div className="absolute left-3">
+                    {icon}
+                </div>
+            )}
+            {textarea ? (
+                <textarea
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    placeholder={placeholder}
+                    required={required}
+                    disabled={disabled}
+                    className={`${inputClass} ${icon ? "pl-10" : ""} ${className}`}
+                />
+            ) : (
+                <input
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    type={type}
+                    placeholder={placeholder}
+                    required={required}
+                    disabled={disabled}
+                    className={`${inputClass} ${icon ? "pl-10" : ""} ${className}`}
+                />
+            )}
+        </div>
     </div>
 );

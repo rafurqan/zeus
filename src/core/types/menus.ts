@@ -25,6 +25,7 @@ export const menus = [
     children: [
       { name: "Riwayat Pendidikan", path: "/master/education-levels" },
       { name: "Guru", path: "/master/teachers" },
+      { name: "Data Penagihan", path: "/master/billing" },
       // { name: "Tipe Dokumen", path: "/master/document-types" },
       // { name: "Tipe Sekolah", path: "/master/school-types" },
     ],
