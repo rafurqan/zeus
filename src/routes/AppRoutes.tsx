@@ -9,6 +9,7 @@ import ProspectiveStudentsPage from '@/feature/prospective-student/pages/prospec
 import LoadingOverlay from '@/core/components/ui/loading_screen';
 import CreateProspectiveStudentsPage from '@/feature/prospective-student/pages/createProspectiveStudentPage';
 import TeacherPage from '@/feature/teacher/pages/teacherPage';
+import BillingPage from '@/feature/billing/pages/billingPage';
 
 
 const AppRoutes = () => {
@@ -41,6 +42,7 @@ const AppRoutes = () => {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="master/education-levels" element={<EducationLevelsPage />} />
           <Route path="master/teachers" element={<TeacherPage />} />
+          <Route path="master/billing" element={<BillingPage />} />
           <Route path="students/prospective" element={<ProspectiveStudentsPage />} />
           <Route path="students/prospective/create" element={<CreateProspectiveStudentsPage />} />
         </Route>
