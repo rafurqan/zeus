@@ -1,3 +1,5 @@
+import { JSX } from "react"
+
 type FormInputProps = {
     label: string | JSX.Element
     name: string
