@@ -6,7 +6,6 @@ import LoadingOverlay from './ui/loading_screen';
 import { logout } from '@/feature/authentication/service/auth';
 import { AxiosError } from 'axios';
 
-
 const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -16,20 +15,19 @@ const Header = () => {
     setShowDropdown(!showDropdown)
   }
 
-  const { token, setUser, setToken } = useContext(AppContext);
+  const { setUser, setToken } = useContext(AppContext);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       setLoading(true);
-      const response = await logout(token);
+      const response = await logout();
       setToken(response.data.access_token);
       setUser(response.data.user);
       navigate('/dashboard');
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
         // Jika error berasal dari Axios, kita bisa akses err.response dan err.message
-
       } else {
         // Error bukan dari Axios, tangani sesuai kebutuhan
       }
@@ -41,7 +39,6 @@ const Header = () => {
       localStorage.removeItem("user");
       navigate("/login");
     }
-
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -61,11 +58,8 @@ const Header = () => {
   }, [])
 
   return (
-
-    <header className="w-full h-16 bg-white  flex items-center justify-between px-6">
-      {loading &&
-        <LoadingOverlay
-        />}
+    <header className="w-full h-16 bg-white flex items-center justify-between px-6 sticky top-0 z-20">
+      {loading && <LoadingOverlay />}
       <div className="flex items-center space-x-3">
         <School className="w-8 h-8 text-green-600" />
         <h1 className="text-xl font-bold">Sistem Manajemen Sekolah</h1>
@@ -109,7 +103,7 @@ const Header = () => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

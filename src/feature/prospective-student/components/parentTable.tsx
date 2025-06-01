@@ -1,5 +1,6 @@
+import { FaEdit, FaTrash } from "react-icons/fa";
 import { Parent } from "../types/parent";
-import ParentRow from "./parentRow";
+import { Table, TableCell, TableHead, TableHeader, TableRow, TableBody } from "@/core/components/ui/table";
 
 
 
@@ -12,30 +13,51 @@ type Props = {
 export default function ParentTable({ items, onDeleted, onEdit }: Props) {
     return (
         <div className="overflow-x-auto">
-            <table className="min-w-full table-auto">
-                <thead className="bg-gray-100 text-left text-sm font-medium text-gray-700">
-                    <tr>
-                        <th className="px-4 py-2">Nama</th>
-                        <th className="px-4 py-2">Hubungan</th>
-                        <th className="px-4 py-2">Pekerjaan</th>
-                        <th className="px-4 py-2">Penghasilan</th>
-                        <th className="px-4 py-2">Pendidikan</th>
-                        <th className="px-4 py-2">Kontak</th>
-                        <th className="px-4 py-2">Kontak Utama</th>
-                        <th className="px-4 py-2 text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Nama</TableHead>
+                        <TableHead>Hubungan</TableHead>
+                        <TableHead>Pekerjaan</TableHead>
+                        <TableHead>Penghasilan</TableHead>
+                        <TableHead>Pendidikan</TableHead>
+                        <TableHead>Kontak</TableHead>
+                        <TableHead>Kontak Utama</TableHead>
+                        <TableHead>Aksi</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
                     {items.map((item) => (
-                        <ParentRow
-                            key={item.id}
-                            item={item}
-                            onDeleted={onDeleted}
-                            onEdit={onEdit}
-                        />
+                        <TableRow key={item.id}>
+                            <TableCell>{item.full_name}</TableCell>
+                            <TableCell>{item.parent_type}</TableCell>
+                            <TableCell>{item.occupation}</TableCell>
+                            <TableCell>{item.income_range?.name ?? ""}</TableCell>
+                            <TableCell>{item.education_level?.name ?? ""}</TableCell>
+                            <TableCell>{item.phone}</TableCell>
+                            <TableCell>{item.is_main_contact ? 'Iya' : 'Tidak'}</TableCell>
+                            <TableCell>
+                                <div className="px-4 py-2 space-x-2">
+                                    <button
+                                        className="text-blue-600 hover:text-blue-800"
+                                        onClick={() => onEdit(item)}
+                                    >
+                                        <FaEdit />
+                                    </button>
+                                    <button
+                                        className={`text-red-600 hover:text-red-800 disabled:opacity-50`}
+                                        onClick={() => onDeleted(item)}
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                </div>
+
+                            </TableCell>
+                        </TableRow>
+
                     ))}
-                </tbody>
-            </table>
+                </TableBody>
+            </Table>
         </div>
     );
 }

@@ -33,13 +33,11 @@ export default function EducationLevelsPage() {
 
     async function fetchEducationLevels() {
         try {
-            const res = await listEducationLevel(token);
+            const res = await listEducationLevel();
 
             if (res.status === 401) {
                 setUser(null);
-                // toast.error("Akses ditolak. Silakan login ulang.");
             }
-            console.log(res);
             setData(res.data || []);
         } catch (err: unknown) {
             if (err instanceof AxiosError && err.status === 401) {

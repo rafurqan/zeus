@@ -1,4 +1,4 @@
-import http from "@/core/service/https";
+import http from "@/core/service/auth";
 import {
   CreateTeacherResponse,
   Teacher,
@@ -6,30 +6,26 @@ import {
 } from "../types/teacher";
 
 export const teacherService = {
-  async getAll(token: string): Promise<Teacher[]> {
-    const response = await http(token).get("/teachers");
+  async getAll(): Promise<Teacher[]> {
+    const response = await http.get("/teachers");
     return response.data.data;
   },
 
-  async create(token: string, data: Teacher): Promise<CreateTeacherResponse> {
-    const response = await http(token).post<CreateTeacherResponse>(
-      "/teachers",
-      data
-    );
+  async create(data: Teacher): Promise<CreateTeacherResponse> {
+    const response = await http.post<CreateTeacherResponse>("/teachers", data);
     return response.data;
   },
 
-  async update(token: string, data: Teacher): Promise<CreateTeacherResponse> {
-    console.log(data);
-    const response = await http(token).put<UpdateTeacherResponse>(
+  async update(data: Teacher): Promise<CreateTeacherResponse> {
+    const response = await http.put<UpdateTeacherResponse>(
       `/teachers/${data.id}`,
       data
     );
     return response.data;
   },
 
-  async remove(token: string, id: string): Promise<CreateTeacherResponse> {
-    const response = await http(token).delete(`/teachers/${id}`);
+  async remove(id: string): Promise<CreateTeacherResponse> {
+    const response = await http.delete(`/teachers/${id}`);
     return response.data;
   },
 };

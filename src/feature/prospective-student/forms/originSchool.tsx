@@ -42,11 +42,6 @@ export default function StudentOriginSchoolForm({
     });
 
 
-    console.log(form);
-
-
-
-
     useEffect(() => {
         if (token) {
             fetchSchoolType();
@@ -56,7 +51,7 @@ export default function StudentOriginSchoolForm({
 
     async function fetchSchoolType() {
         try {
-            const res = await listSchoolType(token);
+            const res = await listSchoolType();
 
             if (res.status === 401) {
                 setUser(null);
@@ -74,7 +69,7 @@ export default function StudentOriginSchoolForm({
 
     async function fetchEducationLevels() {
         try {
-            const res = await listEducationLevel(token);
+            const res = await listEducationLevel();
 
             if (res.status === 401) {
                 setUser(null);
@@ -111,7 +106,6 @@ export default function StudentOriginSchoolForm({
     };
 
     const handleSubmit = async () => {
-        console.log("print confirmation");
         const isConfirmed = await confirm({
             title: isEdit ? "Perbaharui Data" : "Submit Data",
             message: `Apakah Anda yakin ingin ${isEdit ? "perbaharui" : "menambahkan data"} asal sekolah ini?`,

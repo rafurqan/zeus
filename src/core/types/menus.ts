@@ -16,6 +16,7 @@ export const menus = [
       { name: "Calon Siswa", path: "/students/prospective" },
       { name: "Siswa", path: "/students/student" },
       { name: "Kelas", path: "/students/classes" },
+      { name: "Program", path: "/students/program" },
     ],
   },
   {

@@ -1,44 +1,105 @@
 import { ProspectiveStudent } from "../types/prospective-student";
-import ProspectiveStudentRow from "./prospectiveStudentRow";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { Table, TableCell, TableHead, TableHeader, TableRow, TableBody } from "@/core/components/ui/table";
+
 
 type Props = {
     items: ProspectiveStudent[];
-    onDeleted: () => void;
+    onDeleted: (item: ProspectiveStudent) => void;
     onEdit: (item: ProspectiveStudent) => void;
 };
 
 export default function ProspectiveStudentTable({ items, onDeleted, onEdit }: Props) {
     return (
         <div className="overflow-x-auto">
-            <table className="min-w-full table-auto border border-black">
-                <thead className="bg-gray-100 text-left text-sm font-medium text-gray-700">
-                    <tr>
-                        <th className="px-4 py-2">No</th>
-                        <th className="px-4 py-2">Nomor Registrasi</th>
-                        <th className="px-4 py-2">Nama</th>
-                        <th className="px-4 py-2">Nama Orang Tua</th>
-                        <th className="px-4 py-2 text-center">Kota</th>
-                        <th className="px-4 py-2 text-center">Kontak</th>
-                        <th className="px-4 py-2 text-center">Tanggal Daftar</th>
-                        <th className="px-4 py-2 text-center">Status</th>
-                        <th className="px-4 py-2 text-center">Dokumen</th>
-                        <th className="px-4 py-2 text-center">Total Tagihan</th>
-                        <th className="px-4 py-2 text-center">Status Pembayaran</th>
-                        <th className="px-4 py-2 text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {items.map((item,index) => (
-                        <ProspectiveStudentRow
-                            key={item.id}
-                            item={item}
-                            index={index+1}
-                            onDeleted={onDeleted}
-                            onEdit={onEdit}
-                        />
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead className="w-12">No.</TableHead>
+                        <TableHead>Nomor Registrasi</TableHead>
+                        <TableHead>Nama</TableHead>
+                        <TableHead>Nama Orang Tua</TableHead>
+                        <TableHead>Kota</TableHead>
+                        <TableHead>Kontak</TableHead>
+                        <TableHead>Tanggal Daftar</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Dokumen</TableHead>
+                        <TableHead>Total Tagihan</TableHead>
+                        <TableHead>Status Pembayaran</TableHead>
+                        <TableHead>Aksi</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {items.map((item, index) => (
+                        <TableRow key={item.id}>
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>{item.registration_code}</TableCell>
+                            <TableCell>{item.full_name}</TableCell>
+                            <TableCell>{item.parents?.[0]?.full_name ?? "Tidak ada"}</TableCell>
+                            <TableCell>{item.village?.sub_district?.city?.name ?? "-"}</TableCell>
+                            <TableCell>{item.phone ?? "kosong"}</TableCell>
+                            <TableCell>{new Intl.DateTimeFormat('id-ID', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                            }).format(new Date(item.created_at))}</TableCell>
+                            <TableCell>
+                                <span
+                                    className={`px-2 py-1 rounded-4xl text-xs font-bold ${item.status === "rejected"
+                                        ? "bg-red-500 text-white"
+                                        : item.status === "approved"
+                                            ? "bg-green-200 text-black" : "bg-gray-200 text-gray-600"
+                                        }`}
+                                >
+                                    {item.status}
+                                </span>
+                            </TableCell>
+                            <TableCell>
+                                <span
+                                    className={`whitespace-nowrap px-2 py-1 rounded-4xl text-xs font-medium ${item.document_status === "Lengkap"
+                                        ? "bg-black text-white"
+                                        : "bg-gray-200 text-gray-600"
+                                        }`}
+                                >
+                                    {item.document_status}
+                                </span>
+                            </TableCell>
+                            <TableCell>
+                                NULL
+                            </TableCell>
+                            <TableCell>
+                                <span
+                                    className={`px-2 py-1 rounded-4xl text-xs font-medium ${item.full_name === "ACTIVE"
+                                        ? "bg-black text-white"
+                                        : "bg-gray-200 text-gray-600"
+                                        }`}
+                                >
+                                    {item.full_name === "ACTIVE" ? "Aktif" : "Tidak Aktif"}
+                                </span>
+                            </TableCell>
+                            <TableCell>
+                                <div className="flex justify-end items-center space-x-2">
+                                    <button
+                                        className="text-blue-600 hover:text-blue-800 text-lg"
+                                        onClick={() => onEdit(item)}
+                                    >
+                                        <FaEdit />
+                                    </button>
+                                    {item.status !== "rejected" && (
+                                        <button
+                                            className="text-red-600 hover:text-red-800 text-lg disabled:opacity-50"
+                                            onClick={() => onDeleted(item)}>
+                                            <FaTrash />
+                                        </button>
+                                    )}
+                                </div>
+
+                            </TableCell>
+                        </TableRow>
                     ))}
-                </tbody>
-            </table>
+                </TableBody>
+            </Table>
         </div>
+
     );
 }

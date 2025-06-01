@@ -1,23 +1,23 @@
-import { ReactNode } from "react"
-import Sidebar from "./sidebar"
-import Header from "./header"
+import { ReactNode } from "react";
+import Sidebar from "./sidebar";
+import Header from "./header";
 
 type LayoutProps = {
-  children: ReactNode
-}
+  children: ReactNode;
+};
 
 const BaseLayout = ({ children }: LayoutProps) => {
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-64 h-screen bg-white border-r">
+      <aside className="w-64 h-full bg-white border-r fixed z-10">
         <Sidebar />
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col max-h-screen">
+      <div className="flex-1 flex flex-col ml-64">
         {/* Header */}
-        <div className="shrink-0">
+        <div className="sticky top-0 z-20">
           <Header />
         </div>
 
@@ -27,7 +27,7 @@ const BaseLayout = ({ children }: LayoutProps) => {
         </main>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default BaseLayout
+export default BaseLayout;

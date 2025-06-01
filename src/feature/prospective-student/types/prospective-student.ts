@@ -15,6 +15,8 @@ export type ProspectiveStudent = {
   nisn: string;
   village: Village | null;
   status: string;
+  email : string;
+  phone : string;
   child_order: number;
   street: string;
   family_status: string;

@@ -60,6 +60,7 @@ export default function CreateProspectiveStudentsPage() {
 
 
 
+
     const [form, setForm] = useState<ProspectiveStudent>(item || {
         id: "",
         additional_information: "",
@@ -67,6 +68,8 @@ export default function CreateProspectiveStudentsPage() {
         file: null,
         has_kps: false,
         nickname: "",
+        email: "",
+        phone: "",
         street: "",
         nisn: "",
         gender: "",
@@ -118,16 +121,16 @@ export default function CreateProspectiveStudentsPage() {
                 setSelectedProvince(item?.village?.sub_district?.city?.province?.id);
             }
             if (item?.village?.sub_district?.city?.id) {
-                fetchCities(item?.village?.sub_district?.city?.id);
+                fetchCities(item?.village?.sub_district?.city?.province?.id);
                 setSelectedCity(item?.village?.sub_district?.city?.id);
             }
             if (item?.village?.sub_district?.id) {
-                fetchSubDistrict(item?.village?.sub_district?.id);
+                fetchSubDistrict(item?.village?.sub_district?.city?.id);
                 setSelectedSubDistrict(item?.village?.sub_district?.id)
             }
 
             if (item?.village?.id) {
-                fetchVillage(item?.village?.id);
+                fetchVillage(item?.village?.sub_district?.id);
             }
         }
     }, []);
@@ -302,7 +305,7 @@ export default function CreateProspectiveStudentsPage() {
 
     async function fetchSpecialConditions() {
         try {
-            const res = await listSpecialCondition(token);
+            const res = await listSpecialCondition();
             if (res.status === 401) setUser(null);
             setSpecialConditions(res.data || []);
         } catch (err: unknown) {
@@ -315,7 +318,7 @@ export default function CreateProspectiveStudentsPage() {
 
     async function fetchProvinces() {
         try {
-            const res = await listProvince(token);
+            const res = await listProvince();
             if (res.status === 401) setUser(null);
             setProvinces(res.data || []);
         } catch (err: unknown) {
@@ -328,7 +331,7 @@ export default function CreateProspectiveStudentsPage() {
 
     async function fetchNationalities() {
         try {
-            const res = await listNationality(token);
+            const res = await listNationality();
             if (res.status === 401) setUser(null);
             setNationalities(res.data || []);
         } catch (err: unknown) {
@@ -341,7 +344,7 @@ export default function CreateProspectiveStudentsPage() {
 
     async function fetchCities(id: string) {
         try {
-            const res = await listCity(token, id);
+            const res = await listCity(id);
             if (res.status === 401) setUser(null);
             setCities(res.data || []);
         } catch (err: unknown) {
@@ -354,7 +357,7 @@ export default function CreateProspectiveStudentsPage() {
 
     async function fetchSubDistrict(id: string) {
         try {
-            const res = await listSubDistrict(token, id);
+            const res = await listSubDistrict(id);
             if (res.status === 401) setUser(null);
             setSubDistricts(res.data || []);
         } catch (err: unknown) {
@@ -367,7 +370,7 @@ export default function CreateProspectiveStudentsPage() {
 
     async function fetchVillage(id: string) {
         try {
-            const res = await listVillage(token, id);
+            const res = await listVillage(id);
             if (res.status === 401) setUser(null);
             setVillages(res.data || []);
         } catch (err: unknown) {
@@ -380,7 +383,7 @@ export default function CreateProspectiveStudentsPage() {
 
     async function fetchSpecialNeeds() {
         try {
-            const res = await listSpecialNeed(token);
+            const res = await listSpecialNeed();
             if (res.status === 401) setUser(null);
             setSpecialNeeds(res.data || []);
         } catch (err: unknown) {
@@ -393,7 +396,7 @@ export default function CreateProspectiveStudentsPage() {
 
     async function fetchReligionTypes() {
         try {
-            const res = await listReligion(token);
+            const res = await listReligion();
             if (res.status === 401) setUser(null);
             setReligionTypes(res.data || []);
         } catch (err: unknown) {
@@ -406,7 +409,7 @@ export default function CreateProspectiveStudentsPage() {
 
     async function fetchTransportationModes() {
         try {
-            const res = await listTransporatationMode(token);
+            const res = await listTransporatationMode();
             if (res.status === 401) setUser(null);
             setTransportationModes(res.data || []);
         } catch (err: unknown) {
@@ -428,7 +431,7 @@ export default function CreateProspectiveStudentsPage() {
             setLoading(true);
             try {
 
-                const response = !isEdit ? await createProspectiveStudent(token ?? "", form) : await updateProspectiveStudent(token ?? "", form);
+                const response = !isEdit ? await createProspectiveStudent(form) : await updateProspectiveStudent(form);
 
                 if (!response.data) {
                     throw new Error("Gagal simpan data");
@@ -437,7 +440,7 @@ export default function CreateProspectiveStudentsPage() {
                 navigate("/students/prospective");
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
-                    console.error("Fetch failed", error);
+                    console.log("Fetch failed", error.response?.data.message);
                 }
                 alert(error instanceof AxiosError ? error.response?.data.message : "Terjadi kesalahan");
             } finally {
@@ -717,6 +720,37 @@ export default function CreateProspectiveStudentsPage() {
                                                 className="w-full border border-gray-100 shadow-none rounded px-3 py-2 focus:outline-none focus:border-black hover:border-black focus:ring-0"
                                             />
                                         </div>
+                                    </div>
+                                }
+                                {/* Kontak */}
+                                {
+                                    <div className="mt-10">
+                                        <h2 className="font-bold mb-4">Kontak</h2>
+                                        <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-4">
+                                                <FormInput
+                                                    label="Nomor Telepon"
+                                                    name="phone"
+                                                    value={form.phone}
+                                                    onChange={handleChange}
+                                                    placeholder="628XXXXX"
+                                                />
+
+
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <FormInput
+                                                    label="Email"
+                                                    name="email"
+                                                    value={form.email}
+                                                    onChange={handleChange}
+                                                    placeholder="xxx@gmail.com"
+                                                />
+
+
+                                            </div>
+                                        </form>
                                     </div>
                                 }
                             </div>
