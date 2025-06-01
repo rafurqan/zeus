@@ -35,11 +35,6 @@ export default function StudentParentForm({
     });
 
 
-    console.log(form);
-
-
-
-
     useEffect(() => {
         if (token) {
             fetchIncomeRange();
@@ -49,7 +44,7 @@ export default function StudentParentForm({
 
     async function fetchIncomeRange() {
         try {
-            const res = await listIncomeRange(token);
+            const res = await listIncomeRange();
 
             if (res.status === 401) {
                 setUser(null);
@@ -67,7 +62,7 @@ export default function StudentParentForm({
 
     async function fetchEducationLevels() {
         try {
-            const res = await listEducationLevel(token);
+            const res = await listEducationLevel();
 
             if (res.status === 401) {
                 setUser(null);
@@ -104,7 +99,6 @@ export default function StudentParentForm({
     };
 
     const handleSubmit = async () => {
-        console.log("print confirmation");
         const isConfirmed = await confirm({
             title: isEdit ? "Perbaharui Data" : "Submit Data",
             message: `Apakah Anda yakin ingin ${isEdit ? "perbaharui" : "menambahkan data"} keluarga ini?`,

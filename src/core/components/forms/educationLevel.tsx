@@ -70,12 +70,12 @@ export default function EducationLevelForm({
         <div className="flex justify-between items-start mb-4">
           <div>
             <h2 className="text-xl font-bold">
-              {isEdit ? "Edit Program" : "Tambah Program Baru"}
+              {isEdit ? "Edit Riwayat Pendidikan" : "Tambah Riwayat Pendidikan Baru"}
             </h2>
             <p className="text-sm text-gray-500">
               {isEdit
-                ? "Ubah data program pendidikan"
-                : "Tambahkan program pendidikan baru ke dalam sistem"}
+                ? "Ubah data riwayat pendidikan"
+                : "Tambahkan riwayat pendidikan baru ke dalam sistem"}
             </p>
           </div>
           <button onClick={onClose} className="text-gray-500 text-xl">
@@ -85,7 +85,7 @@ export default function EducationLevelForm({
 
         <div className="space-y-4">
           <div>
-            <label className="block font-medium">Nama Program</label>
+            <label className="block font-medium">Nama Pendidikan</label>
             <input
               name="name"
               value={form.name}

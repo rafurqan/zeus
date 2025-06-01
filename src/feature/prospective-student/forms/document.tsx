@@ -32,12 +32,6 @@ export default function StudentDocumentForm({
         id: "", name: "", file: "", file_name: "", created_at: null, document_type: null
     });
 
-
-    console.log(form);
-
-
-
-
     useEffect(() => {
         if (token) {
             fetchDocumentTypes();
@@ -46,7 +40,7 @@ export default function StudentDocumentForm({
 
     async function fetchDocumentTypes() {
         try {
-            const res = await listDocumentType(token);
+            const res = await listDocumentType();
 
             if (res.status === 401) {
                 setUser(null);
@@ -80,7 +74,6 @@ export default function StudentDocumentForm({
     };
 
     const handleSubmit = async () => {
-        console.log("print confirmation");
         const isConfirmed = await confirm({
             title: isEdit ? "Perbaharui Data" : "Submit Data",
             message: `Apakah Anda yakin ingin ${isEdit ? "perbaharui" : "menambahkan data"} dokumen ini?`,

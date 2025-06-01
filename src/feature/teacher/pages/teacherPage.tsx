@@ -14,14 +14,12 @@ import TeacherForm from "../forms/teacherForm";
 import { useConfirm } from "@/core/components/confirmDialog";
 
 
-
 export default function TeacherPage() {
     const { user, setUser } = useContext(AppContext);
     const { data, loading, loadingOverlay, remove, create, update } = useTeacher();
     const [showModal, setShowModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState<Teacher | null>(null);
     const { confirm, ConfirmDialog } = useConfirm();
-
 
 
     if (!user) {
@@ -32,7 +30,7 @@ export default function TeacherPage() {
     const handleRemove = async (item: Teacher) => {
         const isConfirmed = await confirm({
             title: "Hapus Data",
-            message: `Apakah Anda yakin ingin mengahpus guru ini?`,
+            message: `Apakah Anda yakin ingin menghapus guru ini?`,
             confirmText: "Ya, Lanjutkan",
             cancelText: "Batal",
         });
@@ -41,6 +39,24 @@ export default function TeacherPage() {
         }
     };
 
+    const handleSubmit = async (item: Teacher) => {
+        try {
+            if (selectedItem) {
+                await update(item); // Tunggu operasi update selesai
+                // Jika berhasil, baru tutup modal
+                setShowModal(false);
+                setSelectedItem(null);
+            } else {
+                await create(item); // Tunggu operasi create selesai
+                // Jika berhasil, baru tutup modal
+                setShowModal(false);
+                setSelectedItem(null);
+            }
+        } catch (error) {
+            console.error("Gagal menyimpan data guru:", error);
+            
+        }
+    };
 
     return (
         <BaseLayout>
@@ -82,15 +98,7 @@ export default function TeacherPage() {
                                     setShowModal(false);
                                     setSelectedItem(null);
                                 }}
-                                onSuccess={(item) => {
-                                    if (selectedItem) {
-                                        update(item);
-                                    } else {
-                                        create(item);
-                                    }
-                                    setShowModal(false);
-                                    setSelectedItem(null);
-                                }}
+                                onSuccess={handleSubmit}
                             />}
                     </main>
                     {ConfirmDialog}

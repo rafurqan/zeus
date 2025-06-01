@@ -1,45 +1,49 @@
-import { FaEdit, FaFilePdf, FaTrash } from "react-icons/fa";
-import { DocumentStudent } from "../types/document-student";
 import { Table, TableCell, TableHead, TableHeader, TableRow, TableBody } from "@/core/components/ui/table";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { StudentClass } from "../types/student-class";
 
 
 
 type Props = {
-    items: DocumentStudent[];
-    onDeleted: (item: DocumentStudent) => void;
-    onEdit: (item: DocumentStudent) => void;
+    items: StudentClass[];
+    onDeleted: (item: StudentClass) => void;
+    onEdit: (item: StudentClass) => void;
 };
 
-export default function TableDocument({ items, onDeleted, onEdit }: Props) {
+export default function StudentClassTable({ items, onDeleted, onEdit }: Props) {
     return (
         <div className="overflow-x-auto">
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Tipe Dokumen</TableHead>
                         <TableHead>Nama</TableHead>
-                        <TableHead>File</TableHead>
-                        <TableHead>Tanggal Dibuat</TableHead>
+                        <TableHead>Part</TableHead>
+                        <TableHead>Program</TableHead>
+                        <TableHead>Kapasitas</TableHead>
+                        <TableHead>Tahun Ajaran</TableHead>
+                        <TableHead>Guru</TableHead>
+                        <TableHead>Status</TableHead>
                         <TableHead>Aksi</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {items.map((item) => (
                         <TableRow key={item.id}>
-                            <TableCell>{item.document_type?.name}</TableCell>
                             <TableCell>{item.name}</TableCell>
-                            <TableCell>{(item.file !== "") ? (
-                                <div className="ml-2 mt-2 ">
-                                    <FaFilePdf className="w-6 h-6 text-red-500" />
-                                </div>
-                            ) : (
-                                <div className="ml-2 w-6 h-6" />  // Placeholder kosong untuk menjaga lebar tetap
-                            )}</TableCell>
-                            <TableCell>{item.created_at} {new Intl.DateTimeFormat('id-ID', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                            }).format(new Date(item.created_at ?? new Date()))}</TableCell>
+                            <TableCell>{item.part}</TableCell>
+                            <TableCell>{item.program?.name ?? ""}</TableCell>
+                            <TableCell>{item.capacity}</TableCell>
+                            <TableCell>{item.academic_year}</TableCell>
+                            <TableCell>{item.teacher?.name ?? ""}</TableCell>
+                            <TableCell>
+                                <span
+                                    className={`px-2 py-1 rounded-4xl text-xs font-bold ${item.status === "ACTIVE"
+                                        ? "bg-black text-white" : "bg-gray-200 text-gray-600"
+                                        }`}
+                                >
+                                    {item.status === "ACTIVE" ? "Aktif" : "Tidak Aktif"}
+                                </span>
+                            </TableCell>
                             <TableCell>
                                 <div className="px-4 py-2 space-x-2">
                                     <button
@@ -63,6 +67,5 @@ export default function TableDocument({ items, onDeleted, onEdit }: Props) {
                 </TableBody>
             </Table>
         </div>
-
     );
 }
