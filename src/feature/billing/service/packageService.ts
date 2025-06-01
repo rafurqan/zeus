@@ -31,7 +31,7 @@ export const packageService = {
 
   async remove(token: string, id: string): Promise<CreateRatePackageResponse> {
     const response = await http(token).delete(`master/rates-package/${id}`);
-    console.log(response.data);
+    // console.log(response.data);
     return response.data;
   },
 };

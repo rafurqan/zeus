@@ -1,4 +1,4 @@
-export interface packageRate  {
+export interface RatePackage  {
   id: string;
   code?: string; // Ditambahkan berdasarkan penggunaan di tabel
   nama_tarif: string;

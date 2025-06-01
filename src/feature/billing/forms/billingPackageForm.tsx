@@ -20,8 +20,8 @@ type BillingPackage = {
   child_ids: string[];
   discount: number;
   is_active: "Y" | "N";
-  child_ids?: string[]; // Tambahkan propert
   isActiveCheckbox?: boolean;
+  category: string;
 };
 
 type Props = {
@@ -211,7 +211,14 @@ export default function BillingPackageForm({ item = null, onClose, onSuccess }: 
           </div>
           <button onClick={onClose} className="text-gray-500 text-xl">×</button>
         </div>
-
+        {/* hidden category */}
+          <input 
+            type="hidden"
+            name="category"
+            value={form.category}
+            onChange={handleChange}
+          />
+        {/* end  */}
         <div className="space-y-4">
           <FormInput
             label={<>Nama Paket <span className="text-red-500">*</span></>}

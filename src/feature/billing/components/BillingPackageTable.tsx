@@ -83,7 +83,7 @@ export default function BillingPackageTable({ items, onDeleted, onEdit }: Props)
                                         ? JSON.parse(item.child_ids).length 
                                         : Array.isArray(item.child_ids) 
                                             ? item.child_ids.length 
-                                            : Object.keys(item.child_ids).length) 
+                                            : Object.keys(item.child_ids).length) + ' Item'
                                     : '-'}
                             </TableCell>
                             <TableCell>{new Intl.NumberFormat('id-ID', {
