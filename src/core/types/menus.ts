@@ -35,6 +35,9 @@ export const menus = [
     name: "Keuangan",
     icon: FaMoneyBill,
     path: "/finance",
-    children: [{ name: "Transaksi", path: "/finance/transactions" }],
+    children: [
+      { name: "Transaksi", path: "/finance/transactions" },
+      { name: "Tagihan", path: "/finance/billingData" },
+    ],
   },
 ];

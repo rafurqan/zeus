@@ -12,6 +12,8 @@ import TeacherPage from '@/feature/teacher/pages/teacherPage';
 import BillingPage from '@/feature/billing/pages/billingPage';
 import StudentClassPage from '@/feature/student/pages/studentClassPage';
 import ProgramPage from '@/feature/master/pages/programPage';
+import {BillingDataPage} from "@/feature/finance/pages/billingDataPage";
+import {CreateInvoiceForm} from "@/feature/finance/components/CreateInvoiceForm";
 
 
 const AppRoutes = () => {
@@ -49,7 +51,8 @@ const AppRoutes = () => {
           <Route path="students/prospective/create" element={<CreateProspectiveStudentsPage />} />
           <Route path="/students/classes" element={<StudentClassPage />} />
           <Route path="/students/program" element={<ProgramPage />} />
-
+          <Route path="finance/billingData" element={<BillingDataPage />} />
+          <Route path="finance/billingData/create" element={<CreateInvoiceForm />} />
         </Route>
       </Routes>
     </BrowserRouter>

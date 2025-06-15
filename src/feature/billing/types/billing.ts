@@ -1,4 +1,5 @@
 export type Billing = {
+  service_name: any;
   id: string;
   code?: string; // Ditambahkan berdasarkan penggunaan di tabel
   nama_tarif: string;

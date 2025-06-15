@@ -1,4 +1,6 @@
 export interface RatePackage  {
+  child_rates: boolean;
+  service_name: any;
   id: string;
   code?: string; // Ditambahkan berdasarkan penggunaan di tabel
   nama_tarif: string;
