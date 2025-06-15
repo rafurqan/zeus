@@ -10,10 +10,11 @@ import { packageService } from "@/feature/billing/service/packageService";
 import BaseLayout from "@/core/components/baseLayout";
 import { Billing } from "@/feature/billing/types/billing";
 import { RatePackage } from "@/feature/billing/types/ratePackage";
-import { Trash2 } from "lucide-react";
+import { Trash2, Search} from "lucide-react";
 import { useConfirm } from "@/core/components/confirmDialog";
 import { invoiceService } from "../service/invoiceService";
 import { useStudentClass } from "@/feature/student/hooks/useStudentClass";
+
 
 export const CreateInvoiceForm = () => {
   const { confirm, ConfirmDialog } = useConfirm();
@@ -42,9 +43,11 @@ export const CreateInvoiceForm = () => {
   const [itemFrequencies, setItemFrequencies] = useState<Record<number, number>>({});
   const [selectedPackages, setSelectedPackages] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [studentList, setStudentList] = useState<any[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = async () => {
       try {
         const [billingData, packageData] = await Promise.all([
           billingService.getAll(token),
@@ -60,22 +63,14 @@ export const CreateInvoiceForm = () => {
     fetchData();
   }, [token]);
 
-  useEffect(() => {
-    if (!token) return; // Tunggu sampai token siap
-  
-    const fetchInvoiceCode = async () => {
-      try {
-        const code = await invoiceService.generateInvoiceCode(token);
-        console.log("Generated invoice code:", code);
-        setForm((prev) => ({ ...prev, invoice_number: code }));
-      } catch (error) {
-        console.error("Gagal generate invoice code", error);
-      }
-    };
-  
-    fetchInvoiceCode();
-  }, [token]);
-  
+  const fetchStudents = async (keyword: string) => {
+    try {
+      const students = await invoiceService.getStudents(token, keyword);
+      setStudentList(students);
+    } catch (error) {
+      console.error("Gagal fetch student", error);
+    }
+  };
 
   // add item tagihan
   const handleAddPackage = (pkg: RatePackage) => {
@@ -250,6 +245,7 @@ export const CreateInvoiceForm = () => {
             <FormInput 
               name="invoice_number"
               label="Nomor Invoice" 
+              placeholder="Akan di generate secara otomatis"
               value={form.invoice_number} 
               disabled 
             />
@@ -257,9 +253,9 @@ export const CreateInvoiceForm = () => {
             <div className="flex gap-4">
               <label className="text-sm font-medium">Tipe Siswa</label>
               {[
-                { label: "Semua", value: "" },
-                { label: "Siswa", value: "siswa" },
-                { label: "Calon Siswa", value: "calon_siswa" }
+                { label: "Semua", value: "1" },
+                { label: "Siswa", value: "2" },
+                { label: "Calon Siswa", value: "3" }
               ].map(opt => (
                 <label key={opt.value} className="flex items-center gap-2">
                   <input
@@ -286,12 +282,56 @@ export const CreateInvoiceForm = () => {
                 disabled={classesLoading}
               />
 
-            <FormInput 
-              label="Cari Siswa (NIS/Nama)" 
-              placeholder="Cari berdasarkan NIS atau nama" 
-              value={form.student_name} 
-              onChange={(e) => setForm({ ...form, student_name: e.target.value })} 
-            />
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Cari Siswa (NIS/Nama)
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                  <Search size={16} />
+                </span>
+                <input
+                  type="text"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  placeholder="Cari berdasarkan NIS atau nama"
+                  value={form.student_name}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setForm({ ...form, student_name: value });
+                    if (value.length >= 2) {
+                      fetchStudents(value);
+                      setShowDropdown(true);
+                    } else {
+                      setShowDropdown(false);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Dropdown */}
+              {showDropdown && studentList.length > 0 && (
+                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded shadow mt-1 max-h-60 overflow-y-auto">
+                  {studentList.map((student) => (
+                    <li
+                      key={student.id}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setForm({
+                          ...form,
+                          student_name: student.full_name,
+                          entity_id: student.id,
+                          entity_type: "student",
+                        });
+                        setShowDropdown(false);
+                      }}
+                    >
+                      {student.full_name} ({student.registration_code})
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
 
             <FormSelect
               label="Jenis Tagihan"
@@ -299,9 +339,9 @@ export const CreateInvoiceForm = () => {
               value={form.invoice_type}
               onChange={handleChange}
               options={[
-                { label: "Satu Kali", value: "satu_kali" },
-                { label: "Per Semester", value: "per_semester" },
-                { label: "Tahunan", value: "tahunan" }
+                { label: "Satu Kali", value: "1" },
+                { label: "Per Semester", value: "2" },
+                { label: "Tahunan", value: "3" }
               ]}
             />
 
@@ -320,12 +360,15 @@ export const CreateInvoiceForm = () => {
               />
             </div>
 
-            <FormInput 
-              label="Catatan (Opsional)" 
-              placeholder="Masukkan catatan tambahan untuk invoice ini" 
-              value={form.notes} 
-              onChange={(e) => setForm({ ...form, notes: e.target.value })} 
-            />
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium">Catatan (Opsional)</label>
+              <textarea
+                className="min-h-[100px] w-full rounded-md border border-gray-300 p-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                placeholder="Masukkan catatan tambahan untuk invoice ini"
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              />
+            </div>
           </div>
 
           {/* Kanan: Item Tagihan */}

@@ -8,7 +8,7 @@ import {
 export const invoiceService = {
   async getAll(token: string): Promise<Invoice[]> {
     const response = await http(token).get("finance/invoices");
-    // console.log(response.data.data);
+    console.log(response.data.data);
     return response.data.data;
   },
 
@@ -18,6 +18,18 @@ export const invoiceService = {
     // console.log(response.data.data.invoice_code);
     return response.data.data.invoice_code;
   },
+
+  async getStudents(token: string, keyword = "", perPage = 10): Promise<any[]> {
+    const response = await http(token).get("students", {
+      params: {
+        keyword,
+        per_page: perPage,
+      },
+    });
+  
+    return response.data.data; // sesuai struktur di BE kamu (pakai ResponseFormatter)
+  },
+  
 
   async create(token: string, data: Invoice): Promise<createInvoice> {
     const response = await http(token).post<createInvoice>(
