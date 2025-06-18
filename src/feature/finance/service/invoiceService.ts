@@ -12,6 +12,11 @@ export const invoiceService = {
     return response.data.data;
   },
 
+  async showDataById(id: string, token: string): Promise<Invoice> {
+    const response = await http(token).get(`finance/invoices/${id}`);
+    return response.data.data;
+  },
+
   async generateInvoiceCode(token: string): Promise<string> {
     // console.log(token);
     const response = await http(token).get("finance/invoices/generate-invoice-code");

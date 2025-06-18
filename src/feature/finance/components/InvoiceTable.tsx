@@ -1,10 +1,40 @@
 import { Invoice } from "../types/invoice";
+import { invoiceService } from "../service/invoiceService";
+import { useContext } from "react";
+import { AppContext } from "@/context/AppContext";
+import { useNavigate } from "react-router-dom";
+import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+
 
 interface InvoiceTableProps {
   invoices: Invoice[];
+  onDelete?: () => void;
 }
 
-export const InvoiceTable = ({ invoices }: InvoiceTableProps) => {
+export const InvoiceTable = ({ invoices, onDelete }: InvoiceTableProps) => {
+  const { token } = useContext(AppContext);
+  const navigate = useNavigate();
+
+  const handleDelete = async (id: string) => {
+    if (!token) return;
+    
+    if (window.confirm('Apakah Anda yakin ingin menghapus faktur ini?')) {
+      try {
+        await invoiceService.remove(token, id);
+        if (onDelete) {
+          onDelete(); // Refresh data setelah berhasil hapus
+        }
+      } catch (error) {
+        console.error('Error deleting invoice:', error);
+        alert('Gagal menghapus faktur');
+      }
+    }
+  };
+
+  const handleEdit = (id: string) => {
+    navigate(`/finance/billingData/create?id=${id}`);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Lunas":
@@ -80,7 +110,26 @@ export const InvoiceTable = ({ invoices }: InvoiceTableProps) => {
                 })}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-                {/* Aksi buttons */}
+                <div className="flex space-x-2">
+                  <button
+                        className="text-black-600 hover:text-black-800"
+                        onClick={() => handleEdit(invoice.id)}
+                  >
+                  <FaEye />
+                  </button>
+                  <button
+                        className="text-blue-600 hover:text-blue-800"
+                        onClick={() => handleEdit(invoice.id)}
+                  >
+                  <FaEdit />
+                  </button>
+                  <button
+                        className="text-red-600 hover:text-red-800"
+                        onClick={() => handleDelete(invoice.id)}
+                  >
+                  <FaTrash />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

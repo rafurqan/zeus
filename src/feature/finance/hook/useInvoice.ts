@@ -41,6 +41,7 @@ export const useInvoice = () => {
 
   return {
     invoices: filteredInvoices,
+    originalInvoices: invoices,
     loading,
     error,
     searchTerm,

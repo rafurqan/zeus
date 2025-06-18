@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppContext } from "@/context/AppContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/core/components/ui/tabs";
 import { FormInput } from "@/core/components/forms/formInput";
@@ -14,12 +14,16 @@ import { Trash2, Search} from "lucide-react";
 import { useConfirm } from "@/core/components/confirmDialog";
 import { invoiceService } from "../service/invoiceService";
 import { useStudentClass } from "@/feature/student/hooks/useStudentClass";
+import ConfirmDialog from "@/core/components/confirmDialog";
 
 
 export const CreateInvoiceForm = () => {
   const { confirm, ConfirmDialog } = useConfirm();
-  const { token, setUser, setToken } = useContext(AppContext);
+  const { token } = useContext(AppContext);
   const { data: classes = [], loading: classesLoading } = useStudentClass();
+  const [searchParams] = useSearchParams();
+  const invoiceId = searchParams.get('id');
+  // const navigate = useNavigate();
   const [form, setForm] = useState({
     invoice_number: "",
     student_name: "",
@@ -206,36 +210,115 @@ export const CreateInvoiceForm = () => {
     });
   };
 
-  const handleSubmit = async () => {
-    try {
-      const isConfirmed = await confirm({
-        title: "Konfirmasi Simpan",
-        message: "Apakah Anda yakin ingin menyimpan invoice ini?",
-        confirmText: "Ya, Simpan",
-        cancelText: "Batal",
-      });
-
-      if (isConfirmed) {
-        await invoiceService.create(token, form);
-        navigate("/finance/billingData");
+  // Tambahkan useEffect untuk memuat data invoice jika ada ID
+  useEffect(() => {
+    const fetchInvoiceData = async () => {
+      if (invoiceId && token) {
+        try {
+          const invoiceData = await invoiceService.showDataById(invoiceId, token);
+          if (invoiceData) {
+            const formatDate = (dateString: string | null) => {
+              if (!dateString) return "";
+              return dateString.split(' ')[0];
+            };
+  
+            // Rebuild selected_items from invoice.items
+            const selectedItemsFromItems = invoiceData.items.map(item => ({
+              id: item.rate.id, // for React key
+              rate_id: item.rate.id,
+              service_id: item.rate.service.id,
+              service_name: item.rate.service.name,
+              category: item.rate.category,
+              description: item.rate.description,
+              price: item.amount_rate,
+              frequency: item.frequency,
+            }));
+  
+            setForm({
+              ...form,
+              invoice_number: invoiceData.code,
+              student_name: invoiceData.entity?.full_name || "",
+              class: invoiceData.student_class?.id || "",
+              class_name: invoiceData.student_class?.name || "",
+              issue_date: formatDate(invoiceData.publication_date),
+              due_date: formatDate(invoiceData.due_date),
+              notes: invoiceData.notes || "",
+              student_type: invoiceData.entity_type || "",
+              invoice_type: "",
+              selected_items: selectedItemsFromItems,
+            });
+  
+            // Set item frequencies dari items
+            const frequencies: Record<string, number> = {};
+            invoiceData.items.forEach(item => {
+              if (item.rate_id) {
+                frequencies[item.rate_id] = item.frequency;
+              }
+            });
+            setItemFrequencies(frequencies);
+  
+            // Set added item IDs
+            const itemIds = invoiceData.items.map(item => item.rate_id);
+            setAddedItemIds(itemIds);
+          }
+        } catch (error) {
+          console.error("Gagal memuat data invoice:", error);
+          alert("Gagal memuat data invoice");
+        }
       }
-    } catch (error) {
-      console.error("Gagal menyimpan invoice:", error);
-      await confirm({
-        title: "Error",
-        message: "Gagal menyimpan invoice. Silakan periksa data Anda dan coba lagi.",
-        confirmText: "OK",
-        cancelText: "",
+    };
+  
+    fetchInvoiceData();
+  }, [invoiceId, token]);  
+
+  // Modifikasi handleSubmit yang sudah ada untuk menangani update
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    if (invoiceId) {
+      // Update existing invoice
+      await invoiceService.update(token, {
+        id: invoiceId,
+        ...form
       });
-      // Form tidak direset, jadi user bisa memperbaiki data dan mencoba submit lagi
+      confirm({
+        title: "Success",
+        message: "Invoice Berhasil Diupdate!",
+        confirmText: "OK",
+        showCancel: false,
+      });
+      setTimeout(() => {
+        navigate('/finance/billingData');
+      }, 1000);
+    } else {
+      // Create new invoice
+      await invoiceService.create(token, form);
+      confirm({
+        title: "Success", 
+        message: "Invoice Berhasil Dibuat!",
+        confirmText: "OK",
+        showCancel: false,
+      });
+      setTimeout(() => {
+        navigate('/finance/billingData');
+      }, 1000);
     }
-  };
+  } catch (error) {
+    console.error("Gagal menyimpan invoice:", error);
+    await confirm({
+      title: "Error",
+      message: "Failed to save invoice. Please try again.",
+      confirmText: "OK",
+      showCancel: false,
+    });
+  }
+};
 
   return (
     <BaseLayout>
       <div className="p-6 flex flex-col gap-6">
         <div>
-          <h2 className="text-2xl font-bold">Buat Invoice Baru</h2>
+          <h2 className="text-2xl font-bold">{invoiceId ? 'Edit Invoice' : 'Buat Invoice Baru'}</h2>
           <p className="text-gray-500">Masukkan informasi dasar untuk invoice ini</p>
         </div>
 
@@ -339,10 +422,13 @@ export const CreateInvoiceForm = () => {
               value={form.invoice_type}
               onChange={handleChange}
               options={[
-                { label: "Satu Kali", value: "1" },
-                { label: "Per Semester", value: "2" },
-                { label: "Tahunan", value: "3" }
-              ]}
+                { label: "Satu Kali", value: "1", selected: form.invoice_type === "1" },
+                { label: "Per Semester", value: "2", selected: form.invoice_type === "2" },
+                { label: "Tahunan", value: "3", selected: form.invoice_type === "3" }
+              ].map(option => ({
+                ...option,
+                selected: option.value === form.invoice_type
+              }))}
             />
 
             <div className="grid grid-cols-2 gap-4">
@@ -525,7 +611,7 @@ export const CreateInvoiceForm = () => {
             className="px-4 py-2 bg-black text-white rounded disabled:opacity-50"
             onClick={handleSubmit}
           >
-            Simpan Invoice
+            {invoiceId ? 'Update Invoice' : 'Simpan Invoice'}
           </Button>
         </div>
       </div>

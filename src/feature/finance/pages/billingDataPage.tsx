@@ -7,13 +7,26 @@ import { useState } from "react";
 
 export const BillingDataPage = () => {
   const navigate = useNavigate();
-  const { invoices, searchTerm, setSearchTerm } = useInvoice();
+  // const { invoices, searchTerm, setSearchTerm, selectedStatus, setSelectedStatus } = useInvoice();
+  const { invoices, originalInvoices, searchTerm, setSearchTerm, selectedStatus, setSelectedStatus } = useInvoice();
 
+  // Gunakan data invoices asli untuk perhitungan statistik
   const stats = {
-    total: invoices.length,
-    pending: invoices.filter((i) => i.status === "Menunggu Pembayaran").length,
-    late: invoices.filter((i) => i.status === "Terlambat").length,
-    paid: invoices.filter((i) => i.status === "Lunas").length,
+    total: originalInvoices?.length || 0,
+    pending: originalInvoices?.filter((i) => i.status === "Menunggu Pembayaran").length || 0,
+    late: originalInvoices?.filter((i) => i.status === "Terlambat").length || 0,
+    paid: originalInvoices?.filter((i) => i.status === "Lunas").length || 0,
+  };
+
+  // Hitung total amount menggunakan data asli
+  const totalAmount = originalInvoices?.reduce((sum, i) => sum + i.total, 0) || 0;
+  const pendingAmount = originalInvoices?.filter(i => i.status === "Menunggu Pembayaran").reduce((sum, i) => sum + i.amount, 0) || 0;
+  const lateAmount = originalInvoices?.filter(i => i.status === "Terlambat").reduce((sum, i) => sum + i.amount, 0) || 0;
+  const paidAmount = originalInvoices?.filter(i => i.status === "Lunas").reduce((sum, i) => sum + i.amount, 0) || 0;
+
+  const handleDelete = () => {
+    // Ini akan memanggil fetchInvoices lagi dari useInvoice
+    window.location.reload();
   };
 
   return (
@@ -41,22 +54,22 @@ export const BillingDataPage = () => {
           <div className="bg-white p-4 rounded-lg shadow">
             <div className="text-sm text-black-500">Total Faktur</div>
             <div className="text-2xl font-bold">{stats.total}</div>
-            <div className="text-sm text-black-500">Rp {invoices.reduce((sum, i) => sum + i.total, 0).toLocaleString()}</div>
+            <div className="text-sm text-black-500">Rp {totalAmount.toLocaleString()}</div>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
             <div className="text-sm text-black-500">Menunggu Pembayaran</div>
             <div className="text-2xl font-bold">{stats.pending}</div>
-            <div className="text-sm text-black-500">Rp {invoices.filter(i => i.status === "Menunggu Pembayaran").reduce((sum, i) => sum + i.amount, 0).toLocaleString()}</div>
+            <div className="text-sm text-black-500">Rp {pendingAmount.toLocaleString()}</div>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
             <div className="text-sm text-black-500">Terlambat</div>
             <div className="text-2xl font-bold">{stats.late}</div>
-            <div className="text-sm text-black-500">Rp {invoices.filter(i => i.status === "Terlambat").reduce((sum, i) => sum + i.amount, 0).toLocaleString()}</div>
+            <div className="text-sm text-black-500">Rp {lateAmount.toLocaleString()}</div>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
             <div className="text-sm text-black-500">Lunas</div>
             <div className="text-2xl font-bold">{stats.paid}</div>
-            <div className="text-sm text-black-500">Rp {invoices.filter(i => i.status === "Lunas").reduce((sum, i) => sum + i.amount, 0).toLocaleString()}</div>
+            <div className="text-sm text-black-500">Rp {paidAmount.toLocaleString()}</div>
           </div>
         </div>
 
@@ -92,7 +105,7 @@ export const BillingDataPage = () => {
             </div>
           </div>
 
-          <InvoiceTable invoices={invoices} />
+          <InvoiceTable invoices={invoices} onDelete={handleDelete} />
         </div>
       </div>
     </BaseLayout>
