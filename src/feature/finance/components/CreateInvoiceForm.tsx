@@ -32,7 +32,7 @@ export const CreateInvoiceForm = () => {
     issue_date: "",
     due_date: "",
     notes: "",
-    student_type: "",
+    // student_type: "",
     invoice_type: "",
     selected_items: [] as Billing[],
   });
@@ -244,7 +244,7 @@ export const CreateInvoiceForm = () => {
               due_date: formatDate(invoiceData.due_date),
               notes: invoiceData.notes || "",
               student_type: invoiceData.entity_type || "",
-              invoice_type: "",
+              invoice_type: invoiceData.invoice_type || "",
               selected_items: selectedItemsFromItems,
             });
   
@@ -333,7 +333,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               disabled 
             />
 
-            <div className="flex gap-4">
+            {/* <div className="flex gap-4">
               <label className="text-sm font-medium">Tipe Siswa</label>
               {[
                 { label: "Semua", value: "1" },
@@ -351,7 +351,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   <span className="text-sm">{opt.label}</span>
                 </label>
               ))}
-            </div>
+            </div> */}
 
             <FormSelect
                 label="Kelas"

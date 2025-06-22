@@ -2,30 +2,44 @@ import { useInvoice } from "../hook/useInvoice";
 import { InvoiceTable } from "../components/InvoiceTable";
 import BaseLayout from "@/core/components/baseLayout";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-
+import { useState, useEffect, useContext } from "react";
+import { AppContext } from "@/context/AppContext";
+import { invoiceService } from "../service/invoiceService";
 
 export const BillingDataPage = () => {
   const navigate = useNavigate();
-  // const { invoices, searchTerm, setSearchTerm, selectedStatus, setSelectedStatus } = useInvoice();
-  const { invoices, originalInvoices, searchTerm, setSearchTerm, selectedStatus, setSelectedStatus } = useInvoice();
+  const { token } = useContext(AppContext);
+  const {
+    invoices,
+    originalInvoices,
+    searchTerm,
+    setSearchTerm,
+    selectedStatus,
+    setSelectedStatus,
+    page,
+    setPage,
+    lastPage,
+  } = useInvoice();  
 
-  // Gunakan data invoices asli untuk perhitungan statistik
-  const stats = {
-    total: originalInvoices?.length || 0,
-    pending: originalInvoices?.filter((i) => i.status === "Menunggu Pembayaran").length || 0,
-    late: originalInvoices?.filter((i) => i.status === "Terlambat").length || 0,
-    paid: originalInvoices?.filter((i) => i.status === "Lunas").length || 0,
-  };
+  const [statistics, setStatistics] = useState({
+    total: { count: 0, amount: 0 },
+    per_status: [
+      { status: "Menunggu Pembayaran", count: 0, amount: 0 },
+      { status: "Terlambat", count: 0, amount: 0 },
+      { status: "Lunas", count: 0, amount: 0 }
+    ]
+  });
 
-  // Hitung total amount menggunakan data asli
-  const totalAmount = originalInvoices?.reduce((sum, i) => sum + i.total, 0) || 0;
-  const pendingAmount = originalInvoices?.filter(i => i.status === "Menunggu Pembayaran").reduce((sum, i) => sum + i.amount, 0) || 0;
-  const lateAmount = originalInvoices?.filter(i => i.status === "Terlambat").reduce((sum, i) => sum + i.amount, 0) || 0;
-  const paidAmount = originalInvoices?.filter(i => i.status === "Lunas").reduce((sum, i) => sum + i.amount, 0) || 0;
+  useEffect(() => {
+    if (!token) return;
+    invoiceService.getStatistics(token).then(res => {
+      setStatistics(res);
+    });
+  }, [token]);
+
+  const getStatusStat = (status) => statistics.per_status.find(s => s.status === status) || { count: 0, amount: 0 };
 
   const handleDelete = () => {
-    // Ini akan memanggil fetchInvoices lagi dari useInvoice
     window.location.reload();
   };
 
@@ -53,23 +67,23 @@ export const BillingDataPage = () => {
         <div className="grid grid-cols-4 gap-4 mb-6">
           <div className="bg-white p-4 rounded-lg shadow">
             <div className="text-sm text-black-500">Total Faktur</div>
-            <div className="text-2xl font-bold">{stats.total}</div>
-            <div className="text-sm text-black-500">Rp {totalAmount.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{statistics.total.count}</div>
+            <div className="text-sm text-black-500">Rp {statistics.total.amount.toLocaleString()}</div>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
             <div className="text-sm text-black-500">Menunggu Pembayaran</div>
-            <div className="text-2xl font-bold">{stats.pending}</div>
-            <div className="text-sm text-black-500">Rp {pendingAmount.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{getStatusStat("Menunggu Pembayaran").count}</div>
+            <div className="text-sm text-black-500">Rp {getStatusStat("Menunggu Pembayaran").amount.toLocaleString()}</div>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
             <div className="text-sm text-black-500">Terlambat</div>
-            <div className="text-2xl font-bold">{stats.late}</div>
-            <div className="text-sm text-black-500">Rp {lateAmount.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{getStatusStat("Terlambat").count}</div>
+            <div className="text-sm text-black-500">Rp {getStatusStat("Terlambat").amount.toLocaleString()}</div>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
             <div className="text-sm text-black-500">Lunas</div>
-            <div className="text-2xl font-bold">{stats.paid}</div>
-            <div className="text-sm text-black-500">Rp {paidAmount.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{getStatusStat("Lunas").count}</div>
+            <div className="text-sm text-black-500">Rp {getStatusStat("Lunas").amount.toLocaleString()}</div>
           </div>
         </div>
 
@@ -79,33 +93,13 @@ export const BillingDataPage = () => {
             <p className="text-sm text-black-500">Kelola semua faktur siswa di sini</p>
           </div>
 
-          <div className="flex justify-between items-center mb-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Cari faktur, siswa, atau deskripsi..."
-                className="w-389 pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <div className="absolute left-3 top-2.5">
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </div>
-
-            <div className="relative inline-block text-left">
-              <button className="px-4 py-2 bg-white text-black-700 border border-black-300 rounded-md shadow-sm hover:bg-black-50 flex items-center">
-                Semua Status
-                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <InvoiceTable invoices={invoices} onDelete={handleDelete} />
+          <InvoiceTable 
+            invoices={invoices} 
+            onDelete={handleDelete} 
+            page={page} 
+            setPage={setPage} 
+            lastPage={lastPage}
+          />
         </div>
       </div>
     </BaseLayout>

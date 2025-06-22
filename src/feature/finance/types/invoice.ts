@@ -11,6 +11,7 @@ export type Invoice = {
   notes: string;
   status: InvoiceStatus;
   total: number;
+  invoice_type: string;
   delivered_wa: boolean;
   created_at: Date;
   created_by_id: string;

@@ -14,6 +14,7 @@ import StudentClassPage from '@/feature/student/pages/studentClassPage';
 import ProgramPage from '@/feature/master/pages/programPage';
 import {BillingDataPage} from "@/feature/finance/pages/billingDataPage";
 import {CreateInvoiceForm} from "@/feature/finance/components/CreateInvoiceForm";
+import InvoiceDetailPage from "@/feature/finance/pages/invoiceDetailPage";
 
 
 const AppRoutes = () => {
@@ -53,6 +54,7 @@ const AppRoutes = () => {
           <Route path="/students/program" element={<ProgramPage />} />
           <Route path="finance/billingData" element={<BillingDataPage />} />
           <Route path="finance/billingData/create" element={<CreateInvoiceForm />} />
+          <Route path="finance/billingData/detail/:id" element={<InvoiceDetailPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
