@@ -317,6 +317,12 @@ const handleSubmit = async (e: React.FormEvent) => {
   return (
     <BaseLayout>
       <div className="p-6 flex flex-col gap-6">
+        <div
+          onClick={() => navigate(-1)}
+          className="text-sm text-gray-500 cursor-pointer mb-2 hover:underline"
+        >
+          &larr; Kembali
+        </div>
         <div>
           <h2 className="text-2xl font-bold">{invoiceId ? 'Edit Invoice' : 'Buat Invoice Baru'}</h2>
           <p className="text-gray-500">Masukkan informasi dasar untuk invoice ini</p>
