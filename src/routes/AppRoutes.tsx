@@ -12,12 +12,13 @@ import TeacherPage from '@/feature/teacher/pages/teacherPage';
 import BillingPage from '@/feature/billing/pages/billingPage';
 import StudentClassPage from '@/feature/student/pages/studentClassPage';
 import ProgramPage from '@/feature/master/pages/programPage';
-import {BillingDataPage} from "@/feature/finance/pages/billingDataPage";
-import {CreateInvoiceForm} from "@/feature/finance/components/CreateInvoiceForm";
-import InvoiceDetailPage from "@/feature/finance/pages/invoiceDetailPage";
+import { BillingDataPage } from "@/feature/finance/pages/billingDataPage";
+import { CreateInvoiceForm } from "@/feature/finance/components/CreateInvoiceForm";
+import InvoiceDetailPage from '@/feature/finance/pages/InvoiceDetailPage';
 import StudentsPage from '@/feature/student/pages/studentPage';
 import StudentDetailPage from '@/feature/student/pages/viewStudentPage';
 import UpdateStudentPage from '@/feature/student/pages/updateStudentPage';
+
 
 
 const AppRoutes = () => {
