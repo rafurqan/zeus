@@ -122,7 +122,7 @@ export default function StudentDocumentForm({
                     />
                     <PdfUploadWithPreview
                         label="Upload Dokumen PDF"
-                        fileUrl={(form.file_name ?? "") !== "" ? (form.file_name ?? "") : (form.file ?? "") !== "" ? form.file : ""}
+                        fileUrl={((form.file_name ?? "") !== "" ? (form.file_name ?? "") : (form.file ?? "") !== "" ? form.file : "") ?? ""}
                         onChange={handleFileChange}
                     />
 

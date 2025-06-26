@@ -2,8 +2,8 @@ import { JSX } from "react"
 
 type FormInputProps = {
     label: string | JSX.Element
-    name: string
-    value: string | number
+    name: string | null
+    value: string | number | null
     type?: string
     placeholder?: string
     disabled?: boolean
@@ -25,8 +25,8 @@ export const FormInput = ({
     <div>
         <label className={labelClass}>{label}</label>
         <input
-            name={name}
-            value={value}
+            name={name ?? ""}
+            value={value ?? ""}
             onChange={onChange}
             type={type}
             placeholder={placeholder}
