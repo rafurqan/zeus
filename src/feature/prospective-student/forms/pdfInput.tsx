@@ -3,19 +3,18 @@ import { FilePlus, FileCheck } from "lucide-react";
 
 interface Props {
     label?: string;
-    fileUrl?: string; // untuk edit, file URL dari API
-    onChange: (base64: string) => void; // Pastikan menerima string (bukan string | null)
+    fileUrl?: string;
+    onChange: (base64: string) => void;
 }
 
 const PdfUploadWithPreview: React.FC<Props> = ({ label = "Upload PDF", fileUrl, onChange }) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [fileBase64, setFileBase64] = useState<string>(""); // Ganti dengan string kosong
+    const [fileBase64, setFileBase64] = useState<string>("");
 
     useEffect(() => {
         if (fileUrl) {
-            // Jika sudah ada file URL (misalnya edit form), tampilkan ikon check
-            setFileBase64(fileUrl); // Kirimkan URL ke base64 sebagai string
+            setFileBase64(fileUrl);
         }
     }, [fileUrl]);
 
@@ -29,7 +28,7 @@ const PdfUploadWithPreview: React.FC<Props> = ({ label = "Upload PDF", fileUrl, 
             reader.onloadend = () => {
                 const base64 = reader.result as string;
                 setFileBase64(base64);
-                onChange(base64); // Pastikan mengirimkan string
+                onChange(base64);
             };
             reader.readAsDataURL(file);
         } else {
