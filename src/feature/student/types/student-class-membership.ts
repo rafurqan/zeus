@@ -8,6 +8,9 @@ export type ClassMembership = {
   nisn: string;
   type: "student" | "prospective_student" | string;
   active_class: StudentClass | null;
+  start_at: string | null;
+  end_at: string | null;
+  student_class: StudentClass | null;
 };
 
 export type ClassMembershipResponse = {

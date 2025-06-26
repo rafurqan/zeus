@@ -86,7 +86,7 @@ export default function ChangeClassMembershipForm({
                         name="id"
                         value={form.id ?? ''}
                         onChange={handleChange}
-                        options={data.filter((value) => value.id !== item?.active_class?.id).map((value) => ({ label: `${value.name} ${value.part} - ${value.teacher?.name ?? ""}`, value: value.id }))}
+                        options={data.filter((value) => value.id !== item?.active_class?.id).map((value) => ({ label: `${value.name} ${value.part} (${value.academic_year}) - ${value.teacher?.name ?? ""}`, value: value.id }))}
                     />
 
                     <FormInput

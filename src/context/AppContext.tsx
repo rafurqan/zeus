@@ -8,6 +8,8 @@ import {
   SetStateAction,
 } from 'react';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 // Konteks untuk AppContext
 interface AppContextType {
@@ -21,17 +23,18 @@ interface AppContextType {
 
 export const AppContext = createContext<AppContextType>({
   user: null,
-  setUser: () => { },
+  setUser: () => {},
   token: null,
-  setToken: () => { },
+  setToken: () => {},
   loading: true,
-  setLoading: () => { },
+  setLoading: () => {},
 });
 
-// Props untuk AppProvider
 interface AppProviderProps {
   children: ReactNode;
 }
+
+const queryClient = new QueryClient(); // React Query client
 
 export default function AppProvider({ children }: AppProviderProps) {
   const [user, setUser] = useState<User | null>(null);
@@ -61,8 +64,13 @@ export default function AppProvider({ children }: AppProviderProps) {
   }, [user, token]);
 
   return (
-    <AppContext.Provider value={{ user, setUser, token, setToken, loading, setLoading }}>
-      {children}
-    </AppContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <AppContext.Provider
+        value={{ user, setUser, token, setToken, loading, setLoading }}
+      >
+        {children}
+      </AppContext.Provider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }

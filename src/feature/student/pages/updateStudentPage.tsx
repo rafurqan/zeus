@@ -3,18 +3,11 @@ import BaseLayout from "@/core/components/baseLayout";
 import { AppContext } from "@/context/AppContext";
 import { MasterData } from "@/core/types/master-data";
 import { useContext, useEffect, useRef, useState } from "react";
-import { ProspectiveStudent } from "../types/prospective-student";
 import { Camera, Plus } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
-import { DocumentStudent } from "../types/document-student";
-import TableDocument from "../components/documentTable";
-import StudentDocumentForm from "../forms/document";
-import StudentParentForm from "../forms/parent";
-import { Parent } from "../types/parent";
-import ParentTable from "../components/parentTable";
 import { useConfirm } from "@/core/components/confirmDialog";
 import { AxiosError } from "axios";
-import { createProspectiveStudent, updateProspectiveStudent } from "@/feature/prospective-student/service/prospectiveStudentService";
+import { updateStudent } from "@/feature/prospective-student/service/prospectiveStudentService";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FormSelect } from "@/core/components/forms/formSelect";
 import { FormInput } from "@/core/components/forms/formInput";
@@ -23,19 +16,27 @@ import { City } from "@/core/types/city";
 import { Village } from "@/core/types/village";
 import { SubDistrict } from "@/core/types/sub-district";
 import LoadingOverlay from "@/core/components/ui/loading_screen";
-import TableOriginSchool from "../components/originSchoolTable";
-import StudentOriginSchoolForm from "../forms/originSchool";
-import { OriginSchool } from "../types/origin-school";
-import { useGetRegistrationCode } from "../hooks/useGetRegistrationCode";
+import { useGetRegistrationCode } from "@/feature/prospective-student/hooks/useGetRegistrationCode";
+import { DocumentStudent } from "@/feature/prospective-student/types/document-student";
+import { OriginSchool } from "@/feature/prospective-student/types/origin-school";
+import { Parent } from "@/feature/prospective-student/types/parent";
+import { Student } from "../types/student";
+import TableOriginSchool from "@/feature/prospective-student/components/originSchoolTable";
+import TableDocument from "@/feature/prospective-student/components/documentTable";
+import StudentDocumentForm from "@/feature/prospective-student/forms/document";
+import ParentTable from "@/feature/prospective-student/components/parentTable";
+import StudentParentForm from "@/feature/prospective-student/forms/parent";
+import StudentOriginSchoolForm from "@/feature/prospective-student/forms/originSchool";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/core/components/ui/tabs";
 
 
 
-export default function CreateProspectiveStudentsPage() {
+export default function UpdateStudentPage() {
     const location = useLocation();
     const { item } = location.state || {};
     const isEdit = !!item;
     const navigate = useNavigate();
+
     const { token, setUser } = useContext(AppContext);
     const { confirm, ConfirmDialog } = useConfirm();
     const [religionTypes, setReligionTypes] = useState<MasterData[]>([]);
@@ -66,7 +67,7 @@ export default function CreateProspectiveStudentsPage() {
 
 
 
-    const [form, setForm] = useState<ProspectiveStudent>(item || {
+    const [form, setForm] = useState<Student>(item || {
         id: "",
         additional_information: "",
         full_name: "",
@@ -441,7 +442,7 @@ export default function CreateProspectiveStudentsPage() {
     const handleSubmit = async () => {
         const isConfirmed = await confirm({
             title: "Submit Data",
-            message: `Apakah Anda yakin ingin menambahkan calon siswa ini?`,
+            message: `Apakah Anda yakin ingin menambahkan siswa ini?`,
             confirmText: "Ya, Lanjutkan",
             cancelText: "Batal",
         });
@@ -449,13 +450,13 @@ export default function CreateProspectiveStudentsPage() {
             setLoading(true);
             try {
 
-                const response = !isEdit ? await createProspectiveStudent(form) : await updateProspectiveStudent(form);
+                const response = await updateStudent(form);
 
                 if (!response.data) {
                     throw new Error("Gagal simpan data");
                 }
 
-                navigate("/students/prospective");
+                navigate("/students/student");
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     console.log("Fetch failed", error.response?.data.message);
@@ -479,10 +480,10 @@ export default function CreateProspectiveStudentsPage() {
                             />}
                         <div className="flex justify-between items-center mb-4">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-2xl font-bold">Buat Calon Siswa</h2>
+                                <h2 className="text-2xl font-bold">{isEdit ? "Perbarui Siswa" : "Buat Siswa"}</h2>
                             </div>
                             <Button onClick={handleSubmit} disabled={loading} className="flex items-center gap-1 bg-black hover:bg-gray-800 text-white">
-                                <span>{isEdit ? "Perbarui Calon Siswa" : "Tambah Calon Siswa"}</span>
+                                <span>{isEdit ? "Perbarui Siswa" : "Tambah Siswa"}</span>
                                 {!isEdit && (
                                     <Plus className="h-4 w-4" />
                                 )}
@@ -503,6 +504,7 @@ export default function CreateProspectiveStudentsPage() {
                                     <h2 className="font-bold">Informasi Data Diri</h2>
                                 </div>
                                 <div className="bg-white p-6">
+
                                     <div className="mb-4">
                                         <FormInput
                                             label={"Kode Registrasi"}
@@ -855,7 +857,7 @@ export default function CreateProspectiveStudentsPage() {
                                     </div>
 
                                     <TableDocument
-                                        items={form.documents}
+                                        items={form.documents ?? []}
                                         onDeleted={handleRemoveDocument}
                                         onEdit={(item) => {
                                             setSelectedItem(item);
@@ -925,8 +927,6 @@ export default function CreateProspectiveStudentsPage() {
 
                                 </div>
                             </TabsContent>
-
-
                         </Tabs>
 
 
