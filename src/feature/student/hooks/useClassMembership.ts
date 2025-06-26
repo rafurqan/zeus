@@ -23,7 +23,6 @@ export const useClassMembership = () => {
     try {
       setLoading(true);
       setError(null); // Reset error sebelum fetch baru
-      console.log(JSON.stringify(params));
       const result = await classMembershipService.getAll(params);
 
       if (result && result.data && result.meta) {

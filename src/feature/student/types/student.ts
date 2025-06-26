@@ -1,11 +1,12 @@
 import { MasterData } from "@/core/types/master-data";
-import { OriginSchool } from "./origin-school";
-import { Contact } from "./contact";
-import { Parent } from "./parent";
-import { DocumentStudent } from "./document-student";
 import { Village } from "@/core/types/village";
 import { Meta } from "@/core/types/meta";
-export type ProspectiveStudent = {
+import { OriginSchool } from "@/feature/prospective-student/types/origin-school";
+import { Contact } from "@/feature/prospective-student/types/contact";
+import { DocumentStudent } from "@/feature/prospective-student/types/document-student";
+import { Parent } from "@/feature/prospective-student/types/parent";
+import { ClassMembership } from "./student-class-membership";
+export type Student = {
   id: string;
   registration_code: string;
   full_name: string;
@@ -17,7 +18,6 @@ export type ProspectiveStudent = {
   village: Village | null;
   status: string;
   email: string;
-  photo_url: string |null;
   phone: string;
   child_order: number;
   street: string;
@@ -36,6 +36,8 @@ export type ProspectiveStudent = {
   created_by_id: string;
   updated_by_id: string | null;
 
+  photo_url: string | null;
+
   special_need: MasterData | null;
 
   nationality: MasterData | null;
@@ -46,29 +48,36 @@ export type ProspectiveStudent = {
 
   transportation_mode: MasterData | null;
 
-  addresses: []; // kamu bisa bikin type khusus juga kalau strukturnya diketahui
+  addresses: [];
 
   origin_schools: OriginSchool[];
 
   contacts: Contact[];
 
-  documents: DocumentStudent[];
+  documents: DocumentStudent[] | null;
 
   parents: Parent[];
+
+  class_memberships: ClassMembership[] | null;
 };
 
-export type ProspectiveStudentResponse = {
+export type StudentResponse = {
   meta: Meta | null;
-  data: ProspectiveStudent[];
+  data: Student[];
 };
 
-export type ListProspectiveStudentRequest = {
+export type GetStudentResponse = {
+  meta: Meta | null;
+  data: Student;
+};
+
+export type ListStudentRequest = {
   keyword?: string;
   page?: number;
   per_page?: number;
 };
 
-export interface CreateProspectiveStudentResponse {
+export interface CreateStudentResponse {
   meta: {
     code: number;
     status: string;
@@ -79,7 +88,7 @@ export interface CreateProspectiveStudentResponse {
   };
 }
 
-export interface UpdateProspectiveStudentResponse {
+export interface UpdateStudentResponse {
   meta: {
     code: number;
     status: string;
@@ -90,7 +99,7 @@ export interface UpdateProspectiveStudentResponse {
   };
 }
 
-export interface RemoveProspectiveStudentResponse {
+export interface RemoveStudentResponse {
   meta: {
     code: number;
     status: string;
@@ -98,7 +107,7 @@ export interface RemoveProspectiveStudentResponse {
   };
 }
 
-export interface ApproveProspectiveStudentResponse {
+export interface ApproveStudentResponse {
   meta: {
     code: number;
     status: string;

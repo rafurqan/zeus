@@ -12,9 +12,13 @@ import TeacherPage from '@/feature/teacher/pages/teacherPage';
 import BillingPage from '@/feature/billing/pages/billingPage';
 import StudentClassPage from '@/feature/student/pages/studentClassPage';
 import ProgramPage from '@/feature/master/pages/programPage';
-import {BillingDataPage} from "@/feature/finance/pages/billingDataPage";
-import {CreateInvoiceForm} from "@/feature/finance/components/CreateInvoiceForm";
-import InvoiceDetailPage from "@/feature/finance/pages/invoiceDetailPage";
+import { BillingDataPage } from "@/feature/finance/pages/billingDataPage";
+import { CreateInvoiceForm } from "@/feature/finance/components/CreateInvoiceForm";
+import InvoiceDetailPage from '@/feature/finance/pages/InvoiceDetailPage';
+import StudentsPage from '@/feature/student/pages/studentPage';
+import StudentDetailPage from '@/feature/student/pages/viewStudentPage';
+import UpdateStudentPage from '@/feature/student/pages/updateStudentPage';
+
 
 
 const AppRoutes = () => {
@@ -50,11 +54,16 @@ const AppRoutes = () => {
           <Route path="master/billing" element={<BillingPage />} />
           <Route path="students/prospective" element={<ProspectiveStudentsPage />} />
           <Route path="students/prospective/create" element={<CreateProspectiveStudentsPage />} />
+          <Route path="/students/student" element={<StudentsPage />} />
           <Route path="/students/classes" element={<StudentClassPage />} />
           <Route path="/students/program" element={<ProgramPage />} />
           <Route path="finance/billingData" element={<BillingDataPage />} />
           <Route path="finance/billingData/create" element={<CreateInvoiceForm />} />
           <Route path="finance/billingData/detail/:id" element={<InvoiceDetailPage />} />
+          <Route path="/students/student/:id/edit" element={<UpdateStudentPage />} />
+          <Route path="/students/student/:id" element={<StudentDetailPage />} />
+
+
         </Route>
       </Routes>
     </BrowserRouter>

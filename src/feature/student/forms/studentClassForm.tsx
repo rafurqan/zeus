@@ -158,7 +158,7 @@ export default function StudentClassForm({
                         onChange={handleChange}
                         options={Array.from({ length: 5 }, (_, i) => {
                             const year = new Date().getFullYear() - 2 + i;
-                            return { label: year.toString(), value: year.toString() };
+                            return { label: `${year.toString()}/${(year + 1).toString()}`, value: `${year.toString()}/${(year + 1).toString()}` };
                         })}
                     />
 

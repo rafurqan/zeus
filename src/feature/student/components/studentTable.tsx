@@ -1,18 +1,19 @@
-import { ProspectiveStudent } from "../types/prospective-student";
-import { FaCheck, FaEdit, FaTrash } from "react-icons/fa";
+
+import { FaCheck, FaEye, FaTrash } from "react-icons/fa";
 import { Table, TableCell, TableHead, TableHeader, TableRow, TableBody } from "@/core/components/ui/table";
+import { Student } from "../types/student";
 
 
 type Props = {
-    items: ProspectiveStudent[];
-    onDeleted: (item: ProspectiveStudent) => void;
-    onEdit: (item: ProspectiveStudent) => void;
-    onApproved: (item: ProspectiveStudent) => void;
+    items: Student[];
+    onDeleted: (item: Student) => void;
+    onEdit: (item: Student) => void;
+    onApproved: (item: Student) => void;
     currentPage: number;
     perPage: number;
 };
 
-export default function ProspectiveStudentTable({ items, onDeleted, onApproved, onEdit, currentPage, perPage }: Props) {
+export default function StudentTable({ items, onDeleted, onApproved, onEdit, currentPage, perPage }: Props) {
     return (
         <div className="overflow-x-auto">
             <Table>
@@ -86,7 +87,7 @@ export default function ProspectiveStudentTable({ items, onDeleted, onApproved, 
                                         className="text-blue-600 hover:text-blue-800 text-lg"
                                         onClick={() => onEdit(item)}
                                     >
-                                        <FaEdit />
+                                        <FaEye />
                                     </button>
                                     {item.status === "waiting" && (
                                         <button

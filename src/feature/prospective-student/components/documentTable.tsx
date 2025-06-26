@@ -1,6 +1,8 @@
 import { FaEdit, FaFilePdf, FaTrash } from "react-icons/fa";
 import { DocumentStudent } from "../types/document-student";
 import { Table, TableCell, TableHead, TableHeader, TableRow, TableBody } from "@/core/components/ui/table";
+import { useState } from "react";
+import PDFPreviewModal from "@/core/components/ui/pdf_viewer";
 
 
 
@@ -10,7 +12,24 @@ type Props = {
     onEdit: (item: DocumentStudent) => void;
 };
 
+type PDFSource = { type: 'url'; value: string } | { type: 'base64'; value: string };
+
+
 export default function TableDocument({ items, onDeleted, onEdit }: Props) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [activePdfSource, setActivePdfSource] = useState<PDFSource | null>(null);
+
+    const openModal = (source: PDFSource) => {
+        setActivePdfSource(source);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setActivePdfSource(null); // Reset source saat ditutup
+    };
+
+
     return (
         <div className="overflow-x-auto">
             <Table>
@@ -28,13 +47,23 @@ export default function TableDocument({ items, onDeleted, onEdit }: Props) {
                         <TableRow key={item.id}>
                             <TableCell>{item.document_type?.name}</TableCell>
                             <TableCell>{item.name}</TableCell>
-                            <TableCell>{(item.file !== "") ? (
-                                <div className="ml-2 mt-2 ">
-                                    <FaFilePdf className="w-6 h-6 text-red-500" />
-                                </div>
-                            ) : (
-                                <div className="ml-2 w-6 h-6" />  // Placeholder kosong untuk menjaga lebar tetap
-                            )}</TableCell>
+                            <TableCell>
+                                {item.file_name || item.file ? (
+                                    <button
+                                        onClick={() => openModal({
+                                            type: item.file_url ? 'url' : 'base64',
+                                            value: (item.file_url || item.file) ?? "",
+                                        })}
+                                        className="ml-2 mt-2 cursor-pointer transition-opacity opacity-90 hover:opacity-100 hover:text-red-600"
+                                        title="Lihat Dokumen"
+                                        aria-label="Lihat dokumen PDF"
+                                    >
+                                        <FaFilePdf className="w-6 h-6 text-red-500" />
+                                    </button>
+                                ) : (
+                                    <div className="ml-2 w-6 h-6" />
+                                )}
+                            </TableCell>
                             <TableCell>{item.created_at} {new Intl.DateTimeFormat('id-ID', {
                                 year: 'numeric',
                                 month: 'long',
@@ -62,6 +91,14 @@ export default function TableDocument({ items, onDeleted, onEdit }: Props) {
                     ))}
                 </TableBody>
             </Table>
+            {activePdfSource && (
+                <PDFPreviewModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    source={activePdfSource}
+                    title="Pratinjau Dokumen PDF"
+                />
+            )}
         </div>
 
     );

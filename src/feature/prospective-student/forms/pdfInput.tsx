@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { File, FilePlus, FileCheck } from "lucide-react";
+import { FilePlus, FileCheck } from "lucide-react";
 
 interface Props {
     label?: string;

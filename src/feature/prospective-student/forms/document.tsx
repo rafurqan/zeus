@@ -29,7 +29,7 @@ export default function StudentDocumentForm({
     const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
 
     const [form, setForm] = useState<DocumentStudent>(item || {
-        id: "", name: "", file: "", file_name: "", created_at: null, document_type: null
+        id: "", name: "", file: "", file_name: "", created_at: null, document_type: null, file_url: null
     });
 
     useEffect(() => {
