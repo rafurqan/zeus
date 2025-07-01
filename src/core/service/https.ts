@@ -3,7 +3,7 @@ import axios from "axios";
 
 const http = (token: string | null) => {
   return axios.create({
-    baseURL: "http://0.0.0.0:8080/api/v1",
+    baseURL: "http://eudora.railway.internal:8080/api/v1",
     withCredentials: true,
     headers: {
       Authorization: token ? `Bearer ${token}` : null,
