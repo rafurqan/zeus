@@ -6,6 +6,7 @@ import { Contact } from "@/feature/prospective-student/types/contact";
 import { DocumentStudent } from "@/feature/prospective-student/types/document-student";
 import { Parent } from "@/feature/prospective-student/types/parent";
 import { ClassMembership } from "./student-class-membership";
+import { Invoice } from "@/feature/finance/types/invoice";
 export type Student = {
   id: string;
   registration_code: string;
@@ -59,11 +60,14 @@ export type Student = {
   parents: Parent[];
 
   class_memberships: ClassMembership[] | null;
+
+  invoices: Invoice[] | null;
 };
 
 export type StudentResponse = {
   meta: Meta | null;
   data: Student[];
+  extra: Extra | null;
 };
 
 export type GetStudentResponse = {
@@ -128,3 +132,30 @@ export type RegistrationCode = {
   id: string;
   registration_code: string;
 };
+
+export type Extra = {
+  summary: Summary | null;
+};
+
+export type Summary = {
+  total: number | null;
+  approved: number | null;
+  orphan: number | null;
+  teacher_child: number | null;
+  special_needs: number | null;
+};
+
+export interface ChangeStatusRequest {
+  id: string;
+  status: string;
+}
+
+export interface ChangeStatusResponse {
+  meta: {
+    code: number;
+    status: string;
+    message: string;
+  };
+  id: string | null;
+  status: string | null;
+}

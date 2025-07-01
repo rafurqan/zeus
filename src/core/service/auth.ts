@@ -14,7 +14,7 @@ const handleUnauthorized = () => {
 };
 
 const http = axios.create({
-  baseURL: "http://localhost/api/v1",  // Ada typo disini
+  baseURL: "https://eudora-production.up.railway.app/api/v1", // Ada typo disini
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

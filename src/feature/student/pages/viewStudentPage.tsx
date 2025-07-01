@@ -11,6 +11,10 @@ import {
     FileText,
     Eye,
     Briefcase,
+    Receipt,
+    CheckCircle,
+    Clock,
+    XCircle,
 } from "lucide-react"
 import { Button } from "@/core/components/ui/button"
 import { Badge } from "@/core/components/ui/badge"
@@ -28,6 +32,7 @@ import { DocumentStudent } from "@/feature/prospective-student/types/document-st
 import { Parent } from "@/feature/prospective-student/types/parent"
 import { ClassMembership } from "../types/student-class-membership"
 import StudentDetailShimmer from "../components/studentDetailShimmer"
+import { Invoice } from "@/feature/finance/types/invoice"
 
 // Mock data for a single student - in a real app, this would come from an API
 
@@ -37,20 +42,6 @@ export default function StudentDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate()
     const { data, isLoading, isError, error } = useStudentById(id);
-
-
-    // useEffect(() => {
-    //     // In a real app, this would be an API call
-    //     const fetchedStudent = getStudentById("1")
-    //     if (fetchedStudent) {
-    //         setStudent(fetchedStudent)
-    //     } else {
-    //         // Handle student not found
-    //         alert("Siswa tidak ditemukan")
-    //         navigate("/dashboard/students/enrolled")
-    //     }
-    //     setLoading(false)
-    // }, [id, navigate])
 
 
     if (isLoading) return <BaseLayout>
@@ -75,15 +66,6 @@ export default function StudentDetailPage() {
         navigate('/students/student')
     }
 
-    // if (isLoading) {
-    //     return (
-    //         <div className="flex items-center justify-center min-h-screen">
-    //             <p>Memuat data...</p>
-    //         </div>
-    //     )
-    // }
-
-
     if (!data) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh]">
@@ -93,6 +75,33 @@ export default function StudentDetailPage() {
             </div>
         )
     }
+
+    // Helper function to format currency
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(amount)
+    }
+
+    const totalInvoices = data.invoices ? data.invoices.length : 0
+    const paidInvoices = data.invoices ? data.invoices.filter((p: Invoice) => p.status === "Lunas").length : 0
+    const pendingInvoices = data.invoices ? data.invoices.filter((p: Invoice) => p.status === "Menunggu Pembayaran").length : 0
+    const overdueInvoices = data.invoices ? data.invoices.filter((p: Invoice) => p.status === "Terlambat").length : 0
+
+    const totalAmount = data.invoices ? data.invoices.reduce((sum: number, p: Invoice) => sum + p.total, 0) : 0
+
+    const paidAmount = data.invoices
+        ? data.invoices.filter((p: Invoice) => p.status === "Lunas").reduce((sum: number, p: Invoice) => sum + p.total, 0)
+        : 0
+
+    const pendingAmount = data.invoices
+        ? data.invoices
+            .filter((p: Invoice) => p.status === "Menunggu Pembayaran" || p.status === "Terlambat")
+            .reduce((sum: number, p: Invoice) => sum + p.total, 0)
+        : 0
 
     return (
         <BaseLayout>
@@ -230,7 +239,7 @@ export default function StudentDetailPage() {
                                             <TabsTrigger value="documents">Dokumen</TabsTrigger>
                                             <TabsTrigger value="additional">Tambahan</TabsTrigger>
                                             <TabsTrigger value="class-history">Riwayat Kelas</TabsTrigger>
-                                            {/* <TabsTrigger value="payments">Pembayaran</TabsTrigger> */}
+                                            <TabsTrigger value="invoices">Riwayat Tagihan</TabsTrigger>
                                         </TabsList>
 
                                         {/* Personal Information Tab */}
@@ -815,15 +824,15 @@ export default function StudentDetailPage() {
                                         </TabsContent>
 
                                         {/* Payment History Tab */}
-                                        <TabsContent value="payments">
+                                        <TabsContent value="invoices">
                                             <Card>
                                                 <CardHeader>
-                                                    <CardTitle>Riwayat Pembayaran</CardTitle>
+                                                    <CardTitle>Riwayat Tagihan</CardTitle>
                                                     <CardDescription>Riwayat pembayaran dan tagihan siswa</CardDescription>
                                                 </CardHeader>
                                                 <CardContent className="space-y-6">
                                                     {/* Payment Statistics */}
-                                                    {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                                         <Card>
                                                             <CardContent className="p-4 flex flex-col items-center justify-center">
                                                                 <Receipt className="h-8 w-8 text-gray-500 mb-2" />
@@ -855,10 +864,10 @@ export default function StudentDetailPage() {
                                                                 <p className="text-xl font-bold">{overdueInvoices}</p>
                                                             </CardContent>
                                                         </Card>
-                                                    </div> */}
+                                                    </div>
 
                                                     {/* Payment History Table */}
-                                                    {/* <div className="border rounded-md">
+                                                    <div>
                                                         <Table>
                                                             <TableHeader>
                                                                 <TableRow>
@@ -868,34 +877,42 @@ export default function StudentDetailPage() {
                                                                     <TableHead>Jatuh Tempo</TableHead>
                                                                     <TableHead>Status</TableHead>
                                                                     <TableHead>Tanggal Bayar</TableHead>
-                                                                    <TableHead>Metode</TableHead>
+                                                                    {/* <TableHead>Metode</TableHead> */}
                                                                 </TableRow>
                                                             </TableHeader>
                                                             <TableBody>
-                                                                {student.payments && student.payments.length > 0 ? (
-                                                                    student.payments.map((payment: any) => (
+                                                                {data.invoices && data.invoices.length > 0 ? (
+                                                                    data.invoices.map((payment: Invoice) => (
                                                                         <TableRow key={payment.id}>
-                                                                            <TableCell className="font-medium">{payment.invoiceNumber}</TableCell>
-                                                                            <TableCell>{payment.description}</TableCell>
-                                                                            <TableCell>{formatCurrency(payment.amount)}</TableCell>
-                                                                            <TableCell>{payment.dueDate}</TableCell>
+                                                                            <TableCell className="font-medium">{payment.code}</TableCell>
+                                                                            <TableCell>{payment.notes}</TableCell>
+                                                                            <TableCell>{formatCurrency(payment.total)}</TableCell>
+                                                                            <TableCell>{new Date(payment.due_date).toLocaleDateString('id-ID', {
+                                                                                day: '2-digit',
+                                                                                month: 'long',
+                                                                                year: 'numeric',
+                                                                            })}</TableCell>
                                                                             <TableCell>
                                                                                 <Badge
                                                                                     variant={
-                                                                                        payment.status === "paid"
+                                                                                        payment.status === "Lunas"
                                                                                             ? "default"
-                                                                                            : payment.status === "overdue"
+                                                                                            : payment.status === "Terlambat"
                                                                                                 ? "destructive"
                                                                                                 : "secondary"
                                                                                     }
                                                                                 >
-                                                                                    {payment.status === "paid" && "Lunas"}
-                                                                                    {payment.status === "pending" && "Menunggu"}
-                                                                                    {payment.status === "overdue" && "Terlambat"}
+                                                                                    {payment.status === "Lunas" && "Lunas"}
+                                                                                    {payment.status === "Menunggu Pembayaran" && "Menunggu"}
+                                                                                    {payment.status === "Terlambat" && "Terlambat"}
                                                                                 </Badge>
                                                                             </TableCell>
-                                                                            <TableCell>{payment.paymentDate || "-"}</TableCell>
-                                                                            <TableCell>{payment.paymentMethod || "-"}</TableCell>
+                                                                            <TableCell>{new Date(payment.publication_date).toLocaleDateString('id-ID', {
+                                                                                day: '2-digit',
+                                                                                month: 'long',
+                                                                                year: 'numeric',
+                                                                            })}</TableCell>
+                                                                            {/* <TableCell>{payment. || "-"}</TableCell> */}
                                                                         </TableRow>
                                                                     ))
                                                                 ) : (
@@ -907,7 +924,7 @@ export default function StudentDetailPage() {
                                                                 )}
                                                             </TableBody>
                                                         </Table>
-                                                    </div> */}
+                                                    </div>
                                                 </CardContent>
                                             </Card>
                                         </TabsContent>

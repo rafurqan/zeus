@@ -66,6 +66,7 @@ export type ListProspectiveStudentRequest = {
   keyword?: string;
   page?: number;
   per_page?: number;
+  status?: string;
 };
 
 export interface CreateProspectiveStudentResponse {

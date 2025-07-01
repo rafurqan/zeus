@@ -13,6 +13,37 @@ type Props = {
 };
 
 export default function ProspectiveStudentTable({ items, onDeleted, onApproved, onEdit, currentPage, perPage }: Props) {
+    const getStatusBadge = (status: string) => {
+        const baseClasses = "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap";
+
+        switch (status) {
+            case "rejected":
+                return `${baseClasses} bg-red-100 text-red-800 border border-red-200`;
+            case "approved":
+                return `${baseClasses} bg-green-100 text-green-800 border border-green-200`;
+            case "waiting":
+                return `${baseClasses} bg-yellow-100 text-yellow-800 border border-yellow-200`;
+            default:
+                return `${baseClasses} bg-gray-100 text-gray-600 border border-gray-200`;
+        }
+    };
+
+    const getDocumentBadge = (status: string) => {
+        const baseClasses = "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap";
+
+        return status === "Lengkap"
+            ? `${baseClasses} bg-gray-800 text-white`
+            : `${baseClasses} bg-gray-100 text-gray-600 border border-gray-200`;
+    };
+
+    const getPaymentBadge = (isActive: boolean) => {
+        const baseClasses = "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap";
+
+        return isActive
+            ? `${baseClasses} bg-gray-800 text-white`
+            : `${baseClasses} bg-gray-100 text-gray-600 border border-gray-200`;
+    };
+
     return (
         <div className="overflow-x-auto">
             <Table>
@@ -46,64 +77,54 @@ export default function ProspectiveStudentTable({ items, onDeleted, onApproved, 
                                 month: 'long',
                                 day: 'numeric',
                             }).format(new Date(item.created_at))}</TableCell>
-                            <TableCell>
-                                <span
-                                    className={`px-2 py-1 rounded-4xl text-xs font-bold ${item.status === "rejected"
-                                        ? "bg-red-500 text-white"
-                                        : item.status === "approved"
-                                            ? "bg-green-200 text-black" : "bg-gray-200 text-gray-600"
-                                        }`}
-                                >
-                                    {item.status}
+                            <TableCell className="py-4">
+                                <span className={getStatusBadge(item.status)}>
+                                    {item.status === "approved" ? "Disetujui" :
+                                        item.status === "rejected" ? "Ditolak" :
+                                            item.status === "waiting" ? "Menunggu" : item.status}
                                 </span>
                             </TableCell>
-                            <TableCell>
-                                <span
-                                    className={`whitespace-nowrap px-2 py-1 rounded-4xl text-xs font-medium ${item.document_status === "Lengkap"
-                                        ? "bg-black text-white"
-                                        : "bg-gray-200 text-gray-600"
-                                        }`}
-                                >
+                            <TableCell className="py-4">
+                                <span className={getDocumentBadge(item.document_status)}>
                                     {item.document_status}
                                 </span>
                             </TableCell>
                             <TableCell>
                                 NULL
                             </TableCell>
-                            <TableCell>
-                                <span
-                                    className={`px-2 py-1 rounded-4xl text-xs font-medium ${item.full_name === "ACTIVE"
-                                        ? "bg-black text-white"
-                                        : "bg-gray-200 text-gray-600"
-                                        }`}
-                                >
+                            <TableCell className="py-4">
+                                <span className={getPaymentBadge(item.full_name === "ACTIVE")}>
                                     {item.full_name === "ACTIVE" ? "Aktif" : "Tidak Aktif"}
                                 </span>
                             </TableCell>
-                            <TableCell>
-                                <div className="flex justify-end items-center space-x-2">
+                            <TableCell className="py-4">
+                                <div className="flex items-center justify-center gap-2">
                                     <button
-                                        className="text-blue-600 hover:text-blue-800 text-lg"
+                                        className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-105"
                                         onClick={() => onEdit(item)}
+                                        title="Edit"
                                     >
-                                        <FaEdit />
+                                        <FaEdit className="w-4 h-4" />
                                     </button>
                                     {item.status === "waiting" && (
                                         <button
-                                            className="text-green-600 hover:text-green-800 text-lg disabled:opacity-50"
-                                            onClick={() => onApproved(item)}>
-                                            <FaCheck />
+                                            className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-200 hover:scale-105"
+                                            onClick={() => onApproved(item)}
+                                            title="Approve"
+                                        >
+                                            <FaCheck className="w-4 h-4" />
                                         </button>
                                     )}
                                     {item.status === "waiting" && (
                                         <button
-                                            className="text-red-600 hover:text-red-800 text-lg disabled:opacity-50"
-                                            onClick={() => onDeleted(item)}>
-                                            <FaTrash />
+                                            className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-105"
+                                            onClick={() => onDeleted(item)}
+                                            title="Delete"
+                                        >
+                                            <FaTrash className="w-4 h-4" />
                                         </button>
                                     )}
                                 </div>
-
                             </TableCell>
                         </TableRow>
                     ))}

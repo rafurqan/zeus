@@ -24,10 +24,6 @@ import UpdateStudentPage from '@/feature/student/pages/updateStudentPage';
 const AppRoutes = () => {
   const { user, loading } = useContext(AppContext);
 
-  if (loading) {
-    return <div >{loading && <LoadingOverlay />}</div>;
-  }
-
   const ProtectedRoute = () => {
     const { user } = useContext(AppContext);
 
@@ -40,6 +36,7 @@ const AppRoutes = () => {
 
   return (
     <BrowserRouter>
+      {loading && <LoadingOverlay />}
       <Routes>
         <Route
           path="/login"
