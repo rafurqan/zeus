@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getToken, clearToken } from "@/utils/storage";
-import { clear } from "console";
 
 export const useAuth = () => {
   const [token, setToken] = useState<string | null>(getToken());
