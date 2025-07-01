@@ -23,10 +23,6 @@ import { PrintPayment } from '@/feature/payment/components/PrintPayment';
 const AppRoutes = () => {
   const { user, loading } = useContext(AppContext);
 
-  if (loading) {
-    return <div >{loading && <LoadingOverlay />}</div>;
-  }
-
   const ProtectedRoute = () => {
     const { user } = useContext(AppContext);
 
@@ -39,6 +35,7 @@ const AppRoutes = () => {
 
   return (
     <BrowserRouter>
+      {loading && <LoadingOverlay />}
       <Routes>
         <Route
           path="/login"
