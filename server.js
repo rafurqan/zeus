@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 4173; // Railway akan menyediakan PORT
 app.use(
   "/api/v1",
   createProxyMiddleware({
-    target: process.env.VITE_BACKEND_URL || "http://eudora.railway.internal",
+    target: "http://eudora.railway.internal",
     changeOrigin: true,
   })
 );
