@@ -24,6 +24,6 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
-app.listen(PORT, () => {
-  console.log(`Server produksi berjalan di http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server listening on port ${PORT} and host 0.0.0.0`);
 });
