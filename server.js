@@ -8,7 +8,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 4173; // Railway akan menyediakan PORT
+const PORT = process.env.PORT || 4173;
+
+// Fungsi untuk menangani error dari proxy
+const onProxyError = function (err, req, res) {
+  // Mencetak pesan error yang detail ke Deploy Logs
+  console.error("PROXY ERROR:", err);
+  // Anda bisa mengirim respon error kustom jika perlu,
+  // tapi untuk sekarang, biarkan Express yang menanganinya.
+};
 
 app.use(
   "/api/v1",
@@ -16,6 +24,9 @@ app.use(
     target: "http://eudora",
     changeOrigin: true,
     logLevel: "debug",
+    // --- PENAMBAHAN DI SINI ---
+    // Kita memberitahu proxy untuk menjalankan fungsi kita jika terjadi error
+    onError: onProxyError,
   })
 );
 
@@ -25,6 +36,6 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server listening on port ${PORT} and host 0.0.0.0`);
+app.listen(PORT, () => {
+  console.log(`Server produksi berjalan di http://localhost:${PORT}`);
 });
