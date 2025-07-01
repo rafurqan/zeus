@@ -9,7 +9,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/v1": {
-        target: "eudora.railway.internal:8080",
+        target: "eudora-production.up.railway.app",
         changeOrigin: true,
         headers: {
           Accept: "application/json",
