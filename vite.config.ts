@@ -9,12 +9,13 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/v1": {
-        target: "eudora-production.up.railway.app",
+        target: "http://eudora.railway.internal",
         changeOrigin: true,
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
+        rewrite: (path) => path.replace(/^\/api\/v1/, ""),
       },
     },
   },
