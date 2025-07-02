@@ -10,11 +10,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 4173; // Railway akan inject PORT ini
 
-// Proxy requests to backend Laravel (yang pakai prefix /api/v1)
-app.use("/api/v1", (req, res, next) => {
-  console.log("🔥 Proxy request hit:", req.method, req.url);
-  next();
-});
+
 
 app.use(
   "/api/v1",
