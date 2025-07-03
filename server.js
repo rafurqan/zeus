@@ -10,22 +10,18 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 4173;
 
-// Konfigurasi backend target dengan multiple fallback options
 const isDevelopment = process.env.NODE_ENV === "development";
 const isRailway = process.env.RAILWAY_ENVIRONMENT_NAME;
 
 let BACKEND_URL;
 
 if (isDevelopment) {
-  // Untuk development lokal
   BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8080";
 } else if (isRailway) {
-  // Untuk Railway - gunakan environment variable atau fallback
   BACKEND_URL =
     process.env.BACKEND_URL ||
     process.env.LARAVEL_URL ||
-    // Default ke internal hostname dengan port 8080 (sesuai Laravel logs)
-    "http://eudora.railway.internal:8080";
+    "https://eudora-production.up.railway.app";
 } else {
   BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8080";
 }
@@ -36,7 +32,6 @@ console.log(
 );
 console.log("🎯 Backend target:", BACKEND_URL);
 
-// Proxy middleware dengan konfigurasi untuk handle IPv6 issues
 const proxyOptions = {
   target: BACKEND_URL,
   changeOrigin: true,
@@ -44,9 +39,7 @@ const proxyOptions = {
   logLevel: "info",
   timeout: 30000,
   proxyTimeout: 30000,
-  // Force IPv4 untuk avoid IPv6 issues di Railway
   family: 4,
-  // Headers khusus untuk Railway internal networking
   headers: {
     Connection: "keep-alive",
     "X-Railway-Request": "true",
@@ -54,7 +47,6 @@ const proxyOptions = {
   onProxyReq: (proxyReq, req, res) => {
     console.log("➡️ Forwarding to backend:", `${BACKEND_URL}${proxyReq.path}`);
 
-    // Set headers yang diperlukan untuk Railway
     if (isRailway) {
       proxyReq.setHeader("X-Forwarded-Proto", req.protocol);
       proxyReq.setHeader("X-Forwarded-Host", req.get("host"));
@@ -68,7 +60,6 @@ const proxyOptions = {
     console.error("❌ Target was:", BACKEND_URL);
     console.error("❌ Request path:", req.path);
 
-    // Log tambahan untuk debugging IPv6 issues
     if (err.code === "ECONNREFUSED") {
       console.error("🔍 Connection refused - possible causes:");
       console.error("   - Backend service not running");
@@ -109,7 +100,6 @@ const proxyOptions = {
       `(${req.path})`
     );
 
-    // Add Railway-specific headers
     if (isRailway) {
       res.setHeader("X-Proxied-By", "Railway-Frontend");
       res.setHeader("X-Backend-Response-Time", new Date().toISOString());
@@ -117,10 +107,8 @@ const proxyOptions = {
   },
 };
 
-// Gunakan proxy middleware
 app.use("/api/v1", createProxyMiddleware(proxyOptions));
 
-// Add error handling middleware setelah routes
 app.use((err, req, res, next) => {
   console.error("Express Error:", err);
   if (!res.headersSent) {
@@ -128,7 +116,6 @@ app.use((err, req, res, next) => {
   }
 });
 
-// Serve static files dengan path yang aman
 const distPath = path.join(__dirname, "dist");
 console.log("📁 Serving static files from:", distPath);
 
@@ -139,7 +126,6 @@ app.use(
   })
 );
 
-// Health check endpoint
 app.get("/health", (req, res) => {
   res.json({
     status: "ok",
@@ -155,11 +141,9 @@ app.get("/health", (req, res) => {
   });
 });
 
-// Test backend connectivity dengan multiple attempts
 app.get("/test-backend", async (req, res) => {
   const testUrls = [
     BACKEND_URL, // Primary target
-    // Backup URLs jika primary gagal
     "http://eudora.railway.internal:8080", // Explicit internal URL
     "https://eudora-production.up.railway.app", // Public URL fallback
     process.env.LARAVEL_PUBLIC_URL,
@@ -172,7 +156,6 @@ app.get("/test-backend", async (req, res) => {
       const axios = (await import("axios")).default;
       const startTime = Date.now();
 
-      // Test dengan endpoint yang pasti ada
       const testEndpoint = url.includes("railway.app")
         ? "/api/v1/health"
         : "/api/v1/health";
@@ -196,7 +179,6 @@ app.get("/test-backend", async (req, res) => {
         data: response.data,
       });
 
-      // Jika berhasil, set sebagai working URL
       console.log(`✅ Working backend URL found: ${url}`);
       break;
     } catch (error) {
@@ -228,10 +210,8 @@ app.get("/test-backend", async (req, res) => {
   });
 });
 
-// Fallback route untuk SPA dengan validasi path
 app.get("*", (req, res) => {
   try {
-    // Hindari path yang bermasalah
     if (req.url.includes("..") || req.url.includes("//")) {
       return res.status(400).send("Invalid path");
     }
