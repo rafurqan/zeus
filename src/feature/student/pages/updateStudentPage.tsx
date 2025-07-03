@@ -456,7 +456,7 @@ export default function UpdateStudentPage() {
                     throw new Error("Gagal simpan data");
                 }
 
-                navigate("/students/student");
+                navigate(`/students/student/${item.id}`);
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     console.log("Fetch failed", error.response?.data.message);

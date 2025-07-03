@@ -26,7 +26,7 @@ export default function TableDocument({ items, onDeleted, onEdit }: Props) {
 
     const closeModal = () => {
         setIsModalOpen(false);
-        setActivePdfSource(null); // Reset source saat ditutup
+        setActivePdfSource(null); 
     };
 
 
@@ -50,15 +50,18 @@ export default function TableDocument({ items, onDeleted, onEdit }: Props) {
                             <TableCell>
                                 {item.file_name || item.file ? (
                                     <button
-                                        onClick={() => openModal({
-                                            type: item.file_url ? 'url' : 'base64',
-                                            value: (item.file_url || item.file) ?? "",
-                                        })}
-                                        className="ml-2 mt-2 cursor-pointer transition-opacity opacity-90 hover:opacity-100 hover:text-red-600"
+                                        onClick={() =>
+                                            openModal({
+                                                type: item.file_url ? "url" : "base64",
+                                                value: item.file_url || item.file || "",
+                                            })
+                                        }
+                                        className="ml-2 mt-2 flex flex-col items-center cursor-pointer transition-opacity opacity-90 hover:opacity-100 hover:text-red-600"
                                         title="Lihat Dokumen"
                                         aria-label="Lihat dokumen PDF"
                                     >
                                         <FaFilePdf className="w-6 h-6 text-red-500" />
+                                        <span className="text-xs mt-1 text-red-600">Lihat</span>
                                     </button>
                                 ) : (
                                     <div className="ml-2 w-6 h-6" />

@@ -15,7 +15,7 @@ const Header = () => {
     setShowDropdown(!showDropdown)
   }
 
-  const { setUser, setToken, setLoading } = useContext(AppContext);
+  const { user, setUser, setToken, setLoading } = useContext(AppContext);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -90,13 +90,19 @@ const Header = () => {
             <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center group-hover:bg-gray-300 transition-colors">
               <User className="w-4 h-4 text-gray-600" />
             </div>
-            <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">User</span>
+            <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{user?.name ?? "User"}</span>
             <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${showDropdown ? 'rotate-180' : ''}`} />
           </button>
 
-          {/* Dropdown Menu */}
           {showDropdown && (
-            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden animate-in slide-in-from-top-2 duration-200">
+            <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden animate-in slide-in-from-top-2 duration-200">
+              {/* User Info */}
+              <div className="px-4 py-3 border-b border-gray-100">
+                <p className="text-sm font-medium text-gray-900">{user?.name ?? "-"}</p>
+                <p className="text-sm text-gray-500 truncate">{user?.email ?? "-"}</p>
+              </div>
+
+              {/* Menu Items */}
               <div className="py-2">
                 <button
                   className="w-full text-left px-4 py-2.5 hover:bg-gray-100 text-sm text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-2"
@@ -117,6 +123,7 @@ const Header = () => {
               </div>
             </div>
           )}
+
         </div>
       </div>
     </header>
