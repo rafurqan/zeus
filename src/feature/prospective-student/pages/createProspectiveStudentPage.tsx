@@ -4,7 +4,7 @@ import { AppContext } from "@/context/AppContext";
 import { MasterData } from "@/core/types/master-data";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ProspectiveStudent } from "../types/prospective-student";
-import { Camera, Plus } from "lucide-react";
+import { ArrowLeft, Camera, Plus } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { DocumentStudent } from "../types/document-student";
 import TableDocument from "../components/documentTable";
@@ -312,6 +312,10 @@ export default function CreateProspectiveStudentsPage() {
         }));
     };
 
+    const handleGoBack = () => {
+        navigate(`/students/prospective`);
+    }
+
 
     const handleRemoveParent = (item: Parent) => {
         setForm((prev) => ({
@@ -479,7 +483,10 @@ export default function CreateProspectiveStudentsPage() {
                             />}
                         <div className="flex justify-between items-center mb-4">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-2xl font-bold">Buat Calon Siswa</h2>
+                                <Button variant="ghost" size="icon" onClick={handleGoBack}>
+                                    <ArrowLeft className="h-5 w-5" />
+                                </Button>
+                                <h2 className="text-2xl font-bold">{isEdit ? "Perbarui Calon Siswa" : "Buat Calon Siswa"}</h2>
                             </div>
                             <Button onClick={handleSubmit} disabled={loading} className="flex items-center gap-1 bg-black hover:bg-gray-800 text-white">
                                 <span>{isEdit ? "Perbarui Calon Siswa" : "Tambah Calon Siswa"}</span>

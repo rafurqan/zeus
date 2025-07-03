@@ -3,7 +3,7 @@ import BaseLayout from "@/core/components/baseLayout";
 import { AppContext } from "@/context/AppContext";
 import { MasterData } from "@/core/types/master-data";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Camera, Plus } from "lucide-react";
+import { ArrowLeft, Camera, Plus } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { useConfirm } from "@/core/components/confirmDialog";
 import { AxiosError } from "axios";
@@ -456,7 +456,7 @@ export default function UpdateStudentPage() {
                     throw new Error("Gagal simpan data");
                 }
 
-                navigate("/students/student");
+                navigate(`/students/student/${item.id}`);
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     console.log("Fetch failed", error.response?.data.message);
@@ -469,6 +469,10 @@ export default function UpdateStudentPage() {
 
     };
 
+    const handleGoBack = () => {
+        navigate(`/students/student/${item.id}`);
+    }
+
 
     return (
         <BaseLayout>
@@ -479,8 +483,11 @@ export default function UpdateStudentPage() {
                             <LoadingOverlay
                             />}
                         <div className="flex justify-between items-center mb-4">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-2xl font-bold">{isEdit ? "Perbarui Siswa" : "Buat Siswa"}</h2>
+                            <div className="flex items-center gap-2">
+                                <Button variant="ghost" size="icon" onClick={handleGoBack}>
+                                    <ArrowLeft className="h-5 w-5" />
+                                </Button>
+                                <h1 className="text-2xl font-bold">{isEdit ? "Perbarui Siswa" : "Buat Siswa"}</h1>
                             </div>
                             <Button onClick={handleSubmit} disabled={loading} className="flex items-center gap-1 bg-black hover:bg-gray-800 text-white">
                                 <span>{isEdit ? "Perbarui Siswa" : "Tambah Siswa"}</span>

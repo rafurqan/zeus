@@ -1,6 +1,8 @@
 import http from "@/core/service/auth";
 import {
   ApproveStudentResponse,
+  ChangeStatusRequest,
+  ChangeStatusResponse,
   CreateStudentResponse,
   GetRegistrationCodeResponse,
   GetStudentResponse,
@@ -20,7 +22,7 @@ export const studentService = {
 
   async getById(id: string): Promise<Student> {
     const response = await http.get<GetStudentResponse>(`/students/${id}`);
-    return response.data.data; // Assuming the API returns an array of students
+    return response.data.data;
   },
 
   async create(data: Student): Promise<CreateStudentResponse> {
@@ -50,6 +52,14 @@ export const studentService = {
 
   async approve(id: string): Promise<ApproveStudentResponse> {
     const response = await http.post(`/students/${id}/approve`);
+    return response.data;
+  },
+
+  async changeStatus(data: ChangeStatusRequest): Promise<ChangeStatusResponse> {
+    const response = await http.post(
+      `/students/${data.id}/change-status`,
+      data
+    );
     return response.data;
   },
 };

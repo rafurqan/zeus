@@ -5,6 +5,7 @@ import { Parent } from "./parent";
 import { DocumentStudent } from "./document-student";
 import { Village } from "@/core/types/village";
 import { Meta } from "@/core/types/meta";
+import { Invoice } from "@/feature/finance/types/invoice";
 export type ProspectiveStudent = {
   id: string;
   registration_code: string;
@@ -17,7 +18,7 @@ export type ProspectiveStudent = {
   village: Village | null;
   status: string;
   email: string;
-  photo_url: string |null;
+  photo_url: string | null;
   phone: string;
   child_order: number;
   street: string;
@@ -55,6 +56,8 @@ export type ProspectiveStudent = {
   documents: DocumentStudent[];
 
   parents: Parent[];
+
+  invoices: Invoice[] | null;
 };
 
 export type ProspectiveStudentResponse = {
@@ -66,6 +69,7 @@ export type ListProspectiveStudentRequest = {
   keyword?: string;
   page?: number;
   per_page?: number;
+  status?: string;
 };
 
 export interface CreateProspectiveStudentResponse {

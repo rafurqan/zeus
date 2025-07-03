@@ -9,23 +9,19 @@ import ProspectiveStudentsPage from '@/feature/prospective-student/pages/prospec
 import LoadingOverlay from '@/core/components/ui/loading_screen';
 import CreateProspectiveStudentsPage from '@/feature/prospective-student/pages/createProspectiveStudentPage';
 import TeacherPage from '@/feature/teacher/pages/teacherPage';
-import BillingPage from '@/feature/billing/pages/billingPage';
 import StudentClassPage from '@/feature/student/pages/studentClassPage';
 import ProgramPage from '@/feature/master/pages/programPage';
-import {BillingDataPage} from "@/feature/finance/pages/billingDataPage";
-import {CreateInvoiceForm} from "@/feature/finance/components/CreateInvoiceForm";
-import InvoiceDetailPage from "@/feature/finance/pages/invoiceDetailPage";
+import { BillingDataPage } from "@/feature/finance/pages/billingDataPage";
+import { CreateInvoiceForm } from "@/feature/finance/components/CreateInvoiceForm";
+import InvoiceDetailPage from "@/feature/finance/pages/InvoiceDetailPage";
 import { PaymentDataPage } from "@/feature/payment/pages/PaymentDataPage";
-import { CreatePaymentForm } from "@/feature/payment/components/createPaymentForm";
+import { CreatePaymentForm } from "@/feature/payment/components/CreatePaymentForm";
 import { PrintPayment } from '@/feature/payment/components/PrintPayment';
+import StudentsPage from '@/feature/student/pages/studentPage';
 
 
 const AppRoutes = () => {
   const { user, loading } = useContext(AppContext);
-
-  if (loading) {
-    return <div >{loading && <LoadingOverlay />}</div>;
-  }
 
   const ProtectedRoute = () => {
     const { user } = useContext(AppContext);
@@ -39,6 +35,7 @@ const AppRoutes = () => {
 
   return (
     <BrowserRouter>
+      {loading && <LoadingOverlay />}
       <Routes>
         <Route
           path="/login"
@@ -50,7 +47,7 @@ const AppRoutes = () => {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="master/education-levels" element={<EducationLevelsPage />} />
           <Route path="master/teachers" element={<TeacherPage />} />
-          <Route path="master/billing" element={<BillingPage />} />
+          {/* <Route path="master/billing" element={<BillingPage />} /> */}
           <Route path="students/prospective" element={<ProspectiveStudentsPage />} />
           <Route path="students/prospective/create" element={<CreateProspectiveStudentsPage />} />
           <Route path="/students/student" element={<StudentsPage />} />

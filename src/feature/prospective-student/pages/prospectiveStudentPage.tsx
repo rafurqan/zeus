@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import { useProspectiveStudent } from "../hooks/useProspectiveStudent";
 import Pagination from "@/core/components/forms/pagination";
 import { useConfirm } from "@/core/components/confirmDialog";
+import { FormSelect } from "@/core/components/forms/formSelect";
 
 
 export default function ProspectiveStudentsPage() {
@@ -22,6 +23,7 @@ export default function ProspectiveStudentsPage() {
     const [loadingOverlay, setLoadingOverlay] = useState(false);
     const { confirm, ConfirmDialog } = useConfirm();
     const [searchKeyword, setSearchKeyword] = useState("");
+    const [statusFilter, setStatusFilter] = useState("Semua");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
     const {
@@ -44,11 +46,12 @@ export default function ProspectiveStudentsPage() {
             page: currentPage,
             per_page: itemsPerPage,
             ...(searchKeyword && { keyword: searchKeyword }),
+            ...(statusFilter !== 'Semua' && { status: statusFilter }),
         };
         if (!loadingOverlay) {
             fetchAllProspectiveStudents(params);
         }
-    }, [searchKeyword, currentPage, fetchAllProspectiveStudents, loadingOverlay]);
+    }, [searchKeyword, currentPage, fetchAllProspectiveStudents, loadingOverlay, statusFilter]);
 
     if (!user) {
         setUser(null);
@@ -104,6 +107,10 @@ export default function ProspectiveStudentsPage() {
         setSearchKeyword(e.target.value);
     };
 
+    const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setStatusFilter(e.target.value);
+    };
+
 
 
     return (
@@ -128,26 +135,41 @@ export default function ProspectiveStudentsPage() {
 
                         </div>
 
-                        {/* Search */}
-                        <div className="relative mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Cari Calon Siswa
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    placeholder="Cari berdasarkan nama, kode registrasi siswa..."
-                                    value={searchKeyword}
-                                    onChange={handleSearchChange}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-0 focus:border-gray-500"
+                        <div className="flex flex-wrap gap-4 mb-4 items-end">
+                            {/* Search */}
+                            <div className="flex-grow max-w-[50%] min-w-[250px]">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Cari Calon Siswa
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        placeholder="Cari berdasarkan nama, kode registrasi siswa..."
+                                        value={searchKeyword}
+                                        onChange={handleSearchChange}
+                                        className="w-full pl-10 pr-4 h-10 border border-gray-300 rounded-md focus:ring-0 focus:border-gray-500"
+                                    />
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                </div>
+                            </div>
+
+                            {/* Filter Dropdown */}
+                            <div className="w-48">
+                                <FormSelect
+                                    label="Status"
+                                    name="Status"
+                                    value={statusFilter}
+                                    onChange={handleStatusChange}
+                                    options={[{ label: 'Semua', value: 'Semua' }, { label: 'Waiting', value: 'waiting' }, { label: 'Approved', value: 'approved' }, { label: 'Rejected', value: 'rejected' }]}
                                 />
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+
                             </div>
                         </div>
+
                         {prospectiveStudentLoading && <EducationLevelTableSkeleton />}
                         {prospectiveStudentError && <p className="text-red-500">Error: {prospectiveStudentError}</p>}
 
-                        {!prospectiveStudentLoading && !prospectiveStudentError && prospectiveStudentData.length > 0 && (
+                        {!prospectiveStudentLoading && !prospectiveStudentError && (
                             <ProspectiveStudentTable
                                 currentPage={currentPage}
                                 perPage={itemsPerPage}
