@@ -39,6 +39,7 @@ export const BillingDataPage = () => {
 
   const getStatusStat = (status) => statistics.per_status.find(s => s.status === status) || { count: 0, amount: 0 };
 
+  const handleRefresh = () => window.location.reload();
   const handleDelete = () => {
     window.location.reload();
   };
@@ -49,11 +50,8 @@ export const BillingDataPage = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Faktur</h1>
           <div className="space-x-2">
-            <button className="px-4 py-2 bg-white text-black-700 border border-black-300 rounded-md shadow-sm hover:bg-black-50">
+            <button className="px-4 py-2 bg-white text-black-700 border border-black-300 rounded-md shadow-sm hover:bg-black-50" onClick={handleRefresh}>
               Segarkan
-            </button>
-            <button className="px-4 py-2 bg-white text-black-700 border border-black-300 rounded-md shadow-sm hover:bg-black-50">
-              Buat Faktur Kolektif
             </button>
             <button 
               onClick={() => navigate("/finance/billingData/create")} 

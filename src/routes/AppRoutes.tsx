@@ -12,13 +12,12 @@ import TeacherPage from '@/feature/teacher/pages/teacherPage';
 import BillingPage from '@/feature/billing/pages/billingPage';
 import StudentClassPage from '@/feature/student/pages/studentClassPage';
 import ProgramPage from '@/feature/master/pages/programPage';
-import { BillingDataPage } from "@/feature/finance/pages/billingDataPage";
-import { CreateInvoiceForm } from "@/feature/finance/components/CreateInvoiceForm";
-import InvoiceDetailPage from '@/feature/finance/pages/InvoiceDetailPage';
-import StudentsPage from '@/feature/student/pages/studentPage';
-import StudentDetailPage from '@/feature/student/pages/viewStudentPage';
-import UpdateStudentPage from '@/feature/student/pages/updateStudentPage';
-
+import {BillingDataPage} from "@/feature/finance/pages/billingDataPage";
+import {CreateInvoiceForm} from "@/feature/finance/components/CreateInvoiceForm";
+import InvoiceDetailPage from "@/feature/finance/pages/invoiceDetailPage";
+import { PaymentDataPage } from "@/feature/payment/pages/PaymentDataPage";
+import { CreatePaymentForm } from "@/feature/payment/components/createPaymentForm";
+import { PrintPayment } from '@/feature/payment/components/PrintPayment';
 
 
 const AppRoutes = () => {
@@ -60,10 +59,10 @@ const AppRoutes = () => {
           <Route path="finance/billingData" element={<BillingDataPage />} />
           <Route path="finance/billingData/create" element={<CreateInvoiceForm />} />
           <Route path="finance/billingData/detail/:id" element={<InvoiceDetailPage />} />
-          <Route path="/students/student/:id/edit" element={<UpdateStudentPage />} />
-          <Route path="/students/student/:id" element={<StudentDetailPage />} />
-
-
+          <Route path="payment/paymentData" element={<PaymentDataPage />} />
+          <Route path="payment/paymentData/paymentForm" element={<CreatePaymentForm />} />
+          <Route path="payment/paymentData/paymentForm/:id" element={<CreatePaymentForm />} />
+          <Route path="payment/print" element={<PrintPayment />} />
         </Route>
       </Routes>
     </BrowserRouter>
