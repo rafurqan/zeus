@@ -43,7 +43,10 @@ export default function StudentTable({ items, onEdit, onStatusChange, currentPag
     };
 
     const getBackgroundColor = (item: Student) => {
-        if (item.special_condition?.name === "Anak Guru") {
+        if (item.status === "inactive") {
+            return "bg-white";
+        }
+        else if (item.special_condition?.name === "Anak Guru") {
             return "bg-purple-50";
         } else if (item.special_condition?.name === "Anak Yatim") {
             return "bg-yellow-50";

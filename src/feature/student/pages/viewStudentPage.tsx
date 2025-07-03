@@ -33,16 +33,29 @@ import { Parent } from "@/feature/prospective-student/types/parent"
 import { ClassMembership } from "../types/student-class-membership"
 import StudentDetailShimmer from "../components/studentDetailShimmer"
 import { Invoice } from "@/feature/finance/types/invoice"
+import { useState } from "react"
+import PDFPreviewModal from "@/core/components/ui/pdf_viewer"
 
 // Mock data for a single student - in a real app, this would come from an API
 
-
+type PDFSource = { type: 'url'; value: string } | { type: 'base64'; value: string };
 
 export default function StudentDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate()
     const { data, isLoading, isError, error } = useStudentById(id);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [activePdfSource, setActivePdfSource] = useState<PDFSource | null>(null);
 
+    const openModal = (source: PDFSource) => {
+        setActivePdfSource(source);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setActivePdfSource(null);
+    };
 
     if (isLoading) return <BaseLayout>
         <div className="flex min-h-screen">
@@ -707,7 +720,10 @@ export default function StudentDetailPage() {
                                                                                     <Button
                                                                                         variant="ghost"
                                                                                         size="icon"
-                                                                                        onClick={() => { }}
+                                                                                        onClick={() => openModal({
+                                                                                            type: doc.file_url ? "url" : "base64",
+                                                                                            value: doc.file_url || doc.file || "",
+                                                                                        })}
                                                                                         title="Lihat"
                                                                                     >
                                                                                         <Eye className="h-4 w-4" />
@@ -931,6 +947,14 @@ export default function StudentDetailPage() {
                                     </Tabs>
                                 </div>
                             </div>
+                            {activePdfSource && (
+                                <PDFPreviewModal
+                                    isOpen={isModalOpen}
+                                    onClose={closeModal}
+                                    source={activePdfSource}
+                                    title="Pratinjau Dokumen PDF"
+                                />
+                            )}
                         </div>
 
                     </main>
