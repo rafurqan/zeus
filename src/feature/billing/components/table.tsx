@@ -62,6 +62,7 @@ export default function BillingTable({ items, onDeleted, onEdit }: Props) {
             <Table>
                 <TableHeader>
                     <TableRow>
+                        <TableHead>No</TableHead>
                         <TableHead>ID</TableHead>
                         <TableHead>Nama</TableHead>
                         <TableHead>Kategori</TableHead>
@@ -74,8 +75,9 @@ export default function BillingTable({ items, onDeleted, onEdit }: Props) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {items.map((item) => (
+                    {items.map((item, index) => (
                         <TableRow key={item.id}>
+                            <TableCell className="font-medium">{index + 1}</TableCell>
                             <TableCell className="font-medium">{item.code ?? '-'}</TableCell>
                             <TableCell>{item.service_name ?? '-'}</TableCell>
                             <TableCell>
