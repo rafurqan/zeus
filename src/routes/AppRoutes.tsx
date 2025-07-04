@@ -11,13 +11,12 @@ import CreateProspectiveStudentsPage from '@/feature/prospective-student/pages/c
 import TeacherPage from '@/feature/teacher/pages/teacherPage';
 import StudentClassPage from '@/feature/student/pages/studentClassPage';
 import ProgramPage from '@/feature/master/pages/programPage';
-import { BillingDataPage } from "@/feature/finance/pages/billingDataPage";
-import { CreateInvoiceForm } from "@/feature/finance/components/CreateInvoiceForm";
-import InvoiceDetailPage from "@/feature/finance/pages/InvoiceDetailPage";
+import {BillingDataPage} from "@/feature/finance/pages/billingDataPage";
+import {CreateInvoiceForm} from "@/feature/finance/components/CreateInvoiceForm";
+import InvoiceDetailPage from "@/feature/finance/pages/invoiceDetailPage";
 import { PaymentDataPage } from "@/feature/payment/pages/PaymentDataPage";
-import { CreatePaymentForm } from "@/feature/payment/components/CreatePaymentForm";
+import { CreatePaymentForm } from "@/feature/payment/components/createPaymentForm";
 import { PrintPayment } from '@/feature/payment/components/PrintPayment';
-import StudentsPage from '@/feature/student/pages/studentPage';
 
 
 const AppRoutes = () => {

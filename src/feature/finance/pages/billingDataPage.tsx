@@ -62,7 +62,7 @@ export const BillingDataPage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        {/* <div className="grid grid-cols-4 gap-4 mb-6">
           <div className="bg-white p-4 rounded-lg shadow">
             <div className="text-sm text-black-500">Total Faktur</div>
             <div className="text-2xl font-bold">{statistics.total.count}</div>
@@ -83,7 +83,7 @@ export const BillingDataPage = () => {
             <div className="text-2xl font-bold">{getStatusStat("Lunas").count}</div>
             <div className="text-sm text-black-500">Rp {getStatusStat("Lunas").amount.toLocaleString()}</div>
           </div>
-        </div>
+        </div> */}
 
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="mb-4">

@@ -32,28 +32,37 @@ export const PaymentTable = ({
   const { confirm, ConfirmDialog } = useConfirm();
   const [showDetail, setShowDetail] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
+  const [deleteReason, setDeleteReason] = useState("");
 
   const handleChangeTab = (status: string | null) => {
     setPage(1);
     setActiveTab(status);
   };  
 
-  const handleDelete = async (id: string) => {
-    if (!token) return;
-    const result = await confirm({
-      title: "Konfirmasi Hapus",
-      message: "Apakah Anda yakin ingin membatalkan pembayaran ini?",
-      confirmText: "Ya, Hapus",
-      cancelText: "Batal"
-    });
-    if (result) {
-      try {
-        await paymentService.remove(token, id);
-        window.location.reload();
-      } catch (error) {
-        alert("Gagal menghapus pembayaran");
-      }
+  const handleDeleteClick = (id: string) => {
+    setSelectedPaymentId(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!token || !selectedPaymentId || !deleteReason.trim()) return;
+    
+    try {
+      await paymentService.remove(token, selectedPaymentId, { reason: deleteReason });
+      setShowDeleteModal(false);
+      setDeleteReason("");
+      window.location.reload();
+    } catch (error) {
+      alert("Gagal menghapus pembayaran");
     }
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeleteReason("");
+    setSelectedPaymentId(null);
   };
 
   const handlePayment = (id: string) => navigate(`/payment/paymentData/paymentForm?id=${id}`);
@@ -180,18 +189,61 @@ export const PaymentTable = ({
                   <button onClick={() => handlePayment(payment.id)} className="mr-2 text-green-600"><FaWallet /></button>
                 )}
                 {payment.payment?.id && (
-                  <button onClick={() => handleDelete(payment.payment?.id)} className="text-red-600"><FaTimes /></button>
+                  <button onClick={() => handleDeleteClick(payment.payment?.id)} className="text-red-600"><FaTimes /></button>
                 )}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-    <PaymentDetailModal
+      {/* Delete Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
+          <div className="bg-white/90 rounded-lg p-6 w-96 shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Konfirmasi Pembatalan Pembayaran</h3>
+              <button onClick={closeDeleteModal} className="text-gray-500 hover:text-gray-700">
+                <FaTimes />
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Alasan Pembatalan
+              </label>
+              <textarea
+                value={deleteReason}
+                onChange={(e) => setDeleteReason(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                rows={4}
+                placeholder="Masukkan alasan pembatalan pembayaran..."
+              />
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={closeDeleteModal}
+                className="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={!deleteReason.trim()}
+                className={`px-4 py-2 text-white rounded-md ${deleteReason.trim() ? 'bg-red-600 hover:bg-red-700' : 'bg-red-300 cursor-not-allowed'}`}
+              >
+                Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <PaymentDetailModal
         isOpen={showDetail}
         onClose={() => setShowDetail(false)}
         payment={selectedPayment}
-    />
+      />
 
       {ConfirmDialog}
       <div className="mt-4 flex justify-between items-center">

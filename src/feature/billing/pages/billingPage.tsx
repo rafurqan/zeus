@@ -25,7 +25,7 @@ const tabs = ['Biaya', 'Paket Biaya', 'Metode Pembayaran', 'Diskon & Beasiswa', 
 export default function BillingPage() {
     const { user, setUser } = useContext(AppContext);
     const { data, loading, loadingOverlay, remove, create, update } = useBilling();
-    const { data: grantData, loading: grantLoading, loadingOverlay: grantLoadingOverlay, remove: removeGrant, create: createGrant, update: updateGrant } = useGrant();
+    const { data: grantData, loading: grantLoading, loadingOverlay: grantLoadingOverlay, remove: removeGrant, create: createGrant, update: updateGrant, reset } = useGrant();
     const { data: packageData, loading: packageLoading, loadingOverlay: packageLoadingOverlay, remove: removePackage, create: createPackage, update: updatePackage } = usePackage();
     const [showModal, setShowModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>(null);
@@ -297,6 +297,7 @@ export default function BillingPage() {
                                             setSelectedItem(item);
                                             setShowModal(true);
                                         }}
+                                        onReset={(item) => reset(item.id)}
                                     />
                                 )}
                             </div>

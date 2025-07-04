@@ -92,6 +92,26 @@ export const useGrant = () => {
         }
     };
 
+    const reset = async (id: string) => {
+        try {
+        setLoadingOverlay(true);
+        await grantService.reset(token ?? "", id);
+        await fetchAll();
+        toast.success("Dana hibah berhasil direset.");
+        } catch (err: unknown) {
+        if (err instanceof AxiosError) {
+            toast.error(
+            err.response?.data.message ?? "Gagal reset dana hibah."
+            );
+            setError(
+            err.response?.data.message || "Gagal reset dana hibah."
+            );
+        }
+        } finally {
+        setLoadingOverlay(false);
+        }
+    };
+
     useEffect(() => {
         fetchAll();
     }, []);
@@ -104,5 +124,6 @@ export const useGrant = () => {
         create,
         update,
         remove,
+        reset,
     };
 };

@@ -1,6 +1,6 @@
 import { Grant } from "@/feature/billing/types/grant";
 import { Table, TableCell, TableHead, TableHeader, TableRow, TableBody } from "@/core/components/ui/table";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTimes, FaTrash } from "react-icons/fa";
 import { Button } from "@/core/components/ui/button";
 import { useState } from "react";
 
@@ -8,11 +8,28 @@ type Props = {
     items: Grant[];
     onDeleted: (item: Grant) => void;
     onEdit: (item: Grant) => void;
+    onReset: (item: Grant) => void;
 };
 
-export default function GrantTable({ items, onDeleted, onEdit }: Props) {
+export default function GrantTable({ items, onDeleted, onEdit, onReset }: Props) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [selectedItem, setSelectedItem] = useState<Grant | null>(null);
+    const [showResetConfirm, setShowResetConfirm] = useState(false);
+    const [resetItem, setResetItem] = useState<Grant | null>(null);
+
+    const handleReset = (item: Grant) => {
+        setResetItem(item);
+        setShowResetConfirm(true);
+    };
+
+    const confirmReset = () => {
+        if (resetItem) {
+            onReset(resetItem);
+            setShowResetConfirm(false);
+            setResetItem(null);
+        }
+    };
+
 
     const handleDelete = (item: Grant) => {
         setSelectedItem(item);
@@ -57,6 +74,33 @@ export default function GrantTable({ items, onDeleted, onEdit }: Props) {
                 </div>
             )}
 
+            {showResetConfirm && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="fixed inset-0 bg-black/30" onClick={() => setShowResetConfirm(false)} />
+                    <div className="relative bg-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+                        <h3 className="text-lg font-semibold mb-4">Konfirmasi Reset</h3>
+                        <p className="text-gray-600 mb-6">
+                            Anda akan mereset total dana terpakai untuk hibah <b>{resetItem?.grants_name}</b>. Lanjutkan?
+                        </p>
+                        <div className="flex justify-end gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setShowResetConfirm(false);
+                                    setResetItem(null);
+                                }}
+                            >
+                                Batal
+                            </Button>
+                            <Button variant="default" onClick={confirmReset}>
+                                Reset
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -89,7 +133,14 @@ export default function GrantTable({ items, onDeleted, onEdit }: Props) {
                                 style: 'currency',
                                 currency: 'IDR'
                             }).format(item.total_funds)}</TableCell>
-                            <TableCell>On Develop</TableCell>
+                            <TableCell>
+                                {new Intl.NumberFormat('id-ID', {
+                                    style: 'currency',
+                                    currency: 'IDR'
+                                }).format(item.total_funds - item.total_used_funds)}
+                                {' '}
+                                {/* ({Math.round((1 - item.total_used_funds / item.total_funds) * 100)}%) */}
+                            </TableCell>
                             <TableCell>{`${new Date(item.acceptance_date).toLocaleDateString('id-ID', {
                                 day: 'numeric',
                                 month: 'long',
@@ -115,6 +166,12 @@ export default function GrantTable({ items, onDeleted, onEdit }: Props) {
                                         onClick={() => handleDelete(item)}
                                     >
                                         <FaTrash />
+                                    </button>
+                                    <button
+                                        className="text-red-600 hover:text-yellow-800 text-sm font-medium"
+                                        onClick={() => handleReset(item)}
+                                    >
+                                        <FaTimes />
                                     </button>
                                 </div>
                             </TableCell>
