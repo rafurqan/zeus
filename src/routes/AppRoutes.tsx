@@ -11,12 +11,14 @@ import CreateProspectiveStudentsPage from '@/feature/prospective-student/pages/c
 import TeacherPage from '@/feature/teacher/pages/teacherPage';
 import StudentClassPage from '@/feature/student/pages/studentClassPage';
 import ProgramPage from '@/feature/master/pages/programPage';
+import BillingPage from "@/feature/billing/pages/billingPage";
 import {BillingDataPage} from "@/feature/finance/pages/billingDataPage";
 import {CreateInvoiceForm} from "@/feature/finance/components/CreateInvoiceForm";
 import InvoiceDetailPage from "@/feature/finance/pages/invoiceDetailPage";
 import { PaymentDataPage } from "@/feature/payment/pages/PaymentDataPage";
 import { CreatePaymentForm } from "@/feature/payment/components/createPaymentForm";
 import { PrintPayment } from '@/feature/payment/components/PrintPayment';
+import  StudentsPage from "@/feature/student/pages/studentPage";
 
 
 const AppRoutes = () => {
@@ -46,7 +48,7 @@ const AppRoutes = () => {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="master/education-levels" element={<EducationLevelsPage />} />
           <Route path="master/teachers" element={<TeacherPage />} />
-          {/* <Route path="master/billing" element={<BillingPage />} /> */}
+          <Route path="master/billing" element={<BillingPage />} />
           <Route path="students/prospective" element={<ProspectiveStudentsPage />} />
           <Route path="students/prospective/create" element={<CreateProspectiveStudentsPage />} />
           <Route path="/students/student" element={<StudentsPage />} />
