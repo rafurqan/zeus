@@ -5,6 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import { useConfirm } from "@/core/components/confirmDialog";
 
+const TAB_LIST = [
+  { key: "unpaid", label: "Belum Bayar" },
+  { key: null, label: "Semua" },
+  { key: "paid", label: "Sudah Bayar" }
+];
+
 export const InvoiceTable = () => {
   const { token } = useContext(AppContext);
   const navigate = useNavigate();
@@ -12,12 +18,13 @@ export const InvoiceTable = () => {
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState(null);
   const { confirm, ConfirmDialog } = useConfirm();
 
   const fetchInvoices = async () => {
     if (!token) return;
     try {
-      const response = await invoiceService.getAllPage(token, page, 10, searchTerm);
+      const response = await invoiceService.getAllPage(token, page, 10, searchTerm, activeTab);
       setInvoices(response.data?.data || []); // pastikan array
       setLastPage(response.data?.last_page || 1);
     } catch (error) {
@@ -27,7 +34,12 @@ export const InvoiceTable = () => {
 
   useEffect(() => {
     fetchInvoices();
-  }, [page, searchTerm]);
+  }, [page, searchTerm, activeTab]);
+
+  const handleChangeTab = (status) => {
+    setPage(1);
+    setActiveTab(status);
+  };
 
   const handleDelete = async (id) => {
     if (!token) return;
@@ -61,6 +73,19 @@ export const InvoiceTable = () => {
 
   return (
     <div className="overflow-x-auto">
+      {/* Tab Filter */}
+      <div className="flex mb-4">
+        {TAB_LIST.map(tab => (
+          <button
+            key={tab.key}
+            className={`px-4 py-2 mr-2 rounded ${activeTab === tab.key ? 'bg-black text-white' : 'bg-gray-200 text-black'}`}
+            onClick={() => handleChangeTab(tab.key)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {/* Search input */}
       <div className="mb-4 relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -73,7 +98,7 @@ export const InvoiceTable = () => {
           placeholder="Cari faktur, siswa, atau deskripsi..."
           value={searchTerm}
           onChange={(e) => {
-            setPage(1); 
+            setPage(1);
             setSearchTerm(e.target.value);
           }}
           className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"

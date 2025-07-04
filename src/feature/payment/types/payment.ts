@@ -11,6 +11,7 @@ export type Payment = {
   notes: string;
   id_log_grant: string;
   id_grant: string;
+  grant_amount: number;
   created_by_id: string;
   updated_by_id: string;
 };

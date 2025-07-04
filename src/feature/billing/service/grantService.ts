@@ -34,4 +34,11 @@ export const grantService = {
     console.log(response.data);
     return response.data;
   },
+
+  async reset(token: string, id: string): Promise<CreateGrantResponse> {
+    const response = await http(token).post<CreateGrantResponse>(
+      `master/grants/${id}/reset`
+    );
+    return response.data;
+  },
 };
