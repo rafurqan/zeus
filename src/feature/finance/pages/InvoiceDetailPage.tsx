@@ -5,18 +5,6 @@ import { invoiceService } from "../service/invoiceService";
 import BaseLayout from "@/core/components/baseLayout";
 import { Button } from "@/core/components/ui/button";
 
-const categoryMap = {
-  "1": "Registrasi",
-  "2": "Buku",
-  "3": "Seragam",
-  "4": "SPP",
-  "5": "Uang Gedung",
-  "6": "Kegiatan",
-  "7": "Ujian",
-  "8": "Wisuda",
-  "9": "Lainnya"
-};
-
 const InvoiceDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -29,7 +17,7 @@ const InvoiceDetailPage = () => {
       if (!token || !id) return;
       try {
         const data = await invoiceService.showDataById(id, token);
-        setInvoice(data);
+        setInvoice(data as any);
       } catch (error) {
         setInvoice(null);
       } finally {
@@ -88,8 +76,8 @@ const InvoiceDetailPage = () => {
     </div>
   );
 
-  const totalAmount = invoice.items?.reduce(
-    (sum, item) => sum + item.amount_rate * item.frequency,
+  const totalAmount = (invoice as any).items?.reduce(
+    (sum: number, item: { amount_rate: number; frequency: number }) => sum + item.amount_rate * item.frequency,
     0
   );
 
@@ -103,7 +91,7 @@ const InvoiceDetailPage = () => {
           &larr; Kembali
         </div>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Detail Faktur {invoice.code}</h1>
+          <h1 className="text-2xl font-bold">Detail Faktur {(invoice as any).code}</h1>
           <Button variant="outline">Cetak Invoice</Button>
         </div>
 
@@ -113,25 +101,25 @@ const InvoiceDetailPage = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-bold mb-4">Informasi Faktur</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div><b>Nomor Faktur:</b> {invoice.code}</div>
-                <div><b>Siswa:</b> {invoice.entity?.full_name}</div>
-                <div><b>Tanggal Terbit:</b> {new Date(invoice.publication_date).toLocaleDateString('id-ID', {
+                <div><b>Nomor Faktur:</b> {(invoice as any).code}</div>
+                <div><b>Siswa:</b> {(invoice as any).entity?.full_name}</div>
+                <div><b>Tanggal Terbit:</b> {new Date((invoice as any).publication_date).toLocaleDateString('id-ID', {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric'
                 })}</div>
-                <div><b>NIS:</b> {invoice.entity?.nis || '-'}</div>
-                <div><b>Jatuh Tempo:</b> {new Date(invoice.due_date).toLocaleDateString('id-ID', {
+                <div><b>NIS:</b> {(invoice as any).entity?.nis || '-'}</div>
+                <div><b>Jatuh Tempo:</b> {new Date((invoice as any).due_date).toLocaleDateString('id-ID', {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric'
                 })}</div>
-                <div><b>Kelas:</b> {invoice.student_class?.name}</div>
+                <div><b>Kelas:</b> {(invoice as any).student_class?.name}</div>
                 <div><b>Status:</b> <span className="bg-yellow-200 text-yellow-800 rounded px-2">Menunggu</span></div>
                 <div><b>Tipe:</b> Siswa Reguler</div>
                 <div><b>Jenis Tagihan:</b> Bulanan</div>
                 <div><b>Bulan:</b> April</div>
-                <div className="md:col-span-2"><b>Catatan:</b> <i>{invoice.notes}</i></div>
+                <div className="md:col-span-2"><b>Catatan:</b> <i>{(invoice as any).notes}</i></div>
               </div>
             </div>
 
@@ -147,10 +135,10 @@ const InvoiceDetailPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {invoice.items?.map(item => (
+                  {(invoice as any).items?.map((item: any) => (
                     <tr key={item.id} className="border-b">
                       <td className="py-2">{item.rate?.service?.name}</td>
-                      <td>{categoryMap[item.rate?.category] || '-'}</td>
+                      <td>{(item.rate?.category as any) || '-'}</td>
                       <td>{item.rate?.description}</td>
                       <td className="text-right">Rp {(
                         item.amount_rate * item.frequency
@@ -177,7 +165,7 @@ const InvoiceDetailPage = () => {
               <div className="bg-yellow-100 text-yellow-800 p-4 rounded text-sm mb-4">
                 <p><b>Faktur belum dibayar</b></p>
                 <p>Faktur ini jatuh tempo pada {" "}
-                {new Date(invoice.due_date).toLocaleDateString('id-ID', {
+                {new Date((invoice as any).due_date).toLocaleDateString('id-ID', {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric'
@@ -197,7 +185,7 @@ const InvoiceDetailPage = () => {
                   <li><span className="ml-2">Bank Central Asia (BCA)</span></li>
                   <li><span className="ml-2">No. Rekening: 1234567890</span></li>
                   <li><span className="ml-2">Atas Nama: Sekolah Keuangan</span></li>
-                  <li>Sertakan nomor faktur ({invoice.code}) pada keterangan transfer</li>
+                  <li>Sertakan nomor faktur ({(invoice as any).code}) pada keterangan transfer</li>
                   <li>Simpan bukti pembayaran</li>
                   <li>Konfirmasi pembayaran ke bagian keuangan sekolah</li>
                 </ol>

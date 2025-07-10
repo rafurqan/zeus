@@ -1,9 +1,10 @@
-import { useEffect, useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { paymentService } from "../service/paymentService";
 import { AppContext } from "@/context/AppContext";
 import { useNavigate } from "react-router-dom";
 import { FaEdit, FaEye, FaWallet, FaTimes, FaPrint } from "react-icons/fa";
 import { useConfirm } from "@/core/components/confirmDialog";
+import { Payment } from "../types/payment";
 
 import { PaymentDetailModal } from "./PaymentDetailModal";
 
@@ -13,23 +14,32 @@ const TAB_LIST = [
   { key: "paid", label: "Sudah Bayar" }
 ];
 
+// Tambahkan interface untuk props
+interface PaymentTableProps {
+  payments: Payment[];
+  loading: boolean;
+  page: number;
+  lastPage: number;
+  setPage: (page: number) => void;
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  activeTab: string | null;
+  setActiveTab: (tab: string | null) => void;
+}
 
-
-export const PaymentTable = ({
+export const PaymentTable  = ({
   payments,
-  loading,
   page,
   lastPage,
   setPage,
-  total,
   searchTerm,
   setSearchTerm,
   activeTab = null,
   setActiveTab,
-}) => {
+}: PaymentTableProps) => {
   const { token } = useContext(AppContext);
   const navigate = useNavigate();
-  const { confirm, ConfirmDialog } = useConfirm();
+  const { ConfirmDialog } = useConfirm();
   const [showDetail, setShowDetail] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -50,7 +60,7 @@ export const PaymentTable = ({
     if (!token || !selectedPaymentId || !deleteReason.trim()) return;
     
     try {
-      await paymentService.remove(token, selectedPaymentId, { reason: deleteReason });
+      await paymentService.remove(token, selectedPaymentId);
       setShowDeleteModal(false);
       setDeleteReason("");
       window.location.reload();
@@ -107,7 +117,7 @@ export const PaymentTable = ({
           placeholder="Cari pembayaran (ID, Siswa, NIS, Kelas, Faktur)..."
           value={searchTerm}
           onChange={(e) => {
-            setPage(1); // reset ke halaman pertama saat pencarian
+            setPage(1);
             setSearchTerm(e.target.value);
           }}
           className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
@@ -243,6 +253,7 @@ export const PaymentTable = ({
         isOpen={showDetail}
         onClose={() => setShowDetail(false)}
         payment={selectedPayment}
+        invoice={selectedPayment}
       />
 
       {ConfirmDialog}

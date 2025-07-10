@@ -2,16 +2,17 @@ import { JSX } from "react"
 
 type FormInputProps = {
     label: string | JSX.Element
-    name: string | null
+    name?: string
     value: string | number | null
     type?: string
     placeholder?: string
     disabled?: boolean
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void // Tipe yang lebih fleksibel
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
 }
 
 const inputClass = "w-full border border-gray-300 focus:border-blue-500 focus:outline-none p-2 rounded-md text-sm appearance-none bg-white";
 const labelClass = "block text-sm font-medium mb-1 text-gray-700";
+
 
 export const FormInput = ({
     label,

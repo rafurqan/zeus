@@ -14,8 +14,6 @@ import { Trash2, Search} from "lucide-react";
 import { useConfirm } from "@/core/components/confirmDialog";
 import { invoiceService } from "../service/invoiceService";
 import { useStudentClass } from "@/feature/student/hooks/useStudentClass";
-import ConfirmDialog from "@/core/components/confirmDialog";
-
 
 export const CreateInvoiceForm = () => {
   const { confirm, ConfirmDialog } = useConfirm();
@@ -23,7 +21,6 @@ export const CreateInvoiceForm = () => {
   const { data: classes = [], loading: classesLoading } = useStudentClass();
   const [searchParams] = useSearchParams();
   const invoiceId = searchParams.get('id');
-  // const navigate = useNavigate();
   const [form, setForm] = useState({
     invoice_number: "",
     student_name: "",
@@ -32,7 +29,6 @@ export const CreateInvoiceForm = () => {
     issue_date: "",
     due_date: "",
     notes: "",
-    // student_type: "",
     invoice_type: "",
     selected_items: [] as Billing[],
   });
@@ -54,8 +50,8 @@ export const CreateInvoiceForm = () => {
   const fetchData = async () => {
       try {
         const [billingData, packageData] = await Promise.all([
-          billingService.getAll(token),
-          packageService.getAll(token),
+          billingService.getAll(token as string),
+          packageService.getAll(token as string),
         ]);
         setBillings(billingData);
         setPackages(packageData);
@@ -69,7 +65,7 @@ export const CreateInvoiceForm = () => {
 
   const fetchStudents = async (keyword: string) => {
     try {
-      const students = await invoiceService.getStudents(token, keyword);
+      const students = await invoiceService.getStudents(token as string, keyword);
       setStudentList(students);
     } catch (error) {
       console.error("Gagal fetch student", error);
@@ -82,7 +78,7 @@ export const CreateInvoiceForm = () => {
       setForm(prevForm => {
         const existingItems = [...prevForm.selected_items];
         
-        pkg.child_rates.forEach(child => {
+        pkg.child_rates?.forEach(child => {
           // Cari apakah child item sudah ada di selected_items
           const existingItemIndex = existingItems.findIndex(item => item.id === child.id);
           
@@ -178,7 +174,7 @@ export const CreateInvoiceForm = () => {
   };
   
   const filteredPackages = packages.filter(pkg =>
-    pkg.service_name.toLowerCase().includes(searchTermPackage.toLowerCase())
+    pkg.service_name?.toLowerCase().includes(searchTermPackage.toLowerCase())
   );
   
   const filteredBillings = billings.filter(bill =>
@@ -223,7 +219,7 @@ export const CreateInvoiceForm = () => {
             };
   
             // Rebuild selected_items from invoice.items
-            const selectedItemsFromItems = invoiceData.items.map(item => ({
+            const selectedItemsFromItems = (invoiceData as any).items?.map((item: { rate: { id: number; service: { id: number; name: string; }; category: string; description: string; }; amount_rate: number; frequency: number; }) => ({
               id: item.rate.id, // for React key
               rate_id: item.rate.id,
               service_id: item.rate.service.id,
@@ -237,20 +233,19 @@ export const CreateInvoiceForm = () => {
             setForm({
               ...form,
               invoice_number: invoiceData.code,
-              student_name: invoiceData.entity?.full_name || "",
-              class: invoiceData.student_class?.id || "",
-              class_name: invoiceData.student_class?.name || "",
-              issue_date: formatDate(invoiceData.publication_date),
-              due_date: formatDate(invoiceData.due_date),
+              student_name: (invoiceData as any).entity?.full_name || "",
+              class: (invoiceData as any).student_class?.id || "",
+              class_name: (invoiceData as any).student_class?.name || "",
+              issue_date: formatDate((invoiceData as any).publication_date),
+              due_date: formatDate((invoiceData as any).due_date),
               notes: invoiceData.notes || "",
-              student_type: invoiceData.entity_type || "",
-              invoice_type: invoiceData.invoice_type || "",
+              invoice_type: (invoiceData as any).invoice_type || "",
               selected_items: selectedItemsFromItems,
             });
   
             // Set item frequencies dari items
             const frequencies: Record<string, number> = {};
-            invoiceData.items.forEach(item => {
+            (invoiceData as any).items?.forEach((item: { rate_id: number; frequency: number; }) => {
               if (item.rate_id) {
                 frequencies[item.rate_id] = item.frequency;
               }
@@ -258,7 +253,7 @@ export const CreateInvoiceForm = () => {
             setItemFrequencies(frequencies);
   
             // Set added item IDs
-            const itemIds = invoiceData.items.map(item => item.rate_id);
+            const itemIds = (invoiceData as any).items?.map((item: { rate_id: number; }) => item.rate_id);
             setAddedItemIds(itemIds);
           }
         } catch (error) {
@@ -277,7 +272,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   try {
     if (invoiceId) {
       // Update existing invoice
-      await invoiceService.update(token, {
+      await invoiceService.update(token as string, {
         id: invoiceId,
         ...form
       });
@@ -292,7 +287,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       }, 1000);
     } else {
       // Create new invoice
-      await invoiceService.create(token, form);
+      await invoiceService.create(token as string, form);
       confirm({
         title: "Success", 
         message: "Invoice Berhasil Dibuat!",
@@ -331,33 +326,14 @@ const handleSubmit = async (e: React.FormEvent) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Kiri: Form */}
           <div className="md:col-span-2 space-y-4">
-            <FormInput 
+            <FormInput
               name="invoice_number"
-              label="Nomor Invoice" 
-              placeholder="Akan di generate secara otomatis"
-              value={form.invoice_number} 
+              label="Nomor Invoice"
+              placeholder="Akan di generate secara otomatis" 
+              value={form.invoice_number}
+              onChange={() => {}}
               disabled 
             />
-
-            {/* <div className="flex gap-4">
-              <label className="text-sm font-medium">Tipe Siswa</label>
-              {[
-                { label: "Semua", value: "1" },
-                { label: "Siswa", value: "2" },
-                { label: "Calon Siswa", value: "3" }
-              ].map(opt => (
-                <label key={opt.value} className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="student_type"
-                    value={opt.value}
-                    checked={form.student_type === opt.value}
-                    onChange={(e) => setForm({ ...form, student_type: e.target.value })}
-                  />
-                  <span className="text-sm">{opt.label}</span>
-                </label>
-              ))}
-            </div> */}
 
             <FormSelect
                 label="Kelas"

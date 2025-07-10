@@ -11,33 +11,30 @@ export const usePayment = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
-  const [activeTab, setActiveTab] = useState(null);
-  const [total, setTotal] = useState(0);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
   
 
   const fetchPayments = async (page = 1, search = "", status: string | null = null) => {
     setLoading(true);
     setPayments([]); // Reset payments sebelum fetch data baru
     try {
-      const response = await paymentService.getAllPage(token, page, 10, search, status);
+      const response = await paymentService.getAllPage(token as string, page, 10, search, status);
       if (response.data?.data) {
         setPayments(response.data.data);
-        setTotal(response.data.total || 0);
         setLastPage(Math.ceil((response.data.total || 0) / 10));
       }
     } catch (err) {
-      setError(err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
       setPayments([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChangeTab = (status: string | null) => {
-    setPage(1);
-    setActiveTab(status);
-  };
-  
+  // const handleChangeTab = (status: string | null) => {
+  //   setPage(1);
+  //   setActiveTab(status);
+  // };
 
   useEffect(() => {
     if (!token) return; // Tambahkan ini

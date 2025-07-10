@@ -7,7 +7,7 @@ import { useConfirm } from "@/core/components/confirmDialog";
 
 const TAB_LIST = [
   { key: "unpaid", label: "Belum Bayar" },
-  { key: null, label: "Semua" },
+  { key: "", label: "Semua" },
   { key: "paid", label: "Sudah Bayar" }
 ];
 
@@ -18,14 +18,14 @@ export const InvoiceTable = () => {
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState(null);
+  const [activeTab, setActiveTab] = useState("");
   const { confirm, ConfirmDialog } = useConfirm();
 
   const fetchInvoices = async () => {
     if (!token) return;
     try {
       const response = await invoiceService.getAllPage(token, page, 10, searchTerm, activeTab);
-      setInvoices(response.data?.data || []); // pastikan array
+      setInvoices(response.data?.data || []); 
       setLastPage(response.data?.last_page || 1);
     } catch (error) {
       console.error("Error fetching invoices:", error);
@@ -36,12 +36,12 @@ export const InvoiceTable = () => {
     fetchInvoices();
   }, [page, searchTerm, activeTab]);
 
-  const handleChangeTab = (status) => {
+  const handleChangeTab = (status: string | null) => {
     setPage(1);
-    setActiveTab(status);
+    setActiveTab(status || '');
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: number) => {
     if (!token) return;
     const result = await confirm({
       title: "Konfirmasi Hapus",
@@ -51,7 +51,7 @@ export const InvoiceTable = () => {
     });
     if (result) {
       try {
-        await invoiceService.remove(token, id);
+        await invoiceService.remove(token, id.toString());
         window.location.reload();
       } catch (error) {
         alert("Gagal menghapus faktur");
@@ -59,10 +59,10 @@ export const InvoiceTable = () => {
     }
   };
 
-  const handleEdit = (id) => navigate(`/finance/billingData/create?id=${id}`);
-  const handleDetail = (id) => navigate(`/finance/billingData/detail/${id}`);
+  const handleEdit = (id: number) => navigate(`/finance/billingData/create?id=${id}`);
+  const handleDetail = (id: number) => navigate(`/finance/billingData/detail/${id}`);
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "Lunas": return "bg-green-100 text-green-800";
       case "Terlambat": return "bg-red-100 text-red-800";
@@ -122,33 +122,33 @@ export const InvoiceTable = () => {
         <tbody className="bg-white divide-y divide-gray-200">
           {invoices.length > 0 ? (
             invoices.map((invoice) => (
-              <tr key={invoice.id}>
+              <tr key={(invoice as { id: number }).id}>
                 <td className="px-6 py-4 text-sm text-gray-700">{((page - 1) * 10) + invoices.indexOf(invoice) + 1}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">{invoice.code}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">{invoice.entity?.full_name}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">{invoice.student_class?.name}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">{invoice.notes}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">Rp {invoice.total?.toLocaleString()}</td>
+                <td className="px-6 py-4 text-sm text-gray-700">{(invoice as { code: string }).code}</td>
+                <td className="px-6 py-4 text-sm text-gray-700">{(invoice as { entity: { full_name: string } }).entity?.full_name}</td>
+                <td className="px-6 py-4 text-sm text-gray-700">{(invoice as { student_class: { name: string } }).student_class?.name}</td>
+                <td className="px-6 py-4 text-sm text-gray-700">{(invoice as { notes: string }).notes || "-"}</td>
+                <td className="px-6 py-4 text-sm text-gray-700">Rp {(invoice as { total: number }).total?.toLocaleString() || "-"}</td>
                 <td className="px-6 py-4">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(invoice.status)}`}>
-                    {invoice.status}
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor((invoice as { status: string }).status)}`}>
+                    {(invoice as { status: string }).status}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  {new Date(invoice.due_date).toLocaleDateString("id-ID", {
+                  {new Date((invoice as { due_date: string }).due_date).toLocaleDateString("id-ID", {
                     day: "numeric", month: "long", year: "numeric"
                   })}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700 flex gap-2">
-                  <button onClick={() => handleDetail(invoice.id)} className="text-blue-500 hover:text-blue-700" title="Lihat Detail">
+                  <button onClick={() => handleDetail((invoice as { id: number }).id)} className="text-blue-500 hover:text-blue-700" title="Lihat Detail">
                     <FaEye />
                   </button>
-                  {!invoice.payment?.id && (
+                  {!((invoice as { payment: { id: number } }).payment?.id) && (
                     <>
-                      <button onClick={() => handleEdit(invoice.id)} className="text-yellow-500 hover:text-yellow-700" title="Edit">
+                      <button onClick={() => handleEdit((invoice as { id: number }).id)} className="text-yellow-500 hover:text-yellow-700" title="Edit">
                         <FaEdit />
                       </button>
-                      <button onClick={() => handleDelete(invoice.id)} className="text-red-500 hover:text-red-700" title="Hapus">
+                      <button onClick={() => handleDelete((invoice as { id: number }).id)} className="text-red-500 hover:text-red-700" title="Hapus">
                         <FaTrash />
                       </button>
                     </>

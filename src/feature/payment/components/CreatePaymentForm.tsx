@@ -1,9 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppContext } from "@/context/AppContext";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/core/components/ui/tabs";
 import { FormInput } from "@/core/components/forms/formInput";
-import { FormSelect } from "@/core/components/forms/formSelect";
 import { Button } from "@/core/components/ui/button";
 import { billingService } from "@/feature/billing/service/billingService";
 import { packageService } from "@/feature/billing/service/packageService";
@@ -11,19 +9,16 @@ import { invoiceService } from "@/feature/finance/service/invoiceService";
 import BaseLayout from "@/core/components/baseLayout";
 import { Billing } from "@/feature/billing/types/billing";
 import { RatePackage } from "@/feature/billing/types/ratePackage";
-import { Trash2, Search} from "lucide-react";
 import { useConfirm } from "@/core/components/confirmDialog";
 import { paymentService } from "../service/paymentService";
 import { useStudentClass } from "@/feature/student/hooks/useStudentClass";
-import ConfirmDialog from "@/core/components/confirmDialog";
-import { useParams } from "react-router-dom";
 import { useGrant } from "@/feature/billing/hook/useGrant";
 import { Grant } from "@/feature/billing/types/grant";
 
 export const CreatePaymentForm = () => {
   const { confirm, ConfirmDialog } = useConfirm();
   const { token } = useContext(AppContext);
-  const { data: classes = [], loading: classesLoading } = useStudentClass();
+  useStudentClass();
   const [searchParams] = useSearchParams();
   const invoiceId = searchParams.get('id');
   const paymentId = searchParams.get('paymentId');
@@ -39,28 +34,32 @@ export const CreatePaymentForm = () => {
           const payment = response;
           
           if (payment) {
-            // Set metode pembayaran
-            setPaymentMethod(payment.payment_method);
-            
+            setPaymentMethod((payment as any).payment_method);
             // Set nominal pembayaran
-            setPaymentAmount(payment.nominal_payment.toString());
+            setPaymentAmount((payment as any).nominal_payment.toString());
             
             // Set data bank karena metode pembayaran adalah Transfer
             setBankDetails({
-              bank_name: payment.bank_name || "",
-              account_number: payment.account_number || "",
-              account_holder: payment.account_name || "",
-              reference_number: payment.reference_number || ""
+              bank_name: (payment as any).bank_name || "",
+              account_number: (payment as any).account_number || "",
+              account_holder: (payment as any).account_name || "",
+              reference_number: (payment as any).reference_number || ""
             });
             
             setForm(prev => ({
               ...prev,
-              notes: payment.notes
+              notes: (payment as any).notes || ""
             }));
             
-
-            const paymentDate = payment.payment_date.split(' ')[0];
+            const paymentDate = (payment as any).payment_date.split(' ')[0];
             setPaymentDate(paymentDate);
+
+            if ((payment as any).use_grant) {
+              setUseGrantCheckbox(true);
+              setGrantAmount((payment as any).grant_amount?.toString() || "");
+              const grant = grants.find(g => g.id === (payment as any).grant_id);
+              setSelectedGrant(grant || null);
+            } 
           }
         } catch (error) {
           console.error("Gagal memuat data pembayaran:", error);
@@ -68,7 +67,7 @@ export const CreatePaymentForm = () => {
             title: "Error",
             message: "Gagal memuat data pembayaran. Silakan coba lagi.",
             confirmText: "OK",
-            showCancel: false,
+            cancelText: "",
           });
         }
       }
@@ -77,7 +76,6 @@ export const CreatePaymentForm = () => {
     fetchPaymentData();
   }, [isEditMode, paymentId, token]);
 
-  // Modifikasi handleSubmit untuk mendukung update
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -90,7 +88,7 @@ export const CreatePaymentForm = () => {
         payment_method: paymentMethod,
         payment_amount: numericPaymentAmount,
         payment_date: new Date().toISOString().split('T')[0],
-        notes: form.notes,
+        notes: (form as any).notes,
         bank_details: paymentMethod === "Transfer" ? {
           bank_name: bankDetails.bank_name,
           account_number: bankDetails.account_number,
@@ -98,24 +96,33 @@ export const CreatePaymentForm = () => {
           reference_number: bankDetails.reference_number
         } : null,
         grant_id: selectedGrant?.id,
+        nominal_payment: numericPaymentAmount,
         grant_amount: numericGrantAmount,
-        total_payment: totalPayment
+        total_payment: totalPayment,
+        use_grant: useGrantCheckbox 
       };
 
-      if (isEditMode && paymentId) {
-        await paymentService.update(token, {
+      if (isEditMode && paymentId ) {
+        await paymentService.update(token as string, {
             id: paymentId,
-            ...paymentData
+            ...paymentData,
+            total: totalBill,
+            due_date: form.due_date
           });
       } else {
-        await paymentService.create(token, paymentData);
+        await paymentService.create(token as string, {
+          id: "",
+          total: totalBill,
+          due_date: form.due_date,
+          ...paymentData
+        });
       }
 
       await confirm({
         title: "Sukses",
         message: `Pembayaran berhasil ${isEditMode ? 'diperbarui' : 'disimpan'}!`,
         confirmText: "OK",
-        showCancel: false,
+        cancelText: "",
       });
 
       setTimeout(() => {
@@ -127,7 +134,7 @@ export const CreatePaymentForm = () => {
         title: "Error",
         message: `Gagal ${isEditMode ? 'memperbarui' : 'menyimpan'} pembayaran. Silakan coba lagi.`,
         confirmText: "OK",
-        showCancel: false,
+        cancelText: "",
       });
     }
   };
@@ -144,25 +151,17 @@ export const CreatePaymentForm = () => {
     selected_items: [] as Billing[],
   });
 
-  const [selectedTab, setSelectedTab] = useState("package");
   const [billings, setBillings] = useState<Billing[]>([]);
   const [packages, setPackages] = useState<RatePackage[]>([]);
-  const [searchTermPackage, setSearchTermPackage] = useState("");
-  const [searchTermBilling, setSearchTermBilling] = useState("");
   const [addedItemIds, setAddedItemIds] = useState<number[]>([]);
-  const [addedPackageIds, setAddedPackageIds] = useState<number[]>([]);
   const [itemFrequencies, setItemFrequencies] = useState<Record<number, number>>({});
-  const [selectedPackages, setSelectedPackages] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [studentList, setStudentList] = useState<any[]>([]);
-  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
   const fetchData = async () => {
       try {
         const [billingData, packageData] = await Promise.all([
-          billingService.getAll(token),
-          packageService.getAll(token),
+          billingService.getAll(token as string),
+          packageService.getAll(token as string),
         ]);
         setBillings(billingData);
         setPackages(packageData);
@@ -200,8 +199,8 @@ export const CreatePaymentForm = () => {
               return dateString.split(' ')[0];
             };
             // Rebuild selected_items from invoice.items
-            const selectedItemsFromItems = invoiceData.items.map(item => ({
-              id: item.rate.id, // for React key
+            const selectedItemsFromItems = (invoiceData as any).items.map((item: { rate: { id: number; service: { id: number; name: string; }; category: string; description: string; }; amount_rate: number; frequency: number; }) => ({
+              id: item.rate.id, 
               rate_id: item.rate.id,
               service_id: item.rate.service.id,
               service_name: item.rate.service.name,
@@ -214,13 +213,13 @@ export const CreatePaymentForm = () => {
             setForm({
               ...form,
               invoice_number: invoiceData.code,
-              student_name: invoiceData.entity?.full_name || "",
-              registration_code: invoiceData.entity?.registration_code || "",
-              class: invoiceData.student_class?.id || "",
-              class_name: invoiceData.student_class?.name || "",
-              part_class: invoiceData.student_class?.part || "",
-              issue_date: formatDate(invoiceData.publication_date),
-              due_date: formatDate(invoiceData.due_date),
+              student_name: (invoiceData as any).entity?.full_name || "",
+              ...(((invoiceData as any).entity?.registration_code ? { registration_code: (invoiceData as any).entity.registration_code } : {}) as any),
+              class: (invoiceData as any).student_class?.id || "",
+              class_name: (invoiceData as any).student_class?.name || "",
+              part_class: (invoiceData as any).student_class?.part || "",
+              issue_date: formatDate((invoiceData as any).publication_date),
+              due_date: formatDate((invoiceData as any).due_date),
               student_type: invoiceData.entity_type === "App\\Models\\Student" ? "Siswa" : 
                           invoiceData.entity_type === "App\\Models\\ProspectiveStudent" ? "Calon Siswa" : "",
               invoice_type: invoiceData.invoice_type || "",
@@ -229,7 +228,7 @@ export const CreatePaymentForm = () => {
   
             // Set item frequencies dari items
             const frequencies: Record<string, number> = {};
-            invoiceData.items.forEach(item => {
+            (invoiceData as any).items.forEach((item: { rate_id: number; frequency: number; }) => {
               if (item.rate_id) {
                 frequencies[item.rate_id] = item.frequency;
               }
@@ -237,7 +236,7 @@ export const CreatePaymentForm = () => {
             setItemFrequencies(frequencies);
   
             // Set added item IDs
-            const itemIds = invoiceData.items.map(item => item.rate_id);
+            const itemIds = (invoiceData as any).items.map((item: { rate_id: number; }) => item.rate_id);
             setAddedItemIds(itemIds);
           }
         } catch (error) {
@@ -275,15 +274,7 @@ export const CreatePaymentForm = () => {
   const [useGrantCheckbox, setUseGrantCheckbox] = useState(false);
   const [selectedGrant, setSelectedGrant] = useState<Grant | null>(null);
   const [grantAmount, setGrantAmount] = useState("");
-  const { data: grants = [], loading: grantsLoading } = useGrant();
-
-  const handleGrantCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUseGrantCheckbox(e.target.checked);
-    if (!e.target.checked) {
-      setSelectedGrant(null);
-      setGrantAmount("");
-    }
-  };
+  const { data: grants = [] } = useGrant();
 
   const handlePaymentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
@@ -296,8 +287,27 @@ export const CreatePaymentForm = () => {
     
     if (selectedGrant && numericValue > selectedGrant.total_funds) {
       setGrantAmount(selectedGrant.total_funds.toString());
+      // Sesuaikan pembayaran wali siswa
+      const remainingPayment = Math.max(0, totalBill - selectedGrant.total_funds);
+      setPaymentAmount(remainingPayment.toString());
     } else {
       setGrantAmount(value);
+      // Sesuaikan pembayaran wali siswa
+      const remainingPayment = Math.max(0, totalBill - numericValue);
+      setPaymentAmount(remainingPayment.toString());
+    }
+  };
+
+  const handleGrantCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUseGrantCheckbox(e.target.checked);
+    if (!e.target.checked) {
+      setSelectedGrant(null);
+      setGrantAmount("");
+      // Reset pembayaran wali siswa ke total tagihan
+      setPaymentAmount(totalBill.toString());
+    } else {
+      // Jika checkbox dicentang, set pembayaran wali siswa ke total tagihan dulu
+      setPaymentAmount(totalBill.toString());
     }
   };
 
@@ -306,8 +316,10 @@ export const CreatePaymentForm = () => {
     const grant = grants.find(g => g.id === selectedId);
     setSelectedGrant(grant || null);
     setGrantAmount("");
+    // Reset pembayaran wali siswa ke total tagihan saat ganti dana hibah
+    setPaymentAmount(totalBill.toString());
   };
-  const totalBill = form.selected_items.reduce((sum, item) => sum + item.price * item.frequency, 0);
+  const totalBill = (form as any).selected_items.reduce((sum: number, item: { price: number; frequency: number; }) => sum + item.price * item.frequency, 0);
   const numericPaymentAmount = parseInt(paymentAmount) || 0;
   const numericGrantAmount = parseInt(grantAmount) || 0;
   const totalPayment = numericPaymentAmount + numericGrantAmount;
@@ -333,7 +345,7 @@ export const CreatePaymentForm = () => {
                 <div>
                     <p className="text-sm text-gray-600">Tipe Siswa : {form.student_type}</p>
                     <p className="text-sm text-gray-600">Nama Siswa : {form.student_name}</p>
-                    <p className="text-sm text-gray-600">No. Registrasi : {form.registration_code}</p>
+                    <p className="text-sm text-gray-600">No. Registrasi : {(form as any).registration_code}</p>
                     <p className="text-sm text-gray-600">Kelas : {form.class_name} {form.part_class}</p>
                     <p className="text-sm mt-1 text-gray-500">
                         Jatuh Tempo:{' '}
@@ -382,10 +394,16 @@ export const CreatePaymentForm = () => {
                         {item.category === "9" && "Lainnya"}
                     </td>
                     <td className="px-2 py-2">{item.description}</td>
-                    <td className="px-2 py-2 whitespace-nowrap">Rp {item.price.toLocaleString()}</td>
+                    <td className="px-2 py-2 whitespace-nowrap">Rp {item.price.toLocaleString('id-ID', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    })}</td>
                     <td className="px-2 py-2 text-center">{item.frequency}</td>
                     <td className="px-2 py-2 whitespace-nowrap rounded-r">
-                        Rp {(item.price * item.frequency).toLocaleString()}
+                        Rp {(item.price * (item as any).frequency * 1).toLocaleString('id-ID', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                        })}
                     </td>
                 </tr>
                 ))}
@@ -393,14 +411,20 @@ export const CreatePaymentForm = () => {
                     <td colSpan={4}></td>
                     <td className="font-semibold text-right pr-2 rounded-l">Subtotal:</td>
                     <td className="text-left pr-2 rounded-r">
-                        Rp {form.selected_items.reduce((sum, item) => sum + item.price * item.frequency, 0).toLocaleString()}
+                        Rp {form.selected_items.reduce((sum, item) => sum + item.price * (item as any).frequency * 1, 0).toLocaleString('id-ID', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                        })}
                     </td>
                 </tr>
                 <tr>
                     <td colSpan={4}></td>
                     <td className="font-bold text-right pr-2 rounded-l">Total: </td>
                     <td className="font-bold text-left pr-2 rounded-r">
-                        Rp {form.selected_items.reduce((sum, item) => sum + item.price * item.frequency, 0).toLocaleString()}
+                        Rp {form.selected_items.reduce((sum, item) => sum + item.price * (item as any).frequency * 1, 0).toLocaleString('id-ID', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                        })}
                     </td>
                 </tr>
             </tbody>
@@ -570,7 +594,7 @@ export const CreatePaymentForm = () => {
                         name="bank_name"
                         className="w-full border rounded px-3 py-2"
                         value={bankDetails.bank_name}
-                        onChange={handleBankDetailsChange}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleBankDetailsChange(e as unknown as React.ChangeEvent<HTMLInputElement>)}
                       >
                         <option value="">Pilih Bank</option>
                         <option value="BCA">Bank Central Asia (BCA)</option>
@@ -632,7 +656,7 @@ export const CreatePaymentForm = () => {
                     className="w-full border rounded px-3 py-2" 
                     rows={3} 
                     placeholder="Catatan tambahan" 
-                    value={form.notes}
+                    value={(form as any).notes}
                     onChange={(e) => setForm(prev => ({
                         ...prev,
                         notes: e.target.value

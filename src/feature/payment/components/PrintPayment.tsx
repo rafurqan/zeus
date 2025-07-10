@@ -9,7 +9,6 @@ import { convertToRupiah } from '@/lib/utils';
 export const PrintPayment = () => {
 
     const handlePrint = () => {
-        // Set judul dokumen untuk nama file saat disimpan
         document.title = `SLIP_PEMBAYARAN_${invoiceData?.code || 'unknown'}`;
         window.print();
     };
@@ -107,11 +106,10 @@ export const PrintPayment = () => {
             </div>
         ))}
         </div>
-
-
-      {/* Ringkasan Pembayaran */}
+        
+      {/* Payment Summary */}
       <div className="grid grid-cols-2 gap-2 mb-4">
-        <div>
+        <div className="grid grid-cols-2 gap-2">
           <p>Jumlah Total</p>
           <p>Dibayarkan</p>
           <p>Terbilang</p>
@@ -159,7 +157,6 @@ export const PrintPayment = () => {
       </div>
 
       <p className="mt-6 text-sm italic">Nb. Harap disimpan.</p>
-      {LoadingOverlay}
     </div>
     </div>
   );
