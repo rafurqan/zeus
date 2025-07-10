@@ -5,6 +5,7 @@ interface PaymentDetailModalProps {
     payment?: {
       code?: string;
       nominal_payment: number;
+      total_payment: number;
       payment_method?: string;
       status?: 'paid' | 'unpaid' | 'late' | 'partial';
       payment_date?: string;
@@ -67,8 +68,8 @@ export const PaymentDetailModal = ({ isOpen, onClose, payment, invoice }: Paymen
                 <p><strong>ID Faktur:</strong> {payment.code || "-"}</p>
                 <p><strong>Deskripsi:</strong> {payment.description || "-"}</p>
                 <p><strong>Jumlah Tagihan:</strong> Rp {payment.total.toLocaleString() || "-"}</p>
-                <p><strong>Jumlah Bayar:</strong> Rp {payment.payment?.nominal_payment.toLocaleString() || "-"}</p>
-                <p><strong>Kekurangan:</strong> Rp {(payment.total - (payment.payment?.nominal_payment || 0)).toLocaleString() || "-"}</p>
+                <p><strong>Jumlah Bayar:</strong> Rp {payment.payment?.total_payment.toLocaleString() || "-"}</p>
+                <p><strong>Kekurangan:</strong> Rp {(payment.total - (payment.payment?.total_payment || 0)).toLocaleString() || "-"}</p>
                 <p><strong>Metode:</strong> {payment.payment?.payment_method || "-"}</p>
                 <p><strong>Status:</strong> {" "}
                   {(() => {

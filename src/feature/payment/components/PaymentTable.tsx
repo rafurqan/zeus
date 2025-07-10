@@ -88,7 +88,8 @@ export const PaymentTable  = ({
   };
 
   const handlePrint = (invoiceId: string, paymentId: string) => {
-      window.open(`/payment/print?idInvoice=${invoiceId}&idPayment=${paymentId}`, '', 'width=800,height=600');
+      navigate(`/payment/print?idInvoice=${invoiceId}&idPayment=${paymentId}`);
+      // window.open(`/payment/print?idInvoice=${invoiceId}&idPayment=${paymentId}`, '', 'width=800,height=600');
   };
 
   return (

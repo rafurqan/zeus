@@ -108,27 +108,48 @@ export const PrintPayment = () => {
         </div>
         
       {/* Payment Summary */}
-      <div className="grid grid-cols-2 gap-2 mb-4">
-        <div className="grid grid-cols-2 gap-2">
-          <p>Jumlah Total</p>
-          <p>Dibayarkan</p>
-          <p>Terbilang</p>
-          <p>Potongan</p>
-          <p>Kekurangan</p>
-          <p>Ket. Lunas</p>
-        </div>
-        <div className="text-right">
-          <p>: Rp {invoiceData?.total?.toLocaleString()}</p>
-          <p>: Rp {paymentData?.nominal_payment?.toLocaleString()}</p>
-          <p className="text-sm">({convertToRupiah(invoiceData?.total || 0)})</p>
-          <p>: Rp {paymentData?.grant_amount?.toLocaleString()}</p>
-          <p>: Rp {(invoiceData?.total - paymentData?.nominal_payment)?.toLocaleString()}</p>
-          <p className="font-bold uppercase"> {paymentData?.status} </p>
+      <div className="mb-4">
+        <div className="grid grid-cols-[40%_60%] gap-2">
+          <div className="space-y-2">
+            <p>Jumlah Total</p>
+            <p>Dibayarkan</p>
+            <p>Terbilang</p>
+            <p>Potongan</p>
+            <p>Kekurangan</p>
+            <p>Ket. Lunas</p>
+          </div>
+          <div className="space-y-2 text-left">
+            <p className="flex justify-between">
+              <span>:</span>
+              <span>Rp {invoiceData?.total?.toLocaleString()}</span>
+            </p>
+            <p className="flex justify-between">
+              <span>:</span>
+              <span>Rp {paymentData?.total_payment?.toLocaleString()}</span>
+            </p>
+            <p className="text-sm italic flex justify-end">
+              ({convertToRupiah(invoiceData?.total || 0)})
+            </p>
+            <p className="flex justify-between">
+              <span>:</span>
+              <span>Rp {paymentData?.grant_amount?.toLocaleString()}</span>
+            </p>
+            <p className="flex justify-between">
+              <span>:</span>
+              <span>Rp {(invoiceData?.total - paymentData?.total_payment)?.toLocaleString()}</span>
+            </p>
+            <p className="font-bold uppercase flex justify-end">
+              {paymentData?.status === 'paid' ? 'LUNAS' :
+               paymentData?.status === 'unpaid' ? 'BELUM LUNAS' :
+               paymentData?.status === 'partial' ? 'SEBAGIAN' : 
+               paymentData?.status}
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Kotak Kurang */}
-      {invoiceData?.total > paymentData?.nominal_payment && (
+      {invoiceData?.total > paymentData?.total_payment && (
         <div className="mb-4">
           <p className="border border-black w-fit px-2 py-1 bg-yellow-200">
             <span className="font-bold">KURANG</span> Rp {(invoiceData?.total - paymentData?.nominal_payment)?.toLocaleString()}

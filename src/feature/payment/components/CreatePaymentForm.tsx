@@ -8,7 +8,6 @@ import { packageService } from "@/feature/billing/service/packageService";
 import { invoiceService } from "@/feature/finance/service/invoiceService";
 import BaseLayout from "@/core/components/baseLayout";
 import { Billing } from "@/feature/billing/types/billing";
-import { RatePackage } from "@/feature/billing/types/ratePackage";
 import { useConfirm } from "@/core/components/confirmDialog";
 import { paymentService } from "../service/paymentService";
 import { useStudentClass } from "@/feature/student/hooks/useStudentClass";
@@ -25,6 +24,20 @@ export const CreatePaymentForm = () => {
   const mode = searchParams.get('mode');
   const isEditMode = mode === 'edit';
 
+  const [paymentMethod, setPaymentMethod] = useState("Tunai");
+  const [paymentDate, setPaymentDate] = useState("");
+  const [bankDetails, setBankDetails] = useState({
+    bank_name: "",
+    account_number: "",
+    account_holder: "",
+    reference_number: ""
+  });
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [useGrantCheckbox, setUseGrantCheckbox] = useState(false);
+  const [selectedGrant, setSelectedGrant] = useState<Grant | null>(null);
+  const [grantAmount, setGrantAmount] = useState("");
+  const { data: grants = [] } = useGrant();  // Pindahkan ini ke atas sebelum useEffect
+
   // Tambahkan useEffect untuk load data payment jika dalam mode edit
   useEffect(() => {
     const fetchPaymentData = async () => {
@@ -35,10 +48,8 @@ export const CreatePaymentForm = () => {
           
           if (payment) {
             setPaymentMethod((payment as any).payment_method);
-            // Set nominal pembayaran
             setPaymentAmount((payment as any).nominal_payment.toString());
             
-            // Set data bank karena metode pembayaran adalah Transfer
             setBankDetails({
               bank_name: (payment as any).bank_name || "",
               account_number: (payment as any).account_number || "",
@@ -57,8 +68,11 @@ export const CreatePaymentForm = () => {
             if ((payment as any).use_grant) {
               setUseGrantCheckbox(true);
               setGrantAmount((payment as any).grant_amount?.toString() || "");
-              const grant = grants.find(g => g.id === (payment as any).grant_id);
-              setSelectedGrant(grant || null);
+              // Tunggu sampai grants tersedia sebelum mencoba mencari grant yang sesuai
+              if (grants.length > 0) {
+                const grant = grants.find(g => g.id === (payment as any).id_grant);
+                setSelectedGrant(grant || null);
+              }
             } 
           }
         } catch (error) {
@@ -74,7 +88,7 @@ export const CreatePaymentForm = () => {
     };
 
     fetchPaymentData();
-  }, [isEditMode, paymentId, token]);
+  }, [isEditMode, paymentId, token, grants]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,7 +109,7 @@ export const CreatePaymentForm = () => {
           account_holder: bankDetails.account_holder,
           reference_number: bankDetails.reference_number
         } : null,
-        grant_id: selectedGrant?.id,
+        id_grant: selectedGrant?.id,
         nominal_payment: numericPaymentAmount,
         grant_amount: numericGrantAmount,
         total_payment: totalPayment,
@@ -139,7 +153,7 @@ export const CreatePaymentForm = () => {
     }
   };
   // const navigate = useNavigate();
-  const [form, setForm] = useState({
+  const [form, setForm] = useState({    
     invoice_number: "",
     student_name: "",
     class: "",
@@ -151,20 +165,13 @@ export const CreatePaymentForm = () => {
     selected_items: [] as Billing[],
   });
 
-  const [billings, setBillings] = useState<Billing[]>([]);
-  const [packages, setPackages] = useState<RatePackage[]>([]);
-  const [addedItemIds, setAddedItemIds] = useState<number[]>([]);
-  const [itemFrequencies, setItemFrequencies] = useState<Record<number, number>>({});
-
   useEffect(() => {
   const fetchData = async () => {
       try {
-        const [billingData, packageData] = await Promise.all([
+        const [] = await Promise.all([
           billingService.getAll(token as string),
           packageService.getAll(token as string),
         ]);
-        setBillings(billingData);
-        setPackages(packageData);
       } catch (error) {
         console.error("Gagal memuat data tagihan dan paket:", error);
       }
@@ -233,11 +240,7 @@ export const CreatePaymentForm = () => {
                 frequencies[item.rate_id] = item.frequency;
               }
             });
-            setItemFrequencies(frequencies);
-  
-            // Set added item IDs
-            const itemIds = (invoiceData as any).items.map((item: { rate_id: number; }) => item.rate_id);
-            setAddedItemIds(itemIds);
+
           }
         } catch (error) {
           console.error("Gagal memuat data invoice:", error);
@@ -248,15 +251,6 @@ export const CreatePaymentForm = () => {
   
     fetchInvoiceData();
   }, [invoiceId, token]);  
-
-  const [paymentMethod, setPaymentMethod] = useState("Tunai");
-  const [paymentDate, setPaymentDate] = useState("");
-  const [bankDetails, setBankDetails] = useState({
-    bank_name: "",
-    account_number: "",
-    account_holder: "",
-    reference_number: ""
-  });
 
   const handlePaymentMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPaymentMethod(e.target.value);
@@ -269,12 +263,6 @@ export const CreatePaymentForm = () => {
       [name]: value
     }));
   };
-
-  const [paymentAmount, setPaymentAmount] = useState("");
-  const [useGrantCheckbox, setUseGrantCheckbox] = useState(false);
-  const [selectedGrant, setSelectedGrant] = useState<Grant | null>(null);
-  const [grantAmount, setGrantAmount] = useState("");
-  const { data: grants = [] } = useGrant();
 
   const handlePaymentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
