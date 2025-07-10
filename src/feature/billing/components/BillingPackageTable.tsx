@@ -1,20 +1,20 @@
-import { packageRate, PackageRate } from "@/feature/billing/types/ratePackage";
+import { RatePackage } from "@/feature/billing/types/ratePackage";
 import { Table, TableCell, TableHead, TableHeader, TableRow, TableBody } from "@/core/components/ui/table";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { Button } from "@/core/components/ui/button";
 
 type Props = {
-    items: packageRate[];
-    onDeleted: (item: packageRate) => void;
-    onEdit: (item: packageRate) => void;
+    items: RatePackage[];
+    onDeleted: (item: RatePackage) => void;
+    onEdit: (item: RatePackage) => void;
 };
 
 export default function BillingPackageTable({ items, onDeleted, onEdit }: Props) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const [selectedItem, setSelectedItem] = useState<packageRate | null>(null);
+    const [selectedItem, setSelectedItem] = useState<RatePackage | null>(null);
 
-    const handleDelete = (item: packageRate) => {
+    const handleDelete = (item: RatePackage) => {
         setSelectedItem(item);
         setShowDeleteConfirm(true);
     };
@@ -91,7 +91,7 @@ export default function BillingPackageTable({ items, onDeleted, onEdit }: Props)
                             <TableCell>{new Intl.NumberFormat('id-ID', {
                                 style: 'currency',
                                 currency: 'IDR'
-                            }).format(item.total_price)}</TableCell>
+                            }).format(item.total_price ? Number(item.total_price) : 0)}</TableCell>
                             <TableCell>
                                 {item.is_active === 'Y' ? (
                                     <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Aktif</span>

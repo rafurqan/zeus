@@ -7,7 +7,6 @@ import { useConfirm } from "@/core/components/confirmDialog";
 import { listEducationLevel } from "@/core/service/master";
 import { FormInput } from "@/core/components/forms/formInput";
 import { FormSelect } from "@/core/components/forms/formSelect";
-import { FileText, Tag, Home, DollarSign, Calendar, Users } from "lucide-react"; // Import icons
 
 
 type Props = {
@@ -28,22 +27,30 @@ export default function BillingForm({
     const { token, setUser, setToken } = useContext(AppContext);
     const [educationLevels, setEducationLevel] = useState<EducationLevel[]>([]);
 
-    const [form, setForm] = useState<Billing & { isActiveCheckbox: boolean }>(item ? {
-        ...item,
-        isActiveCheckbox: item.is_active === "Y" // Konversi "Y"/"N" ke boolean
-    } : {
-        id: "",
-        service_name: "",
-        price: 0,
-        description: "", // Ini akan digunakan untuk "Kategori"
-        program_id: "",
-        is_active: "Y", // Default untuk API
-        frequency: "",
-        applies_to: "",
-        isActiveCheckbox: true, // Default untuk checkbox
-        service_id: "", // Tambahkan service_id ke state form
-        category : "", // Tambahkan category ke state form
-        child_ids : []
+    const [form, setForm] = useState<Billing & { isActiveCheckbox: boolean }>(() => {
+        if (item) {
+            return {
+                ...item,
+                isActiveCheckbox: item.is_active === "Y"
+            };
+        }
+        
+        return {
+            id: "",
+            nama_tarif: "",
+            price: 0,
+            description: "",
+            program_id: "",
+            program: "",
+            is_active: "Y",
+            frequency: "",
+            applies_to: "",
+            service_name: "",
+            service_id: "",
+            category: "",
+            child_ids: [],
+            isActiveCheckbox: true
+        };
     });
 
     const frequencyOptions = [
@@ -80,7 +87,7 @@ export default function BillingForm({
 
     async function fetchEducationLevels() {
         try {
-            const res = await listEducationLevel(token);
+            const res = await listEducationLevel();
 
             if (res.status === 401) {
                 setUser(null);
@@ -88,10 +95,10 @@ export default function BillingForm({
             }
             setEducationLevel(res.data || []);
         } catch (err: unknown) {
-            if (err instanceof AxiosError && err.response?.status === 401) { // Perbaiki pengecekan status
+            if (err instanceof AxiosError && err.response?.status === 401) { 
                 console.error("Fetch failed", err);
                 setUser(null);
-                setToken(null); // Pastikan token juga di-null-kan
+                setToken(null);
             } else {
                  console.error("Fetch failed", err);
             }
@@ -101,13 +108,13 @@ export default function BillingForm({
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
-        const { name, value, type, checked } = e.target as HTMLInputElement; // Cast to HTMLInputElement for checkbox
+        const { name, value, type, checked } = e.target as HTMLInputElement; 
 
         if (type === 'checkbox') {
             setForm({
                 ...form,
                 isActiveCheckbox: checked,
-                is_active: checked ? "Y" : "N" // Konversi boolean ke "Y"/"N"
+                is_active: checked ? "Y" : "N" 
             });
         } else {
             setForm({ ...form, [name]: value });
@@ -130,7 +137,6 @@ export default function BillingForm({
         });
         if (isConfirmed) {
             try {
-                // Kirim data form, pastikan is_active sudah dalam format "Y"/"N"
                 await onSuccess(form);
             } catch (error) {
                 console.error("Error submitting form:", error);
@@ -163,36 +169,30 @@ export default function BillingForm({
                 <div className="grid grid-cols-2 gap-4"> {/* Gunakan grid untuk layout 2 kolom */}
                     <div className="col-span-1">
                          <FormInput
-                            label={<>Nama <span className="text-red-500">*</span></>} // Ubah label
+                            label={<>Nama <span className="text-red-500">*</span></>} 
                             placeholder="Cth: SPP Bulanan"
                             name="service_name"
                             value={form.service_name}
                             onChange={handleChange}
-                            icon={<FileText className="h-4 w-4 text-gray-400" />} // Tambahkan ikon
-                            required // Tambahkan required jika perlu
                         />
                     </div>
                      <div className="col-span-1">
                          <FormSelect
-                            label={<>Kategori <span className="text-red-500">*</span></>} // Ubah label
-                            name="category" // Gunakan field description untuk kategori
-                            value={form.category}
-                            options={categoryOptions} // Gunakan opsi kategori
+                            label="Kategori *"
+                            name="category"
+                            value={form.category || ''}
+                            options={categoryOptions}
                             onChange={handleChange}
-                            icon={<Tag className="h-4 w-4 text-gray-400" />} // Tambahkan ikon
-                            required // Tambahkan required jika perlu
-                            disabled={isEdit} // Disable the field if in edit mode
+                            disabled={isEdit}
                         />
                     </div>
                      <div className="col-span-2"> {/* Program ambil 2 kolom */}
                          <FormSelect
-                            label={<>Program <span className="text-red-500">*</span></>} // Ubah label
+                            label="Program *"
                             name="program_id"
                             value={form.program_id}
                             options={educationLevels.map(level => ({ value: level.id, label: level.name }))}
-                            onChange={handleProgramChange} // Gunakan handler khusus jika perlu simpan ID saja
-                            icon={<Home className="h-4 w-4 text-gray-400" />} // Tambahkan ikon
-                            required // Tambahkan required jika perlu
+                            onChange={handleProgramChange} 
                         />
                     </div>
                     <div className="col-span-2">
@@ -202,20 +202,16 @@ export default function BillingForm({
                             placeholder="Deskripsi biaya"
                             value={form.description}
                             onChange={handleChange}
-                            icon={<FileText className="h-4 w-4 text-gray-400" />} // Tambahkan ikon
-                            required // Tambahkan required jika perlu
                         />
                     </div>
                      {/* Field Deskripsi dari gambar tidak ada di tipe Billing, jadi diabaikan */}
                      <div className="col-span-2"> {/* Jumlah ambil 2 kolom */}
                          <FormInput
-                            label={<>Jumlah <span className="text-red-500">*</span></>} // Ubah label
+                            label={<>Jumlah <span className="text-red-500">*</span></>} 
                             name="price"
                             type="number"
                             value={form.price}
                             onChange={handleChange}
-                            icon={<DollarSign className="h-4 w-4 text-gray-400" />} // Tambahkan ikon
-                            required // Tambahkan required jika perlu
                         />
                     </div>
                      <div className="col-span-1">
@@ -225,8 +221,6 @@ export default function BillingForm({
                             value={form.frequency}
                             options={frequencyOptions}
                             onChange={handleChange}
-                            icon={<Calendar className="h-4 w-4 text-gray-400" />} // Tambahkan ikon
-                            required // Tambahkan required jika perlu
                         />
                     </div>
                      <div className="col-span-1">
@@ -236,15 +230,13 @@ export default function BillingForm({
                             value={form.applies_to}
                             options={berlakuUntukOptions}
                             onChange={handleChange}
-                            icon={<Users className="h-4 w-4 text-gray-400" />} // Tambahkan ikon
-                            required // Tambahkan required jika perlu
                         />
                     </div>
                      <div className="col-span-2 flex items-center"> {/* Checkbox ambil 2 kolom */}
                          <input
                             type="checkbox"
-                            name="isActiveCheckbox" // Gunakan nama state lokal
-                            checked={form.isActiveCheckbox} // Gunakan state lokal boolean
+                            name="isActiveCheckbox" 
+                            checked={form.isActiveCheckbox} 
                             onChange={handleChange}
                             className="mr-2 h-4 w-4 text-black border-gray-300 rounded focus:ring-black"
                          />

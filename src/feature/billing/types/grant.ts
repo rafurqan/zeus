@@ -6,9 +6,11 @@ export interface Grant {
   description: string | null;
   total_funds: number;
   created_at: string | null;
-  acceptance_date: string | null;
+  acceptance_date?: string;
   notes: string | null;
   is_active: "Y" | "N";
+  code?: string;
+  total_used_funds?: number;
 }
 
 export type CreateGrantResponse = {
