@@ -1,14 +1,13 @@
 import { useState, useContext } from "react";
 import { Button } from "@/core/components/ui/button"
 import { Navigate } from "react-router-dom";
-import { Billing } from "@/feature/billing/types/billing";
 import { AppContext } from "@/context/AppContext";
 import BaseLayout from "@/core/components/baseLayout";
 import Table from "@/feature/billing/components/table";
 import GrantTable from "@/feature/billing/components/grantTable";
 import PackageTable from "@/feature/billing/components/BillingPackageTable";
 import BillingTableSkeleton from "@/core/components/ui/education_level_table_shimmer";
-import { Plus, Search, FileText, RefreshCcw } from "lucide-react"; // Import icons
+import { Plus, Search, FileText, RefreshCcw } from "lucide-react";
 import { useBilling } from "../hook/useBilling";
 import { useGrant } from "../hook/useGrant";
 import { usePackage } from "../hook/usePackage";
@@ -16,7 +15,7 @@ import { usePackage } from "../hook/usePackage";
 
 import LoadingOverlay from "@/core/components/ui/loading_screen";
 import BillingForm from "../forms/billingForm";
-import{ GrantForm } from "../forms/grantForm";
+import GrantForm from "../forms/grantForm";
 import BillingPackageForm from "../forms/billingPackageForm";
 
 // Tab
@@ -25,8 +24,8 @@ const tabs = ['Biaya', 'Paket Biaya', 'Metode Pembayaran', 'Diskon & Beasiswa', 
 export default function BillingPage() {
     const { user, setUser } = useContext(AppContext);
     const { data, loading, loadingOverlay, remove, create, update } = useBilling();
-    const { data: grantData, loading: grantLoading, loadingOverlay: grantLoadingOverlay, remove: removeGrant, create: createGrant, update: updateGrant, reset } = useGrant();
-    const { data: packageData, loading: packageLoading, loadingOverlay: packageLoadingOverlay, remove: removePackage, create: createPackage, update: updatePackage } = usePackage();
+    const { data: grantData, remove: removeGrant, reset, create: createGrant, update: updateGrant } = useGrant();
+    const { data: packageData, remove: removePackage, create: createPackage, update: updatePackage } = usePackage();
     const [showModal, setShowModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>(null);
     const [modalType, setModalType] = useState<"billing" | "grant" | "package">("billing");
@@ -38,13 +37,13 @@ export default function BillingPage() {
         return <Navigate to="/login" />;
     }
     
-    // Gunakan fungsi create dan update dari hook useBilling, useGrant, dan usePackage
+    //create dan update dari hook useBilling, useGrant, dan usePackage
     const handleSuccess = (item: any) => {
         if (modalType === "grant") {
             if (selectedItem) {
-                // updateGrant(item);
+                updateGrant(item);
             } else {
-                // createGrant(item);
+                createGrant(item);
             }
         } else if (modalType === "package") {
             if (selectedItem) {
@@ -82,11 +81,7 @@ export default function BillingPage() {
     );
 
     const filteredPackageData = packageData.filter(item =>
-        item.service_name.toLowerCase().includes(searchTerm.toLowerCase())
-        // item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        // item.applies_to.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        // item.frequency.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        // item.code.toLowerCase().includes(searchTerm.toLowerCase())
+        (item?.service_name || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
     // end filter
     
@@ -283,7 +278,7 @@ export default function BillingPage() {
                                 </div>
 
                                 {/* Grant Table Section */}
-                                {grantLoading ? (
+                                {loading ? (
                                     <BillingTableSkeleton />
                                 ) : (
                                     // Filter grant data
@@ -313,7 +308,7 @@ export default function BillingPage() {
                                         setShowModal(false);
                                         setSelectedItem(null);
                                     }}
-                                    onSuccess={handleSuccess} // Ubah dari onSuccess menjadi onSubmit
+                                    onSuccess={handleSuccess}
                                 />
                             ) : (
                                 activeTab === "Dana Hibah" ? (

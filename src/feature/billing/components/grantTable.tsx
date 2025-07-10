@@ -137,15 +137,14 @@ export default function GrantTable({ items, onDeleted, onEdit, onReset }: Props)
                                 {new Intl.NumberFormat('id-ID', {
                                     style: 'currency',
                                     currency: 'IDR'
-                                }).format(item.total_funds - item.total_used_funds)}
+                                }).format(item.total_funds - (item.total_used_funds ?? 0))}
                                 {' '}
-                                {/* ({Math.round((1 - item.total_used_funds / item.total_funds) * 100)}%) */}
                             </TableCell>
-                            <TableCell>{`${new Date(item.acceptance_date).toLocaleDateString('id-ID', {
+                            <TableCell>{`${item.acceptance_date ? new Date(item.acceptance_date).toLocaleDateString('id-ID', {
                                 day: 'numeric',
                                 month: 'long',
                                 year: 'numeric'
-                            })}`}</TableCell>
+                            }) : '-'}`}</TableCell>
                             <TableCell>
                                 {item.is_active === 'Y' ? (
                                     <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Aktif</span>

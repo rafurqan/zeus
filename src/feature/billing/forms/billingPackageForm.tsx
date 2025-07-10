@@ -8,20 +8,22 @@ import { useConfirm } from "@/core/components/confirmDialog";
 import { listEducationLevel } from "@/core/service/master";
 import { FormInput } from "@/core/components/forms/formInput";
 import { FormSelect } from "@/core/components/forms/formSelect";
-import { Package, School, FileText, DollarSign } from "lucide-react";
+import { DollarSign } from "lucide-react";
 
 type BillingPackage = {
   id: string;
   name: string;
   service_name: string;
+  service_id?: string;
   price: number;
   program_id: string;
   description: string;
-  child_ids: string[];
+  rates: string[];
   discount: number;
   is_active: "Y" | "N";
   isActiveCheckbox?: boolean;
   category: string;
+  child_ids?: string[];
 };
 
 type Props = {
@@ -52,10 +54,9 @@ export default function BillingPackageForm({ item = null, onClose, onSuccess }: 
       rates: initialRates,
       discount: item?.discount || 0,
       is_active: item?.is_active || "Y",
-      // Set isActiveCheckbox to true for new form, use DB value for edit
       isActiveCheckbox: item ? item.is_active === "Y" : true,
+      category: item?.category || "",
       service_id: item?.service_id || "",
-      category: item?.category || ""
     };
   });
 
@@ -102,7 +103,7 @@ export default function BillingPackageForm({ item = null, onClose, onSuccess }: 
 
   const fetchEducationLevels = async () => {
     try {
-      const res = await listEducationLevel(token);
+      const res = await listEducationLevel();
       if (res.status === 401) {
         setUser(null);
         setToken(null);
@@ -226,18 +227,14 @@ export default function BillingPackageForm({ item = null, onClose, onSuccess }: 
             placeholder="Contoh: Paket Siswa Baru SD"
             value={form.service_name}
             onChange={handleChange}
-            icon={<Package className="h-4 w-4 text-gray-400" />}
-            required
           />
 
           <FormSelect
-            label={<>Program <span className="text-red-500">*</span></>}
+            label="Program *"
             name="program_id"
             value={form.program_id}
             options={educationLevels.map(level => ({ value: level.id, label: level.name }))}
             onChange={handleChange}
-            icon={<School className="h-4 w-4 text-gray-400" />}
-            required
           />
 
           <FormInput
@@ -246,7 +243,6 @@ export default function BillingPackageForm({ item = null, onClose, onSuccess }: 
             placeholder="Deskripsi paket biaya"
             value={form.description}
             onChange={handleChange}
-            icon={<FileText className="h-4 w-4 text-gray-400" />}
           />
 
           <div>
