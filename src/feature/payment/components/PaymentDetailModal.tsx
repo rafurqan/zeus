@@ -1,12 +1,43 @@
-import React from "react";
+interface PaymentDetailModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  payment: {
+    payment?: {
+      code?: string;
+      nominal_payment: number;
+      total_payment: number;
+      payment_method?: string;
+      status?: 'paid' | 'unpaid' | 'late' | 'partial';
+      payment_date?: string;
+      reference_number?: string;
+      bank_name?: string;
+      account_number?: string;
+      account_name?: string;
+      notes?: string;
+    };
+    code?: string;
+    description?: string;
+    total: number;
+    publication_date?: string;
+    entity?: {
+      full_name?: string;
+      nisn?: string;
+      phone?: string;
+    };
+    student_class?: {
+      name?: string;
+    };
+  };
+  invoice: any; // Add proper type if needed
+}
 
-export const PaymentDetailModal = ({ isOpen, onClose, payment, invoice }) => {
+export const PaymentDetailModal = ({ isOpen, onClose, payment, invoice }: PaymentDetailModalProps) => {
     if (!isOpen || !payment) return null;
 
     console.log(payment);
     console.log(invoice);
   
-    const formatDate = (dateStr) => {
+    const formatDate = (dateStr: string | undefined) => {
       return dateStr ? new Date(dateStr).toLocaleDateString("id-ID", {
         day: "numeric", month: "long", year: "numeric"
       }) : "-";
@@ -37,8 +68,8 @@ export const PaymentDetailModal = ({ isOpen, onClose, payment, invoice }) => {
                 <p><strong>ID Faktur:</strong> {payment.code || "-"}</p>
                 <p><strong>Deskripsi:</strong> {payment.description || "-"}</p>
                 <p><strong>Jumlah Tagihan:</strong> Rp {payment.total.toLocaleString() || "-"}</p>
-                <p><strong>Jumlah Bayar:</strong> Rp {payment.payment?.nominal_payment.toLocaleString() || "-"}</p>
-                <p><strong>Kekurangan:</strong> Rp {(payment.total - (payment.payment?.nominal_payment || 0)).toLocaleString() || "-"}</p>
+                <p><strong>Jumlah Bayar:</strong> Rp {payment.payment?.total_payment.toLocaleString() || "-"}</p>
+                <p><strong>Kekurangan:</strong> Rp {(payment.total - (payment.payment?.total_payment || 0)).toLocaleString() || "-"}</p>
                 <p><strong>Metode:</strong> {payment.payment?.payment_method || "-"}</p>
                 <p><strong>Status:</strong> {" "}
                   {(() => {
@@ -132,4 +163,4 @@ export const PaymentDetailModal = ({ isOpen, onClose, payment, invoice }) => {
         </div>
       </div>
     );
-  };  
+  };

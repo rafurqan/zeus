@@ -33,11 +33,33 @@ export const BillingDataPage = () => {
   useEffect(() => {
     if (!token) return;
     invoiceService.getStatistics(token).then(res => {
-      setStatistics(res);
+      setStatistics({
+        total: {
+          count: res.total,
+          amount: res.total_amount
+        },
+        per_status: [
+          {
+            status: "Menunggu Pembayaran",
+            count: res.pending,
+            amount: res.pending_amount
+          },
+          {
+            status: "Terlambat", 
+            count: res.late,
+            amount: res.late_amount
+          },
+          {
+            status: "Lunas",
+            count: res.paid, 
+            amount: res.paid_amount
+          }
+        ]
+      });
     });
   }, [token]);
 
-  const getStatusStat = (status) => statistics.per_status.find(s => s.status === status) || { count: 0, amount: 0 };
+  // const getStatusStat = (status: string) => statistics.per_status.find(s => s.status === status) || { count: 0, amount: 0 };
 
   const handleRefresh = () => window.location.reload();
   const handleDelete = () => {

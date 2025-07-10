@@ -14,9 +14,9 @@ import ProgramPage from '@/feature/master/pages/programPage';
 import BillingPage from "@/feature/billing/pages/billingPage";
 import {BillingDataPage} from "@/feature/finance/pages/billingDataPage";
 import {CreateInvoiceForm} from "@/feature/finance/components/CreateInvoiceForm";
-import InvoiceDetailPage from "@/feature/finance/pages/invoiceDetailPage";
+import InvoiceDetailPage from "@/feature/finance/pages/InvoiceDetailPage";
 import { PaymentDataPage } from "@/feature/payment/pages/PaymentDataPage";
-import { CreatePaymentForm } from "@/feature/payment/components/createPaymentForm";
+import { CreatePaymentForm } from "@/feature/payment/components/CreatePaymentForm";
 import { PrintPayment } from '@/feature/payment/components/PrintPayment';
 import  StudentsPage from "@/feature/student/pages/studentPage";
 

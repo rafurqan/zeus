@@ -13,6 +13,7 @@ export interface RatePackage  {
   service_name?: string;
   program?: string;
   total_price?: number;
+  child_rates?: RatePackage[];
 }
 
 export type CreateRatePackageResponse = {

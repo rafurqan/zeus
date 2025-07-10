@@ -1,22 +1,15 @@
 import { usePayment } from "../hook/usePayment";
 import { PaymentTable } from "../components/PaymentTable";
 import BaseLayout from "@/core/components/baseLayout";
-import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useContext } from "react";
-import { AppContext } from "@/context/AppContext";
-import { paymentService } from "../service/paymentService";
 
 export const PaymentDataPage = () => {
-  const navigate = useNavigate();
-  const { token } = useContext(AppContext);
   const {
     payments,
-    loading, // tambahkan ini
+    loading,
     searchTerm,
     setSearchTerm,
     page,
     setPage,
-    total,
     lastPage,
     activeTab,
     setActiveTab,
@@ -46,7 +39,6 @@ export const PaymentDataPage = () => {
           loading={loading}
           page={page}
           setPage={setPage}
-          total={total}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           activeTab={activeTab}
