@@ -10,7 +10,7 @@ import { packageService } from "@/feature/billing/service/packageService";
 import BaseLayout from "@/core/components/baseLayout";
 import { Billing } from "@/feature/billing/types/billing";
 import { RatePackage } from "@/feature/billing/types/ratePackage";
-import { Trash2, Search} from "lucide-react";
+import { Trash2, Search } from "lucide-react";
 import { useConfirm } from "@/core/components/confirmDialog";
 import { invoiceService } from "../service/invoiceService";
 import { useStudentClass } from "@/feature/student/hooks/useStudentClass";
@@ -48,7 +48,7 @@ export const CreateInvoiceForm = () => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
-  const fetchData = async () => {
+    const fetchData = async () => {
       try {
         const [billingData, packageData] = await Promise.all([
           billingService.getAll(token as any),
@@ -77,10 +77,10 @@ export const CreateInvoiceForm = () => {
     if (pkg.child_rates && pkg.child_rates.length > 0) {
       setForm(prevForm => {
         const existingItems = [...prevForm.selected_items];
-        
+
         pkg.child_rates?.forEach(child => {
           const existingItemIndex = existingItems.findIndex(item => item.id === child.id);
-          
+
           if (existingItemIndex !== -1) {
             existingItems[existingItemIndex] = {
               ...existingItems[existingItemIndex],
@@ -96,9 +96,17 @@ export const CreateInvoiceForm = () => {
           selected_items: existingItems
         };
       });
+<<<<<<< HEAD
       
       setAddedPackageIds(prev => [...prev, Number(pkg.id)]);
       
+=======
+
+      // Tambahkan ID paket ke addedPackageIds
+      // setAddedPackageIds(prev => [...prev, pkg.id]);
+
+      // Tambahkan ID child items ke addedItemIds
+>>>>>>> bbd4a10 (update base url)
       pkg.child_rates.forEach(child => {
         if (!addedItemIds.includes(Number(child.id))) {
           setAddedItemIds(prev => [...prev, Number(child.id)]);
@@ -126,6 +134,7 @@ export const CreateInvoiceForm = () => {
       setAddedItemIds(prev => [...prev, Number(item.id)]);
     }
   };
+<<<<<<< HEAD
   
   // const increaseFrequency = (id: string | number) => {
   //   const stringId = id.toString();
@@ -141,6 +150,19 @@ export const CreateInvoiceForm = () => {
   const decreaseFrequency = (id: string | number) => {
     const stringId = id.toString();
     const item = form.selected_items.find(item => item.id.toString() === stringId);
+=======
+  const increaseFrequency = (id: number) => {
+    setForm(prevForm => ({
+      ...prevForm,
+      selected_items: prevForm.selected_items.map(item =>
+        Number(item.id) === id ? { ...item, frequency: item.frequency + 1 } : item
+      )
+    }));
+  };
+
+  const decreaseFrequency = (id: number) => {
+    const item = form.selected_items.find(item => Number(item.id) === id);
+>>>>>>> bbd4a10 (update base url)
     if (!item) return;
 
     if (item.frequency <= 1) {
@@ -154,6 +176,10 @@ export const CreateInvoiceForm = () => {
       }));
     }
   };
+<<<<<<< HEAD
+=======
+
+>>>>>>> bbd4a10 (update base url)
 
   const handleRemoveItem = (id: string | number) => {
     const stringId = id.toString();
@@ -161,7 +187,11 @@ export const CreateInvoiceForm = () => {
     setItemFrequencies(prev => {
       const current = prev[Number(id)] || 1;
       const next = Math.max(current - 1, 0);
+<<<<<<< HEAD
       const updated = { ...prev, [Number(id)]: next };
+=======
+      const updated = { ...prev, [id]: next };
+>>>>>>> bbd4a10 (update base url)
 
       if (next === 0) {
         setForm(prevForm => ({
@@ -175,11 +205,11 @@ export const CreateInvoiceForm = () => {
       return updated;
     });
   };
-  
+
   const filteredPackages = packages.filter(pkg =>
     pkg.service_name?.toLowerCase().includes(searchTermPackage.toLowerCase())
   );
-  
+
   const filteredBillings = billings.filter(bill =>
     bill.service_name?.toLowerCase().includes(searchTermBilling.toLowerCase()) ||
     bill.description?.toLowerCase().includes(searchTermBilling.toLowerCase())
@@ -219,7 +249,7 @@ export const CreateInvoiceForm = () => {
               if (!dateString) return "";
               return dateString.split(' ')[0];
             };
-  
+
             // Rebuild selected_items from invoice.items
             const selectedItemsFromItems = (invoiceData as any).items?.map((item: { rate: { id: number; service: { id: number; name: string; }; category: string; description: string; }; amount_rate: number; frequency: number; }) => ({
               id: item.rate.id, // for React key
@@ -231,7 +261,7 @@ export const CreateInvoiceForm = () => {
               price: item.amount_rate,
               frequency: item.frequency,
             }));
-  
+
             setForm({
               ...form,
               invoice_number: invoiceData.code,
@@ -244,7 +274,7 @@ export const CreateInvoiceForm = () => {
               invoice_type: (invoiceData as any).invoice_type || "",
               selected_items: selectedItemsFromItems,
             });
-  
+
             // Set item frequencies dari items
             const frequencies: Record<string, number> = {};
             (invoiceData as any).items?.forEach((item: { rate_id: number; frequency: number; }) => {
@@ -253,7 +283,7 @@ export const CreateInvoiceForm = () => {
               }
             });
             setItemFrequencies(frequencies);
-  
+
             // Set added item IDs
             const itemIds = (invoiceData as any).items?.map((item: { rate_id: number; }) => item.rate_id);
             setAddedItemIds(itemIds);
@@ -264,10 +294,13 @@ export const CreateInvoiceForm = () => {
         }
       }
     };
-  
-    fetchInvoiceData();
-  }, [invoiceId, token]);  
 
+<<<<<<< HEAD
+=======
+    fetchInvoiceData();
+  }, [invoiceId, token]);
+
+>>>>>>> bbd4a10 (update base url)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -338,23 +371,30 @@ export const CreateInvoiceForm = () => {
           <div className="md:col-span-2 space-y-4">
             <FormInput 
               label="Nomor Invoice"
+<<<<<<< HEAD
               name="invoice_number" 
               value={form.invoice_number}
               onChange={() => {}}
               placeholder="Akan di generate secara otomatis"
+=======
+              placeholder="Akan di generate secara otomatis"
+              value={form.invoice_number}
+              onChange={() => { }}
+              disabled
+>>>>>>> bbd4a10 (update base url)
             />
 
             <FormSelect
-                label="Kelas"
-                name="class"
-                value={form.class}
-                onChange={handleChange}
-                options={classes.map((classItem) => ({
-                  label: `${classItem.name} ${classItem.part} - ${classItem.teacher?.name ?? ""}`,
-                  value: classItem.id
-                }))}
-                disabled={classesLoading}
-              />
+              label="Kelas"
+              name="class"
+              value={form.class}
+              onChange={handleChange}
+              options={classes.map((classItem) => ({
+                label: `${classItem.name} ${classItem.part} - ${classItem.teacher?.name ?? ""}`,
+                value: classItem.id
+              }))}
+              disabled={classesLoading}
+            />
 
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -409,7 +449,7 @@ export const CreateInvoiceForm = () => {
 
             <FormSelect
               label="Jenis Tagihan"
-              name="invoice_type" 
+              name="invoice_type"
               value={form.invoice_type}
               onChange={handleChange}
               options={[
@@ -423,17 +463,25 @@ export const CreateInvoiceForm = () => {
             />
 
             <div className="grid grid-cols-2 gap-4">
+<<<<<<< HEAD
               <FormInput 
                 label="Tanggal Penerbitan" 
                 type="date" 
                 value={invoiceId ? form.issue_date : form.issue_date || new Date().toISOString().split('T')[0]}
                 onChange={(e) => setForm({ ...form, issue_date: e.target.value })} 
+=======
+              <FormInput
+                label="Tanggal Penerbitan"
+                type="date"
+                value={form.issue_date}
+                onChange={(e) => setForm({ ...form, issue_date: e.target.value })}
+>>>>>>> bbd4a10 (update base url)
               />
-              <FormInput 
-                label="Tanggal Jatuh Tempo" 
-                type="date" 
-                value={form.due_date} 
-                onChange={(e) => setForm({ ...form, due_date: e.target.value })} 
+              <FormInput
+                label="Tanggal Jatuh Tempo"
+                type="date"
+                value={form.due_date}
+                onChange={(e) => setForm({ ...form, due_date: e.target.value })}
               />
             </div>
 
@@ -452,14 +500,15 @@ export const CreateInvoiceForm = () => {
           <div className="border rounded-lg p-4">
             <h3 className="text-lg font-semibold mb-2">Tambah Item Tagihan</h3>
             <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-                <TabsList>
+              <TabsList>
                 <TabsTrigger value="package">Paket Tagihan</TabsTrigger>
                 <TabsTrigger value="individual">Item Individual</TabsTrigger>
-                </TabsList>
+              </TabsList>
 
-                {/* Paket Tagihan */}
-                <TabsContent value="package" className="mt-2 space-y-2">
+              {/* Paket Tagihan */}
+              <TabsContent value="package" className="mt-2 space-y-2">
                 <FormInput
+<<<<<<< HEAD
                     label= "paket"
                     placeholder="Cari paket..."
                     value={searchTermPackage}
@@ -504,20 +553,81 @@ export const CreateInvoiceForm = () => {
                 <div className="space-y-2 overflow-y-auto pr-1 max-h-[400px]">
                     {filteredBillings.map(item => (
                     <div key={item.id} className="border p-2 rounded flex justify-between items-center">
+=======
+                  label="Cari paket..."
+                  placeholder="Cari paket..."
+                  value={searchTermPackage}
+                  onChange={(e) => setSearchTermPackage(e.target.value)}
+                /> <br />
+                <div className="space-y-2 overflow-y-auto pr-1 max-h-[400px]">
+                  {filteredPackages.map(pkg => (
+                    <div key={pkg.id} className="border p-2 rounded space-y-2">
+                      <div className="flex justify-between items-center">
+>>>>>>> bbd4a10 (update base url)
                         <div>
+                          <p className="font-semibold">{pkg.service_name}</p>
+                          <p className="text-sm text-gray-500">{pkg.description}</p>
+                        </div>
+                        <Button size="sm" className="rounded-lg" variant="outline" onClick={() => handleAddPackage(pkg)}>Tambah</Button>
+                      </div>
+
+                      {/* Daftar Tarif Anakan */}
+                      {pkg.child_rates && pkg.child_rates.length > 0 && (
+                        <div className="pl-2 mt-1 border-l border-gray-300 space-y-1">
+                          {pkg.child_rates.map(child => {
+                            // const frequency = form.selected_items.find(i => i.id === child.id)?.frequency || 0;
+                            return (
+                              <div key={child.id} className="flex justify-between items-center text-sm text-gray-700">
+                                <span>- {child.service_name}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+
+              {/* Item Individual */}
+              <TabsContent value="individual" className="mt-2 space-y-2">
+                <FormInput
+                  label="Cari item..."
+                  placeholder="Cari item..."
+                  value={searchTermBilling}
+                  onChange={(e) => setSearchTermBilling(e.target.value)}
+                /> <br />
+                <div className="space-y-2 overflow-y-auto pr-1 max-h-[400px]">
+                  {filteredBillings.map(item => (
+                    <div key={item.id} className="border p-2 rounded flex justify-between items-center">
+                      <div>
                         <p className="font-semibold">{item.service_name}</p>
                         <p className="text-sm text-gray-500">{item.description}</p>
                         <p className="text-sm">Rp {item.price.toLocaleString()}</p>
+                      </div>
+                      {addedItemIds.includes((item as any).id) ? (
+                        <div className="flex items-center gap-2">
+                          <Button size="sm" variant="outline" onClick={() => decreaseFrequency((item as any).id)}>-</Button>
+                          <span className="px-2">
+                            {form.selected_items.find(i => i.id === item.id)?.frequency ?? 1}
+                          </span>
+                          <Button size="sm" variant="outline" onClick={() => increaseFrequency((item as any).id)}>+</Button>
                         </div>
+<<<<<<< HEAD
                           <Button 
                             size="sm" 
                             variant="outline" 
                             onClick={() => handleAddItem(item)}
                           >Tambah</Button>
+=======
+                      ) : (
+                        <Button size="sm" variant="outline" onClick={() => handleAddItem(item)}>Tambah</Button>
+                      )}
+>>>>>>> bbd4a10 (update base url)
                     </div>
-                    ))}
+                  ))}
                 </div>
-                </TabsContent>
+              </TabsContent>
             </Tabs>
           </div>
         </div>
@@ -526,10 +636,10 @@ export const CreateInvoiceForm = () => {
         <div className="bg-white border rounded p-4">
           <h3 className="text-xl font-bold mb-1">Item Tagihan</h3>
           <p className="text-gray-500 mb-4">Tambahkan item tagihan ke invoice ini</p>
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-separate border-spacing-y-2">
+          <div className="overflow-x-auto">
+            <table className="min-w-full border-separate border-spacing-y-2">
               <thead>
-                  <tr className="text-left text-sm text-gray-500">
+                <tr className="text-left text-sm text-gray-500">
                   <th className="px-2 py-1">Item</th>
                   <th className="px-2 py-1">Kategori</th>
                   <th className="px-2 py-1">Deskripsi</th>
@@ -537,11 +647,12 @@ export const CreateInvoiceForm = () => {
                   <th className="px-2 py-1">Frekuensi</th>
                   <th className="px-2 py-1">Total</th>
                   <th className="px-2 py-1 text-center">Aksi</th>
-                  </tr>
+                </tr>
               </thead>
               <tbody>
-                  {form.selected_items.map(item => (
+                {form.selected_items.map(item => (
                   <tr key={item.id} className="bg-white rounded shadow-sm">
+<<<<<<< HEAD
                       <td className="px-2 py-2">{item.service_name}</td>
                       <td className="px-2 py-2">
                         {item.category === "1" && "Registrasi"}
@@ -580,20 +691,60 @@ export const CreateInvoiceForm = () => {
                       <td className="font-bold text-left pr-2">
                           Rp {form.selected_items.reduce((sum, item) => sum + item.price * item.frequency, 0).toLocaleString()}
                       </td>
+=======
+                    <td className="px-2 py-2">{item.service_name}</td>
+                    <td className="px-2 py-2">
+                      {item.category === "1" && "Registrasi"}
+                      {item.category === "2" && "Buku"}
+                      {item.category === "3" && "Seragam"}
+                      {item.category === "4" && "SPP"}
+                      {item.category === "5" && "Uang Gedung"}
+                      {item.category === "6" && "Kegiatan"}
+                      {item.category === "7" && "Ujian"}
+                      {item.category === "8" && "Wisuda"}
+                      {item.category === "9" && "Lainnya"}
+                    </td>
+                    <td className="px-2 py-2">{item.description}</td>
+                    <td className="px-2 py-2 whitespace-nowrap">Rp {item.price.toLocaleString()}</td>
+                    <td className="px-2 py-2 text-center">{item.frequency}</td>
+                    <td className="px-2 py-2 whitespace-nowrap">
+                      Rp {(item.price * (item as any).frequency).toLocaleString()}
+                    </td>
+                    <td className="px-2 py-2 text-center">
+                      <button onClick={() => decreaseFrequency((item as any).id)} className="text-red-500 hover:text-red-700">
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+>>>>>>> bbd4a10 (update base url)
                   </tr>
+                ))}
+                <tr>
+                  <td colSpan={4}></td>
+                  <td className="font-semibold text-right pr-2">Subtotal:</td>
+                  <td className="text-left pr-2">
+                    Rp {form.selected_items.reduce((sum, item) => sum + item.price * (item as any).frequency, 0).toLocaleString()}
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan={4}></td>
+                  <td className="font-bold text-right pr-2">Total: </td>
+                  <td className="font-bold text-left pr-2">
+                    Rp {form.selected_items.reduce((sum, item) => sum + item.price * (item as any).frequency, 0).toLocaleString()}
+                  </td>
+                </tr>
               </tbody>
-              </table>
-            </div>
+            </table>
+          </div>
         </div>
 
         <div className="flex justify-end gap-2 mt-4">
-        <Button
-          variant="outline"
-          onClick={handleCancel}
-        >
-          Batal
-        </Button>
-        <Button
+          <Button
+            variant="outline"
+            onClick={handleCancel}
+          >
+            Batal
+          </Button>
+          <Button
             className="px-4 py-2 bg-black text-white rounded disabled:opacity-50"
             onClick={handleSubmit}
           >
