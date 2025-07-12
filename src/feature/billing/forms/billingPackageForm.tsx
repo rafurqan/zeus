@@ -187,8 +187,8 @@ export default function BillingPackageForm({ item = null, onClose, onSuccess }: 
   const filteredRates = rates.filter(
     rate =>
       rate.is_active === 'Y' &&
-      (rate.service_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        rate.program.toLowerCase().includes(searchTerm.toLowerCase()))
+      (rate.service_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        rate.program?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const selectedRates = useMemo(() => {

@@ -43,7 +43,7 @@ export default function BillingForm({
             program_id: "",
             program: "",
             is_active: "Y",
-            frequency: "",
+            frequency: 0,
             applies_to: "",
             service_name: "",
             service_id: "",
@@ -172,7 +172,7 @@ export default function BillingForm({
                             label={<>Nama <span className="text-red-500">*</span></>} 
                             placeholder="Cth: SPP Bulanan"
                             name="service_name"
-                            value={form.service_name}
+                            value={form.service_name || ''}
                             onChange={handleChange}
                         />
                     </div>
@@ -218,7 +218,7 @@ export default function BillingForm({
                          <FormSelect
                             label="Frekuensi"
                             name="frequency"
-                            value={form.frequency}
+                            value={form.frequency.toString()}
                             options={frequencyOptions}
                             onChange={handleChange}
                         />

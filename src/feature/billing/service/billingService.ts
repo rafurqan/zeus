@@ -8,7 +8,6 @@ import {
 export const billingService = {
   async getAll(token: string): Promise<Billing[]> {
     const response = await http(token).get("master/rates");
-    // console.log(response.data.data);
     return response.data.data;
   },
 

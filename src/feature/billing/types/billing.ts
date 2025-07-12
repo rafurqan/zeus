@@ -5,14 +5,15 @@ export type Billing = {
   price: number;
   description: string; 
   program_id: string;
-  program: string; 
+  program?: string; 
   is_active: "Y" | "N";
-  frequency: string;
+  frequency: number;
   applies_to: string;
-  service_name: string;
+  service_name?: string;
   service_id?: string;
   category?: string;
   child_ids?: string[]; 
+
 };
 
 export type CreateBillingResponse = {

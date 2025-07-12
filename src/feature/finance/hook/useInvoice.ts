@@ -6,10 +6,8 @@ import { AppContext } from "@/context/AppContext";
 export const useInvoice = () => {
   const { token } = useContext(AppContext);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [originalInvoices, setOriginalInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm ] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('Semua Status');
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
@@ -19,11 +17,11 @@ export const useInvoice = () => {
   
     try {
       setLoading(true);
-      const response = await invoiceService.getAllPage(token, page, perPage, searchTerm, selectedStatus);
-      setInvoices(response.data.data); // <-- ambil array invoice
+      const response = await invoiceService.getAllPage(token, page, 10, searchTerm, selectedStatus);
+      setInvoices(response.data.data);
       setLastPage(response.data.last_page);
     } catch (err: any) {
-      setError(err.message || "Gagal mengambil data");
+      console.error(err.message || "Failed to fetch data");
     } finally {
       setLoading(false);
     }
@@ -31,19 +29,14 @@ export const useInvoice = () => {
 
   useEffect(() => {
     fetchInvoices();
-  }, [token, page, searchTerm, selectedStatus]);
+  }, [page, searchTerm, selectedStatus, token]); // Tambahkan selectedStatus ke dependencies
 
   return {
     invoices,
-    originalInvoices: invoices,
-    loading,
-    error,
-    searchTerm,
-    setSearchTerm,
-    selectedStatus,
-    setSelectedStatus,
     page,
     setPage,
-    lastPage
-  };  
+    lastPage,
+    setSelectedStatus, // Expose this function
+    loading
+  };
 };

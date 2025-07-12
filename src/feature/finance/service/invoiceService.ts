@@ -39,12 +39,12 @@ export const invoiceService = {
     return response.data.data;
   },
   
-  async create(token: string, data: Invoice): Promise<createInvoice> {
+  async create(token: string, data: Partial<Invoice>): Promise<createInvoice> {
     const response = await http(token).post<createInvoice>("finance/invoices", data);
     return response.data;
   },
 
-  async update(token: string, data: Invoice): Promise<createInvoice> {
+  async update(token: string, data: Partial<Invoice>): Promise<createInvoice> {
     const response = await http(token).put<updateInvoice>(`finance/invoices/${data.id}`, data);
     return response.data;
   },
