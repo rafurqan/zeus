@@ -69,7 +69,6 @@ export default function BillingPage() {
         (item?.service_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item?.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item?.applies_to || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (item?.frequency || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item?.code || '').toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 

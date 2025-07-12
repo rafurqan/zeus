@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { invoiceService } from "../service/invoiceService";
 import { AppContext } from "@/context/AppContext";
 import { useNavigate } from "react-router-dom";
@@ -11,36 +11,34 @@ const TAB_LIST = [
   { key: "paid", label: "Sudah Bayar" }
 ];
 
-export const InvoiceTable = () => {
+interface InvoiceTableProps {
+  invoices: any[];
+  onDelete: () => void;
+  page: number;
+  setPage: (page: number) => void;
+  lastPage: number;
+  setSelectedStatus: (status: string) => void; // Tambahkan ini
+}
+
+export const InvoiceTable = ({ 
+  invoices, 
+  page, 
+  setPage, 
+  lastPage,
+  setSelectedStatus // Tambahkan ini
+}: InvoiceTableProps) => {
   const { token } = useContext(AppContext);
   const navigate = useNavigate();
-  const [invoices, setInvoices] = useState([]);
-  const [page, setPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("");
   const { confirm, ConfirmDialog } = useConfirm();
 
-  const fetchInvoices = async () => {
-    if (!token) return;
-    try {
-      const response = await invoiceService.getAllPage(token, page, 10, searchTerm, activeTab);
-      setInvoices(response.data?.data || []); 
-      setLastPage(response.data?.last_page || 1);
-    } catch (error) {
-      console.error("Error fetching invoices:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchInvoices();
-  }, [page, searchTerm, activeTab]);
-
   const handleChangeTab = (status: string | null) => {
     setPage(1);
     setActiveTab(status || '');
+    setSelectedStatus(status || '');
   };
-
+  
   const handleDelete = async (id: number) => {
     if (!token) return;
     const result = await confirm({
@@ -168,7 +166,7 @@ export const InvoiceTable = () => {
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">
         <button
-          onClick={() => setPage((p) => Math.max(p - 1, 1))}
+          onClick={() => setPage(Math.max(page - 1, 1))}
           disabled={page === 1}
           className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
         >
@@ -176,7 +174,7 @@ export const InvoiceTable = () => {
         </button>
         <span className="text-sm">Halaman {page} dari {lastPage}</span>
         <button
-          onClick={() => setPage((p) => Math.min(p + 1, lastPage))}
+          onClick={() => setPage(Math.min(page + 1, lastPage))}
           disabled={page === lastPage}
           className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
         >

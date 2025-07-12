@@ -24,6 +24,8 @@ export const CreateInvoiceForm = () => {
   const [form, setForm] = useState({
     invoice_number: "",
     student_name: "",
+    entity_id: "",
+    entity_type: "",
     class: "",
     class_name: "",
     issue_date: "",
@@ -39,10 +41,10 @@ export const CreateInvoiceForm = () => {
   const [searchTermPackage, setSearchTermPackage] = useState("");
   const [searchTermBilling, setSearchTermBilling] = useState("");
   const [addedItemIds, setAddedItemIds] = useState<number[]>([]);
-  const [addedPackageIds, setAddedPackageIds] = useState<number[]>([]);
-  const [itemFrequencies, setItemFrequencies] = useState<Record<number, number>>({});
-  const [selectedPackages, setSelectedPackages] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([]);
+  // const [addedPackageIds, setAddedPackageIds] = useState<number[]>([]);
+  const [, setItemFrequencies] = useState<Record<number, number>>({});
+  // const [selectedPackages, setSelectedPackages] = useState([]);
+  // const [selectedItems, setSelectedItems] = useState([]);
   const [studentList, setStudentList] = useState<any[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -90,7 +92,8 @@ export const CreateInvoiceForm = () => {
             };
           } else {
             // Jika belum ada, tambahkan sebagai item baru
-            existingItems.push({ ...child, frequency: 1 });
+            existingItems.push({ ...child, frequency: 1, nama_tarif: child.service_name || '' });
+
           }
         });
 
@@ -101,12 +104,12 @@ export const CreateInvoiceForm = () => {
       });
       
       // Tambahkan ID paket ke addedPackageIds
-      setAddedPackageIds(prev => [...prev, pkg.id]);
+      // setAddedPackageIds(prev => [...prev, pkg.id]);
       
       // Tambahkan ID child items ke addedItemIds
       pkg.child_rates.forEach(child => {
-        if (!addedItemIds.includes(child.id)) {
-          setAddedItemIds(prev => [...prev, child.id]);
+        if (!addedItemIds.includes(Number(child.id))) {
+          setAddedItemIds(prev => [...prev, Number(child.id)]);
         }
       });
     }
@@ -126,20 +129,21 @@ export const CreateInvoiceForm = () => {
         ...prevForm,
         selected_items: [...prevForm.selected_items, { ...item, frequency: 1 }]
       }));
-      setAddedItemIds(prev => [...prev, item.id]);
+      setAddedItemIds(prev => [...prev, Number(item.id)]);
+
     }
   };
   const increaseFrequency = (id: number) => {
     setForm(prevForm => ({
       ...prevForm,
       selected_items: prevForm.selected_items.map(item =>
-        item.id === id ? { ...item, frequency: item.frequency + 1 } : item
+        Number(item.id) === id ? { ...item, frequency: item.frequency + 1 } : item
       )
     }));
   };
   
   const decreaseFrequency = (id: number) => {
-    const item = form.selected_items.find(item => item.id === id);
+    const item = form.selected_items.find(item => Number(item.id) === id);
     if (!item) return;
   
     if (item.frequency <= 1) {
@@ -148,11 +152,12 @@ export const CreateInvoiceForm = () => {
       setForm(prevForm => ({
         ...prevForm,
         selected_items: prevForm.selected_items.map(i =>
-          i.id === id ? { ...i, frequency: i.frequency - 1 } : i
+          Number(i.id) === id ? { ...i, frequency: i.frequency - 1 } : i
         )
       }));
     }
   };
+  
 
   const handleRemoveItem = (id: number) => {
     setItemFrequencies(prev => {
@@ -163,9 +168,9 @@ export const CreateInvoiceForm = () => {
       if (next === 0) {
         setForm(prevForm => ({
           ...prevForm,
-          selected_items: prevForm.selected_items.filter(i => i.id !== id)
+          selected_items: prevForm.selected_items.filter(i => Number(i.id) !== id)
         }));
-        setAddedItemIds(prev => prev.filter(i => i !== id));
+        setAddedItemIds(prev => prev.filter(i => Number(i) !== id));
         delete updated[id];
       }
   
@@ -178,7 +183,7 @@ export const CreateInvoiceForm = () => {
   );
   
   const filteredBillings = billings.filter(bill =>
-    bill.service_name.toLowerCase().includes(searchTermBilling.toLowerCase()) ||
+    bill.service_name?.toLowerCase().includes(searchTermBilling.toLowerCase()) ||
     bill.description?.toLowerCase().includes(searchTermBilling.toLowerCase())
   );
   // end
@@ -266,48 +271,59 @@ export const CreateInvoiceForm = () => {
     fetchInvoiceData();
   }, [invoiceId, token]);  
 
-  // Modifikasi handleSubmit yang sudah ada untuk menangani update
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  try {
-    if (invoiceId) {
-      // Update existing invoice
-      await invoiceService.update(token as string, {
-        id: invoiceId,
-        ...form
-      });
-      confirm({
-        title: "Success",
-        message: "Invoice Berhasil Diupdate!",
+    const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (invoiceId) {
+        // Update existing invoice
+        await invoiceService.update(token as string, {
+          id: invoiceId,
+          ...form,
+          due_date: new Date(form.due_date),
+          publication_date: new Date(form.issue_date),
+        });
+
+        await confirm({
+          title: "Success",
+          message: "Invoice Berhasil Diupdate!",
+          confirmText: "OK",
+          cancelText: "",
+        });
+
+        setTimeout(() => {
+          navigate('/finance/billingData');
+        }, 1000);
+      } else {
+        // Create new invoice
+        await invoiceService.create(token as string, {
+          ...form,
+          due_date: new Date(form.due_date),
+          publication_date: new Date(form.issue_date),
+        });
+
+        await confirm({
+          title: "Success",
+          message: "Invoice Berhasil Dibuat!",
+          confirmText: "OK",
+          cancelText: "",
+        });
+
+        setTimeout(() => {
+          navigate('/finance/billingData');
+        }, 1000);
+      }
+    } catch (error) {
+      console.error("Gagal menyimpan invoice:", error);
+
+      await confirm({
+        title: "Error",
+        message: "Failed to save invoice. Please try again.",
         confirmText: "OK",
-        showCancel: false,
+        cancelText: "",
       });
-      setTimeout(() => {
-        navigate('/finance/billingData');
-      }, 1000);
-    } else {
-      // Create new invoice
-      await invoiceService.create(token as string, form);
-      confirm({
-        title: "Success", 
-        message: "Invoice Berhasil Dibuat!",
-        confirmText: "OK",
-        showCancel: false,
-      });
-      setTimeout(() => {
-        navigate('/finance/billingData');
-      }, 1000);
     }
-  } catch (error) {
-    console.error("Gagal menyimpan invoice:", error);
-    await confirm({
-      title: "Error",
-      message: "Failed to save invoice. Please try again.",
-      confirmText: "OK",
-      showCancel: false,
-    });
-  }
-};
+  };
+
 
   return (
     <BaseLayout>
@@ -451,6 +467,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 {/* Paket Tagihan */}
                 <TabsContent value="package" className="mt-2 space-y-2">
                 <FormInput
+                    label="Cari paket..."
                     placeholder="Cari paket..."
                     value={searchTermPackage}
                     onChange={(e) => setSearchTermPackage(e.target.value)}
@@ -470,7 +487,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     {pkg.child_rates && pkg.child_rates.length > 0 && (
                       <div className="pl-2 mt-1 border-l border-gray-300 space-y-1">
                         {pkg.child_rates.map(child => {
-                          const frequency = form.selected_items.find(i => i.id === child.id)?.frequency || 0;
+                          // const frequency = form.selected_items.find(i => i.id === child.id)?.frequency || 0;
                           return (
                             <div key={child.id} className="flex justify-between items-center text-sm text-gray-700">
                               <span>- {child.service_name}</span>
@@ -487,6 +504,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 {/* Item Individual */}
                 <TabsContent value="individual" className="mt-2 space-y-2">
                 <FormInput
+                    label="Cari item..."
                     placeholder="Cari item..."
                     value={searchTermBilling}
                     onChange={(e) => setSearchTermBilling(e.target.value)}
@@ -499,13 +517,13 @@ const handleSubmit = async (e: React.FormEvent) => {
                         <p className="text-sm text-gray-500">{item.description}</p>
                         <p className="text-sm">Rp {item.price.toLocaleString()}</p>
                         </div>
-                        {addedItemIds.includes(item.id) ? (
+                        {addedItemIds.includes((item as any).id) ? (
                           <div className="flex items-center gap-2">
-                            <Button size="sm" variant="outline" onClick={() => decreaseFrequency(item.id)}>-</Button>
+                            <Button size="sm" variant="outline" onClick={() => decreaseFrequency((item as any).id)}>-</Button>
                             <span className="px-2">
                               {form.selected_items.find(i => i.id === item.id)?.frequency ?? 1}
                             </span>
-                            <Button size="sm" variant="outline" onClick={() => increaseFrequency(item.id)}>+</Button>
+                            <Button size="sm" variant="outline" onClick={() => increaseFrequency((item as any).id)}>+</Button>
                           </div>
                         ) : (
                           <Button size="sm" variant="outline" onClick={() => handleAddItem(item)}>Tambah</Button>
@@ -554,10 +572,10 @@ const handleSubmit = async (e: React.FormEvent) => {
                       <td className="px-2 py-2 whitespace-nowrap">Rp {item.price.toLocaleString()}</td>
                       <td className="px-2 py-2 text-center">{item.frequency}</td>
                       <td className="px-2 py-2 whitespace-nowrap">
-                        Rp {(item.price * item.frequency).toLocaleString()}
+                        Rp {(item.price * (item as any).frequency).toLocaleString()}
                       </td>
                       <td className="px-2 py-2 text-center">
-                        <button onClick={() => decreaseFrequency(item.id)} className="text-red-500 hover:text-red-700">
+                        <button onClick={() => decreaseFrequency((item as any).id)} className="text-red-500 hover:text-red-700">
                           <Trash2 size={16} />
                         </button>
                       </td>
@@ -567,14 +585,14 @@ const handleSubmit = async (e: React.FormEvent) => {
                       <td colSpan={4}></td>
                       <td className="font-semibold text-right pr-2">Subtotal:</td>
                       <td className="text-left pr-2">
-                          Rp {form.selected_items.reduce((sum, item) => sum + item.price * item.frequency, 0).toLocaleString()}
+                          Rp {form.selected_items.reduce((sum, item) => sum + item.price * (item as any).frequency, 0).toLocaleString()}
                       </td>
                   </tr>
                   <tr>
                       <td colSpan={4}></td>
                       <td className="font-bold text-right pr-2">Total: </td>
                       <td className="font-bold text-left pr-2">
-                          Rp {form.selected_items.reduce((sum, item) => sum + item.price * item.frequency, 0).toLocaleString()}
+                          Rp {form.selected_items.reduce((sum, item) => sum + item.price * (item as any).frequency, 0).toLocaleString()}
                       </td>
                   </tr>
               </tbody>
