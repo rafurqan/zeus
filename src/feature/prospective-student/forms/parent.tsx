@@ -4,7 +4,7 @@ import { AxiosError } from "axios";
 import { useConfirm } from "@/core/components/confirmDialog";
 import { Parent } from "../types/parent";
 import { MasterData } from "@/core/types/master-data";
-import { listEducationLevel, listIncomeRange } from "@/core/service/master";
+import { listEducationLevel, listIncomeRange, listParentType } from "@/core/service/master";
 import { EducationLevel } from "@/core/types/education-level";
 import { FormInput } from "@/core/components/forms/formInput";
 import { FormSelect } from "@/core/components/forms/formSelect";
@@ -28,10 +28,11 @@ export default function StudentParentForm({
 
     const { token, setUser, setToken } = useContext(AppContext);
     const [incomeRanges, setIncomeRanges] = useState<MasterData[]>([]);
+    const [parentTypes, setParentTypes] = useState<MasterData[]>([]);
     const [educationLevels, setEducationLevels] = useState<EducationLevel[]>([]);
 
     const [form, setForm] = useState<Parent>(item || {
-        id: "", full_name: "", parent_type: "", education_level: null, income_range: null, occupation: "", phone: "", address: "", is_main_contact: false, is_emergency_contact: false, email: null, nik: null
+        id: "", full_name: "", parent_type: null, education_level: null, income_range: null, occupation: "", phone: "", address: "", is_main_contact: false, is_emergency_contact: false, email: null, nik: null
     });
 
 
@@ -39,6 +40,7 @@ export default function StudentParentForm({
         if (token) {
             fetchIncomeRange();
             fetchEducationLevels();
+            fetchParentType();
         }
     }, []);
 
@@ -52,6 +54,24 @@ export default function StudentParentForm({
                 // toast.error("Akses ditolak. Silakan login ulang.");
             }
             setIncomeRanges(res.data || []);
+        } catch (err: unknown) {
+            if (err instanceof AxiosError && err.status === 401) {
+                console.error("Fetch failed", err);
+                setUser(null);
+            }
+        }
+    }
+
+    async function fetchParentType() {
+        try {
+            const res = await listParentType();
+
+            if (res.status === 401) {
+                setUser(null);
+                setToken(null);
+                // toast.error("Akses ditolak. Silakan login ulang.");
+            }
+            setParentTypes(res.data || []);
         } catch (err: unknown) {
             if (err instanceof AxiosError && err.status === 401) {
                 console.error("Fetch failed", err);
@@ -154,9 +174,9 @@ export default function StudentParentForm({
                     <FormSelect
                         label="Hubungan Keluarga"
                         name="parent_type"
-                        value={form.parent_type}
+                        value={form.parent_type?.id ?? ''}
                         onChange={handleChange}
-                        options={[{ label: 'Ayah', value: 'father' }, { label: 'Ibu', value: 'mother' }, { label: 'Lainnya', value: 'other' }]}
+                        options={parentTypes.map((type) => ({ label: `${type.code ?? ''} ${type.name}`, value: type.id }))}
                     />
 
 
@@ -165,7 +185,7 @@ export default function StudentParentForm({
                         name="income_range"
                         value={form.income_range?.id ?? ''}
                         onChange={handleInputIncomeRange}
-                        options={incomeRanges.map((income) => ({ label: income.name, value: income.id }))}
+                        options={incomeRanges.map((income) => ({ label: `${income.code ?? ''} ${income.name}`, value: income.id }))}
                     />
 
                     <FormInput

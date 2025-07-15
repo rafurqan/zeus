@@ -548,7 +548,7 @@ export default function StudentDetailPage() {
                                                                             className="flex items-center gap-1"
                                                                         >
                                                                             <User className="h-3 w-3" />
-                                                                            <span>{member.parent_type}</span>
+                                                                            <span>{member.parent_type?.name ?? '-'}</span>
                                                                         </Badge>
                                                                         <span className="font-medium">{member.full_name}</span>
                                                                         {member.is_main_contact && (

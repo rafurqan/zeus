@@ -30,7 +30,7 @@ export default function ParentTable({ items, onDeleted, onEdit }: Props) {
                     {items.map((item) => (
                         <TableRow key={item.id}>
                             <TableCell>{item.full_name}</TableCell>
-                            <TableCell>{item.parent_type}</TableCell>
+                            <TableCell>{item.parent_type?.name ?? '-'}</TableCell>
                             <TableCell>{item.occupation}</TableCell>
                             <TableCell>{item.income_range?.name ?? ""}</TableCell>
                             <TableCell>{item.education_level?.name ?? ""}</TableCell>
