@@ -26,7 +26,6 @@ import LoadingOverlay from "@/core/components/ui/loading_screen";
 import TableOriginSchool from "../components/originSchoolTable";
 import StudentOriginSchoolForm from "../forms/originSchool";
 import { OriginSchool } from "../types/origin-school";
-import { useGetRegistrationCode } from "../hooks/useGetRegistrationCode";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/core/components/ui/tabs";
 
 
@@ -57,11 +56,6 @@ export default function CreateProspectiveStudentsPage() {
     const [selectedSubDistrict, setSelectedSubDistrict] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
     const [preview, setPreview] = useState<string | null>(item?.photo_url ?? null);
-    const {
-        data: registrationCode,
-        loading: registrationCodeLoading,
-        getRegistrationCode: getRegistrationCode,
-    } = useGetRegistrationCode();
 
 
 
@@ -110,9 +104,6 @@ export default function CreateProspectiveStudentsPage() {
 
     useEffect(() => {
         if (token) {
-            if (!isEdit) {
-                getRegistrationCode();
-            }
             fetchReligionTypes();
             fetchTransportationModes();
             fetchSpecialConditions();
@@ -121,15 +112,6 @@ export default function CreateProspectiveStudentsPage() {
             fetchNationalities();
         }
     }, []);
-
-    useEffect(() => {
-        if (registrationCode) {
-            setForm((prev) => ({
-                ...prev,
-                registration_code: registrationCode.registration_code,
-            }));
-        }
-    }, [registrationCode]);
 
     useEffect(() => {
         if (item) {
@@ -516,8 +498,8 @@ export default function CreateProspectiveStudentsPage() {
                                             name="registration_code"
                                             value={form.registration_code}
                                             onChange={handleChange}
-                                            disabled={registrationCodeLoading}
-                                            placeholder={registrationCodeLoading ? "Loading..." : "REG"}
+                                            disabled={true}
+                                            placeholder={"Akan Terisi Otomatis"}
                                         />
                                     </div>
                                     <div className="flex flex-col items-center justify-center gap-3 mb-4">
