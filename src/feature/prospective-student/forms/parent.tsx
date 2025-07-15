@@ -111,6 +111,13 @@ export default function StudentParentForm({
         }
     };
 
+    const handleInputParentType = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const selected = parentTypes.find(value => value.id === e.target.value);
+        if (selected) {
+            setForm({ ...form, [e.target.name]: selected });
+        }
+    };
+
     const handleInputEducationLevel = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const selected = educationLevels.find(value => value.id === e.target.value);
         if (selected) {
@@ -175,7 +182,7 @@ export default function StudentParentForm({
                         label="Hubungan Keluarga"
                         name="parent_type"
                         value={form.parent_type?.id ?? ''}
-                        onChange={handleChange}
+                        onChange={handleInputParentType}
                         options={parentTypes.map((type) => ({ label: `${type.code ?? ''} ${type.name}`, value: type.id }))}
                     />
 
