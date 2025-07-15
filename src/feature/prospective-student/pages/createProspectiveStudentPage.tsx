@@ -92,7 +92,7 @@ export default function CreateProspectiveStudentsPage() {
         documents: [],
         addresses: [],
         village: null,
-        registration_code: "REG-0002",
+        registration_code: "",
         status: "",
         photo_url: null,
         special_condition: null,
