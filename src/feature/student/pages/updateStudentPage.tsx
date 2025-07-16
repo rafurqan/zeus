@@ -28,6 +28,7 @@ import ParentTable from "@/feature/prospective-student/components/parentTable";
 import StudentParentForm from "@/feature/prospective-student/forms/parent";
 import StudentOriginSchoolForm from "@/feature/prospective-student/forms/originSchool";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/core/components/ui/tabs";
+import toast from "react-hot-toast";
 
 
 
@@ -461,7 +462,8 @@ export default function UpdateStudentPage() {
                 if (error instanceof AxiosError) {
                     console.log("Fetch failed", error.response?.data.message);
                 }
-                alert(error instanceof AxiosError ? error.response?.data.message : "Terjadi kesalahan");
+                toast.error(
+                    error instanceof AxiosError ? error.response?.data.message : "Terjadi kesalahan saat menyimpan data");
             } finally {
                 setLoading(false);
             }
@@ -561,6 +563,7 @@ export default function UpdateStudentPage() {
                                             <FormInput
                                                 label="Nama Lengkap"
                                                 name="full_name"
+                                                onlyLetters={true}
                                                 value={form.full_name}
                                                 onChange={handleChange}
                                                 placeholder="John Doe"
@@ -591,7 +594,10 @@ export default function UpdateStudentPage() {
                                                 name="child_order"
                                                 value={form.child_order.toString()}
                                                 onChange={(e) => setForm({ ...form, child_order: parseInt(e.target.value) })}
-                                                options={[{ label: '1', value: '1' }, { label: '2', value: '2' }]}
+                                                options={Array.from({ length: 10 }, (_, i) => {
+                                                    const value = (i + 1).toString();
+                                                    return { label: value, value };
+                                                })}
                                             />
                                             <FormSelect
                                                 label="Kondisi Spesial"
@@ -623,6 +629,7 @@ export default function UpdateStudentPage() {
                                             <FormInput
                                                 label="Nama Panggilan"
                                                 name="nickname"
+                                                onlyLetters={true}
                                                 value={form.nickname}
                                                 onChange={handleChange}
                                                 placeholder="John Doe"
@@ -751,6 +758,7 @@ export default function UpdateStudentPage() {
                                                     <FormInput
                                                         label="Nomor Telepon"
                                                         name="phone"
+                                                        onlyNumbers
                                                         value={form.phone}
                                                         onChange={handleChange}
                                                         placeholder="628XXXXX"

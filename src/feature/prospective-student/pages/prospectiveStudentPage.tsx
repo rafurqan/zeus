@@ -174,6 +174,14 @@ export default function ProspectiveStudentsPage() {
                                 currentPage={currentPage}
                                 perPage={itemsPerPage}
                                 items={prospectiveStudentData}
+                                onView={(item) => {
+                                    if (!item.student_id) {
+                                        toast.error("Data siswa belum lengkap atau belum terdaftar.");
+                                        return;
+                                    }
+
+                                    navigate(`/students/student/${item.student_id}`);
+                                }}
                                 onApproved={(item) => {
                                     handleApprove(item);
                                 }}

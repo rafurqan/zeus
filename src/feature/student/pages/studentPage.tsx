@@ -192,7 +192,6 @@ export default function StudentsPage() {
                                 perPage={itemsPerPage}
                                 items={studentData}
                                 onEdit={(item) => {
-                                    console.log(item);
                                     navigate(`/students/student/${item.id}`);
                                 }}
                                 onStatusChange={(item, checked) => {

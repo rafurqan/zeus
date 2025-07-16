@@ -151,7 +151,7 @@ export default function StudentOriginSchoolForm({
                     />
 
                     <FormSelect
-                        label="Pendidikan Terakhir"
+                        label="Pendidikan"
                         name="education_level"
                         value={form.education_level?.id ?? ''}
                         onChange={handleInputEducationLevel}
@@ -159,7 +159,7 @@ export default function StudentOriginSchoolForm({
                     />
 
                     <FormSelect
-                        label="Pilih Jenis Sekolah"
+                        label="Jenis Sekolah"
                         name="school_type"
                         value={form.school_type?.id ?? ''}
                         onChange={handleInputSchoolType}

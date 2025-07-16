@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { EducationLevel } from "@/core/types/education-level";
 import { AppContext } from "@/context/AppContext";
+import toast from "react-hot-toast";
 
 
 
@@ -58,7 +59,8 @@ export default function EducationLevelForm({
 
       onSuccess(); // fetch data ulang dan tutup modal
     } catch (error: unknown) {
-      alert(error instanceof Error ? error.message : "Terjadi kesalahan");
+      toast.error(
+        error instanceof Error ? error.message : "Terjadi kesalahan saat menyimpan data");
     } finally {
       setLoading(false);
     }

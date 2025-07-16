@@ -1,5 +1,5 @@
 
-import { FaCheck, FaEdit, FaTimes } from "react-icons/fa";
+import { FaCheck, FaEdit, FaEye, FaTimes } from "react-icons/fa";
 import { Table, TableCell, TableHead, TableHeader, TableRow, TableBody } from "@/core/components/ui/table";
 import { Invoice } from "@/feature/finance/types/invoice";
 import { ProspectiveStudent } from "../types/prospective-student";
@@ -9,11 +9,12 @@ type Props = {
     items: ProspectiveStudent[];
     onDeleted: (item: ProspectiveStudent) => void;
     onEdit: (item: ProspectiveStudent) => void;
+    onView: (item: ProspectiveStudent) => void;
     onApproved: (item: ProspectiveStudent) => void;
     currentPage: number;
     perPage: number;
 };
-export default function ProspectiveStudentTable({ items, onEdit, onApproved, onDeleted, currentPage, perPage }: Props) {
+export default function ProspectiveStudentTable({ items, onEdit, onApproved, onDeleted, onView, currentPage, perPage }: Props) {
     const getStatusBadge = (status: string) => {
         const baseClasses = "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap";
 
@@ -163,13 +164,15 @@ export default function ProspectiveStudentTable({ items, onEdit, onApproved, onD
                             </TableCell>
                             <TableCell className="py-4">
                                 <div className="flex items-center justify-center gap-2">
-                                    <button
-                                        className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-105"
-                                        onClick={() => onEdit(item)}
-                                        title="Edit"
-                                    >
-                                        <FaEdit className="w-4 h-4" />
-                                    </button>
+                                    {item.status === "waiting" && (
+                                        <button
+                                            className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-105"
+                                            onClick={() => onEdit(item)}
+                                            title="Edit"
+                                        >
+                                            <FaEdit className="w-4 h-4" />
+                                        </button>
+                                    )}
                                     {item.status === "waiting" && (
                                         <button
                                             className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-200 hover:scale-105"
@@ -188,6 +191,18 @@ export default function ProspectiveStudentTable({ items, onEdit, onApproved, onD
                                             <FaTimes className="w-4 h-4" />
                                         </button>
                                     )}
+
+                                    {item.status === "approved" && (
+                                        <button
+                                            className="text-gray-400 hover:text-gray-600 text-lg"
+                                            onClick={() => {
+                                                onView(item);
+                                            }}
+                                        >
+                                            <FaEye />
+                                        </button>
+                                    )}
+
                                 </div>
                             </TableCell>
                         </TableRow>

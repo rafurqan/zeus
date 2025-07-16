@@ -7,12 +7,16 @@ type FormInputProps = {
     type?: string
     placeholder?: string
     disabled?: boolean
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
+    onlyLetters?: boolean
+    onlyNumbers?: boolean
+    onChange: (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => void
 }
 
-const inputClass = "w-full border border-gray-300 focus:border-blue-500 focus:outline-none p-2 rounded-md text-sm appearance-none bg-white";
-const labelClass = "block text-sm font-medium mb-1 text-gray-700";
-
+const inputClass =
+    "w-full border border-gray-300 focus:border-blue-500 focus:outline-none p-2 rounded-md text-sm appearance-none bg-white"
+const labelClass = "block text-sm font-medium mb-1 text-gray-700"
 
 function toCamelCase(str: string): string {
     return str

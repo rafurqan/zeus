@@ -9,9 +9,6 @@ import { EducationLevel } from "@/core/types/education-level";
 import { FormInput } from "@/core/components/forms/formInput";
 import { FormSelect } from "@/core/components/forms/formSelect";
 
-
-
-
 type Props = {
     item?: Parent | null;
     onClose: () => void;
@@ -35,13 +32,20 @@ export default function StudentParentForm({
         id: "", full_name: "", parent_type: null, education_level: null, income_range: null, occupation: "", phone: "", address: "", is_main_contact: false, is_emergency_contact: false, email: null, nik: null
     });
 
-
     useEffect(() => {
         if (token) {
             fetchIncomeRange();
             fetchEducationLevels();
             fetchParentType();
         }
+    }, []);
+
+    // Prevent body scroll when modal is open
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
     }, []);
 
     async function fetchIncomeRange() {
@@ -51,7 +55,6 @@ export default function StudentParentForm({
             if (res.status === 401) {
                 setUser(null);
                 setToken(null);
-                // toast.error("Akses ditolak. Silakan login ulang.");
             }
             setIncomeRanges(res.data || []);
         } catch (err: unknown) {
@@ -69,7 +72,6 @@ export default function StudentParentForm({
             if (res.status === 401) {
                 setUser(null);
                 setToken(null);
-                // toast.error("Akses ditolak. Silakan login ulang.");
             }
             setParentTypes(res.data || []);
         } catch (err: unknown) {
@@ -87,7 +89,6 @@ export default function StudentParentForm({
             if (res.status === 401) {
                 setUser(null);
                 setToken(null);
-                // toast.error("Akses ditolak. Silakan login ulang.");
             }
             setEducationLevels(res.data || []);
         } catch (err: unknown) {
@@ -135,16 +136,15 @@ export default function StudentParentForm({
         if (isConfirmed) {
             onSuccess(form);
         }
-
     };
-
 
     const labelClass = "block text-sm font-medium mb-1";
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/30 flex justify-center items-center">
-            <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
-                <div className="flex justify-between items-start mb-4">
+        <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4 overflow-y-auto">
+            <div className="bg-white rounded-xl shadow-lg w-full max-w-md max-h-[90vh] min-h-[60vh] flex flex-col">
+                {/* Header - Fixed */}
+                <div className="flex justify-between items-start p-6 border-b border-gray-100 flex-shrink-0">
                     <div>
                         <h2 className="text-xl font-bold">
                             {isEdit ? "Edit Data Keluarga" : "Tambah Keluarga Baru"}
@@ -155,13 +155,13 @@ export default function StudentParentForm({
                                 : "Tambahkan data keluarga baru ke dalam sistem"}
                         </p>
                     </div>
-                    <button onClick={onClose} className="text-gray-500 text-xl">
+                    <button onClick={onClose} className="text-gray-500 text-xl hover:text-gray-700">
                         ×
                     </button>
                 </div>
 
-                <div className="space-y-4">
-
+                {/* Content - Scrollable */}
+                <div className="p-6 space-y-4 flex-1 overflow-y-auto">
                     <FormInput
                         label="Nama"
                         name="full_name"
@@ -185,7 +185,6 @@ export default function StudentParentForm({
                         onChange={handleInputParentType}
                         options={parentTypes.map((type) => ({ label: `${type.code ?? ''} ${type.name}`, value: type.id }))}
                     />
-
 
                     <FormSelect
                         label="Pilih Penghasilan"
@@ -211,7 +210,6 @@ export default function StudentParentForm({
                         options={educationLevels.map((education) => ({ label: education.name, value: education.id }))}
                     />
 
-
                     <div>
                         <label className={labelClass}>Alamat (Opsional)</label>
                         <textarea
@@ -220,33 +218,32 @@ export default function StudentParentForm({
                             onChange={handleChange}
                             placeholder="Tulis alamat lengkap"
                             className="w-full border border-gray-100 shadow-none rounded px-3 py-2 focus:outline-none focus:border-black hover:border-black focus:ring-0"
+                            rows={3}
                         />
                     </div>
 
-                    {
-                        <div className="mt-10 space-y-4">
-                            <h3 className="font-bold mb-4">Kontak</h3>
-                            <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-4">
-                                    <FormInput
-                                        label="Nomor Telephon"
-                                        name="phone"
-                                        value={form.phone ?? ""}
-                                        onChange={handleChange}
-                                        placeholder="Contoh: 081283xxx"
-                                    />
-                                </div>
+                    <div className="space-y-4">
+                        <h3 className="font-bold">Kontak</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormInput
+                                label="Nomor Telephon"
+                                name="phone"
+                                onlyNumbers
+                                value={form.phone ?? ""}
+                                onChange={handleChange}
+                                placeholder="Contoh: 081283xxx"
+                            />
 
-                                <div className="space-y-4">
-                                    <FormInput
-                                        label="Email"
-                                        name="email"
-                                        value={form.email ?? ""}
-                                        onChange={handleChange}
-                                        placeholder="xxx@gmail.com"
-                                    />
-                                </div>
-                            </form>
+                            <FormInput
+                                label="Email"
+                                name="email"
+                                value={form.email ?? ""}
+                                onChange={handleChange}
+                                placeholder="xxx@gmail.com"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
                             <label className="inline-flex items-center space-x-2 cursor-pointer">
                                 <input
                                     type="checkbox"
@@ -258,7 +255,7 @@ export default function StudentParentForm({
                                 <span className="text-sm text-gray-700">Kontak Utama</span>
                             </label>
 
-                            <label className="inline-flex items-center space-x-2 cursor-pointer ml-10">
+                            <label className="inline-flex items-center space-x-2 cursor-pointer ml-4">
                                 <input
                                     type="checkbox"
                                     name="is_emergency_contact"
@@ -269,21 +266,20 @@ export default function StudentParentForm({
                                 <span className="text-sm text-gray-700">Kontak Darurat</span>
                             </label>
                         </div>
-                    }
-
-
+                    </div>
                 </div>
 
-                <div className="mt-6 flex justify-end space-x-2">
+                {/* Footer - Fixed */}
+                <div className="p-6 border-t border-gray-100 flex justify-end space-x-2 flex-shrink-0">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 border rounded text-gray-600"
+                        className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
                     >
                         Batal
                     </button>
                     <button
                         onClick={handleSubmit}
-                        className="px-4 py-2 bg-black text-white rounded disabled:opacity-50"
+                        className="px-4 py-2 bg-black text-white rounded disabled:opacity-50 hover:bg-gray-800"
                     >
                         Simpan
                     </button>
@@ -291,7 +287,6 @@ export default function StudentParentForm({
 
                 {ConfirmDialog}
             </div>
-
         </div>
     );
 }

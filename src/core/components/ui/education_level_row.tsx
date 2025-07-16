@@ -1,6 +1,7 @@
 import { AppContext } from "@/context/AppContext";
 import { EducationLevel } from "@/core/types/education-level";
 import { useContext, useState } from "react";
+import toast from "react-hot-toast";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
 
@@ -39,7 +40,9 @@ export default function EducationLevelRow({ item, onDeleted, onEdit }: Props) {
 
       onDeleted(item.id);
     } catch (error: unknown) {
-      alert(error instanceof Error ? error.message : "Terjadi kesalahan");
+      toast.error(
+        error instanceof Error ? error.message : "Terjadi kesalahan saat menghapus data"
+      );
     } finally {
       setLoading(false);
     }
