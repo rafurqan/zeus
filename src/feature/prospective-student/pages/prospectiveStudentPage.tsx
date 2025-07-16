@@ -180,7 +180,9 @@ export default function ProspectiveStudentsPage() {
                                         return;
                                     }
 
-                                    navigate(`/students/student/${item.student_id}`);
+                                    navigate(`/students/student/${item.student_id}`, {
+                                        state: { from: '/students/prospective' }
+                                    });
                                 }}
                                 onApproved={(item) => {
                                     handleApprove(item);

@@ -24,7 +24,7 @@ import { Separator } from "@/core/components/ui/separator"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/core/components/ui/accordion"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/core/components/ui/table"
 import { Alert, AlertDescription } from "@/core/components/ui/alert"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, Location, useLocation } from "react-router-dom"
 import BaseLayout from "@/core/components/baseLayout"
 import { useStudentById } from "../hooks/useStudentById"
 import { OriginSchool } from "@/feature/prospective-student/types/origin-school"
@@ -39,6 +39,9 @@ import PDFPreviewModal from "@/core/components/ui/pdf_viewer"
 // Mock data for a single student - in a real app, this would come from an API
 
 type PDFSource = { type: 'url'; value: string } | { type: 'base64'; value: string };
+type LocationState = {
+  from?: string;
+};
 
 export default function StudentDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -46,6 +49,7 @@ export default function StudentDetailPage() {
     const { data, isLoading, isError, error } = useStudentById(id);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activePdfSource, setActivePdfSource] = useState<PDFSource | null>(null);
+    const location = useLocation() as Location & { state: LocationState };
 
     const openModal = (source: PDFSource) => {
         setActivePdfSource(source);
@@ -76,7 +80,8 @@ export default function StudentDetailPage() {
     }
 
     const handleGoBack = () => {
-        navigate('/students/student')
+        const from = location.state?.from
+        navigate(from || '/students/student')
     }
 
     if (!data) {
@@ -677,8 +682,9 @@ export default function StudentDetailPage() {
                                                                                 </div>
                                                                                 <div className="flex-1 min-w-0">
                                                                                     <div className="flex items-center gap-2">
-                                                                                        <p className="font-medium truncate">{doc.file_name}</p>
-                                                                                        <Badge variant="outline" className="ml-2">
+                                                                                        <p className="font-medium truncate">({doc.document_type?.name ?? ""})</p>
+                                                                                        <p className="font-medium truncate">{doc.name}</p>
+                                                                                        {/* <Badge variant="outline" className="ml-2">
                                                                                             {doc.document_type?.name === "akta_kelahiran" && "Akta Kelahiran"}
                                                                                             {doc.document_type?.name === "kartu_keluarga" && "Kartu Keluarga"}
                                                                                             {doc.document_type?.name === "rapor" && "Rapor"}
@@ -687,7 +693,7 @@ export default function StudentDetailPage() {
                                                                                             {doc.document_type?.name === "surat_keterangan" && "Surat Keterangan"}
                                                                                             {doc.document_type?.name === "sertifikat" && "Sertifikat Prestasi"}
                                                                                             {doc.document_type?.name === "lainnya" && "Dokumen Lainnya"}
-                                                                                        </Badge>
+                                                                                        </Badge> */}
                                                                                         {/* <Badge
                                                                                             variant={
                                                                                                 doc.status === "verified"

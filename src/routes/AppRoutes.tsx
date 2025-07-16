@@ -19,6 +19,8 @@ import { PaymentDataPage } from "@/feature/payment/pages/PaymentDataPage";
 import { CreatePaymentForm } from "@/feature/payment/components/CreatePaymentForm";
 import { PrintPayment } from '@/feature/payment/components/PrintPayment';
 import StudentsPage from "@/feature/student/pages/studentPage";
+import UpdateStudentPage from '@/feature/student/pages/updateStudentPage';
+import StudentDetailPage from '@/feature/student/pages/viewStudentPage';
 
 const ProtectedRoute = () => {
   const { user, loading } = useContext(AppContext);
@@ -65,6 +67,8 @@ const AppRoutes = () => {
           <Route path="payment/paymentData/paymentForm" element={<CreatePaymentForm />} />
           <Route path="payment/paymentData/paymentForm/:id" element={<CreatePaymentForm />} />
           <Route path="payment/print" element={<PrintPayment />} />
+          <Route path="/students/student/:id/edit" element={<UpdateStudentPage />} />
+          <Route path="/students/student/:id" element={<StudentDetailPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

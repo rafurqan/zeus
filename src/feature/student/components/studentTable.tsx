@@ -168,12 +168,17 @@ export default function StudentTable({ items, onEdit, onStatusChange, currentPag
                             </TableCell>
                             <TableCell>
                                 <div className="flex justify-end items-center space-x-2">
-                                    <button
-                                        className="text-gray-400 hover:text-gray-600 text-lg"
-                                        onClick={() => onEdit(item)}
-                                    >
-                                        <FaEye />
-                                    </button>
+                                    <div className="relative group flex items-center">
+                                        <button
+                                            className="text-gray-400 hover:text-gray-600 text-lg"
+                                            onClick={() => onEdit(item)}
+                                        >
+                                            <FaEye />
+                                        </button>
+                                        <span className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-black text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                                            Lihat siswa
+                                        </span>
+                                    </div>
                                     <Switch
                                         checked={item.status === "active"}
                                         onCheckedChange={(checked) => handleStatusToggle(item, checked)}
