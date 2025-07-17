@@ -34,7 +34,7 @@ export const PaymentTable  = ({
   setPage,
   searchTerm,
   setSearchTerm,
-  activeTab = null,
+  activeTab = 'unpaid',
   setActiveTab,
 }: PaymentTableProps) => {
   const { token } = useContext(AppContext);
@@ -236,14 +236,14 @@ export const PaymentTable  = ({
                 onClick={closeDeleteModal}
                 className="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200"
               >
-                Batal
+                Tutup
               </button>
               <button
                 onClick={handleDelete}
                 disabled={!deleteReason.trim()}
                 className={`px-4 py-2 text-white rounded-md ${deleteReason.trim() ? 'bg-red-600 hover:bg-red-700' : 'bg-red-300 cursor-not-allowed'}`}
               >
-                Hapus
+                Batalkan
               </button>
             </div>
           </div>

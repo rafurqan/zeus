@@ -78,27 +78,35 @@ export const PrintPayment = () => {
       </div>
 
       {/* Informasi Siswa */}
-      <div className="mb-6" style={{ fontFamily: 'Times New Roman, serif' }}>
+      <div className="mb-6 text-base" style={{ fontFamily: 'Times New Roman, serif' }}>
         <div className="grid grid-cols-2 gap-2">
           <div>
             <p>Telah Terima Dari</p>
             <p>Nama Siswa</p>
-            <p>No Pendaftaran</p>
+            <p>No Invoice</p>
+            <p>No Pembayaran</p>
             <p>Guna Membayar</p>
             <p>Kelas</p>
+            <p>Tanggal Pemabayaran</p>
           </div>
           <div>
             <br />
             <p>: {invoiceData?.entity?.full_name}</p>
-            <p>: {invoiceData?.entity?.registration_code}</p>
+            <p>: {invoiceData?.code}</p>
+            <p>: {paymentData?.code}</p>
             <p>: {invoiceData?.description || '-'}</p>
             <p>: {invoiceData?.student_class?.name} {invoiceData?.student_class?.part}</p>
+            <p>: {new Date(paymentData?.payment_date).toLocaleDateString('id-ID', {
+              day: 'numeric',
+              month: 'long', 
+              year: 'numeric'
+            })}</p>
           </div>
         </div>
       </div>
 
       {/* Rincian Biaya */}
-      <div className="mb-4 space-y-1 text-sm">
+      <div className="mb-4 space-y-1 text-base">
         {invoiceData?.selected_items?.map((item: any, index: number) => (
             <div key={index} className="flex justify-between border-b border-gray-300 py-1">
             <div>{index + 1}. {item.service_name}</div>
@@ -109,7 +117,7 @@ export const PrintPayment = () => {
         
       {/* Payment Summary */}
       <div className="mb-4">
-        <div className="grid grid-cols-[40%_60%] gap-2">
+        <div className="grid grid-cols-[40%_60%] gap-2 text-base">
           <div className="space-y-2">
             <p>Jumlah Total</p>
             <p>Dibayarkan</p>
@@ -127,7 +135,7 @@ export const PrintPayment = () => {
               <span>:</span>
               <span>Rp {paymentData?.total_payment?.toLocaleString()}</span>
             </p>
-            <p className="text-sm italic flex justify-end">
+            <p className="italic flex justify-end">
               ({convertToRupiah(invoiceData?.total || 0)})
             </p>
             <p className="flex justify-between">
@@ -151,14 +159,14 @@ export const PrintPayment = () => {
       {/* Kotak Kurang */}
       {invoiceData?.total > paymentData?.total_payment && (
         <div className="mb-4">
-          <p className="border border-black w-fit px-2 py-1 bg-yellow-200">
+          <p className="border border-black w-fit px-2 py-1 bg-yellow-200 text-base">
             <span className="font-bold">KURANG</span> Rp {(invoiceData?.total - paymentData?.nominal_payment)?.toLocaleString()}
           </p>
         </div>
       )}
 
       {/* Tanda Tangan */}
-      <div className="grid grid-cols-2 mt-8 text-center text-sm">
+      <div className="grid grid-cols-2 mt-8 text-center text-base">
         <div>
           <p>Pembayar,</p>
           <div className="h-16" />
@@ -177,7 +185,7 @@ export const PrintPayment = () => {
         </div>
       </div>
 
-      <p className="mt-6 text-sm italic">Nb. Harap disimpan.</p>
+      <p className="mt-6 italic text-base">Nb. Harap disimpan.</p>
     </div>
     </div>
   );

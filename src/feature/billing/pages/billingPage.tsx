@@ -19,7 +19,7 @@ import GrantForm from "../forms/grantForm";
 import BillingPackageForm from "../forms/billingPackageForm";
 
 // Tab
-const tabs = ['Biaya', 'Paket Biaya', 'Metode Pembayaran', 'Diskon & Beasiswa', 'Dana Hibah'];
+const tabs = ['Biaya', 'Paket Biaya', 'Dana Hibah', 'Metode Pembayaran', 'Diskon & Beasiswa' ];
 
 export default function BillingPage() {
     const { user, setUser } = useContext(AppContext);
@@ -31,6 +31,7 @@ export default function BillingPage() {
     const [modalType, setModalType] = useState<"billing" | "grant" | "package">("billing");
     const [searchTerm, setSearchTerm] = useState("");
     const [activeTab, setActiveTab] = useState("Biaya");
+    const handleRefresh = () => window.location.reload();
 
     if (!user) {
         setUser(null);
@@ -63,8 +64,6 @@ export default function BillingPage() {
     };
 
 
-    // Filter data based on search term
-    // Menggunakan data dari hook useBilling, useGrant, dan usePackage
     const filteredData = data?.filter(item =>
         (item?.service_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item?.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -82,7 +81,6 @@ export default function BillingPage() {
     const filteredPackageData = packageData.filter(item =>
         (item?.service_name || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
-    // end filter
     
 
     return (
@@ -99,14 +97,9 @@ export default function BillingPage() {
                         <div className="flex justify-between items-center mb-6">
                             <h1 className="text-3xl font-bold">Master Data Penagihan</h1>
                             <div className="flex space-x-2">
-                                <Button variant="outline" className="flex items-center gap-1">
-                                    <FileText className="h-4 w-4" />
-                                    <span>Impor / Ekspor</span>
-                                </Button>
-                                <Button variant="outline" className="flex items-center gap-1">
-                                    <RefreshCcw className="h-4 w-4" />
-                                    <span>Segarkan</span>
-                                </Button>
+                                <button className="px-4 py-2 bg-white text-black-700 border border-black-300 rounded-md shadow-sm hover:bg-black-50" onClick={handleRefresh}>
+                                    Segarkan
+                                </button>
                             </div>
                         </div>
 
@@ -126,7 +119,7 @@ export default function BillingPage() {
                         </div>
 
                         {/* Biaya Section */}
-                        {activeTab === "Biaya" && ( // Only render this section if "Biaya" tab is active
+                        {activeTab === "Biaya" && (
                             <div className="bg-white p-6 rounded-lg shadow">
                                 <div className="flex justify-between items-center mb-4">
                                     <div>
@@ -155,13 +148,11 @@ export default function BillingPage() {
                                 </div>
 
                                 {/* Table Section */}
-                                {/* Menggunakan loading dari hook useBilling */}
                                 {loading ? (
                                     <BillingTableSkeleton />
                                 ) : <Table
-                                    items={filteredData} // Use filtered data
+                                    items={filteredData}
                                     onDeleted={(item) => {
-                                        // Menggunakan remove dari hook useBilling
                                         remove(item.id)
                                     }}
 
@@ -185,17 +176,16 @@ export default function BillingPage() {
                                     </div>
                                     <Button 
                                         onClick={() => { 
-                                            setModalType("package"); // Change this from "billing" to "package"
+                                            setModalType("package");
                                             setShowModal(true); 
                                             setSelectedItem(null); 
                                         }} 
                                         className="flex items-center gap-1 bg-black hover:bg-gray-800 text-white"
                                     >
-                                        <span>Tambah Paket</span> {/* Also update the button text to match the action */}
+                                        <span>Tambah Paket</span> 
                                         <Plus className="h-4 w-4" />
                                     </Button>
                                 </div>
-                                {/* Placeholder Table for Paket Biaya */}
                                 {/* Search Input */}
                                 <div className="relative mb-4">
                                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -209,13 +199,11 @@ export default function BillingPage() {
                                 </div>
 
                                 {/* Table Section */}
-                                {/* Menggunakan loading dari hook usePakcage */}
                                 {loading ? (
                                     <BillingTableSkeleton />
                                 ) : <PackageTable
-                                    items={filteredPackageData} // Use filtered data
+                                    items={filteredPackageData}
                                     onDeleted={(item) => {
-                                        // Menggunakan remove dari hook useBilling
                                         removePackage(item.id)
                                     }}
 
@@ -224,20 +212,6 @@ export default function BillingPage() {
                                         setShowModal(true);
                                     }}
                                 />}
-                            </div>
-                        )}
-
-                        {/* Metode Pembayaran Section (Placeholder) */}
-                        {activeTab === "Metode Pembayaran" && (
-                            <div className="bg-white p-6 rounded-lg shadow">
-                                <p className="text-gray-500">Konten untuk tab "{activeTab}" akan ditampilkan di sini.</p>
-                            </div>
-                        )}
-
-                        {/* Diskon & Beasiswa Section (Placeholder) */}
-                        {activeTab === "Diskon & Beasiswa" && (
-                            <div className="bg-white p-6 rounded-lg shadow">
-                                <p className="text-gray-500">Konten untuk tab "{activeTab}" akan ditampilkan di sini.</p>
                             </div>
                         )}
 
@@ -284,7 +258,6 @@ export default function BillingPage() {
                                     <GrantTable
                                         items={filteredGrantData}
                                         onDeleted={(item) => {
-                                        // Menggunakan remove dari hook useBilling
                                         removeGrant(item.id)
                                         }}
                                         onEdit={(item) => {
@@ -294,6 +267,20 @@ export default function BillingPage() {
                                         onReset={(item) => reset(item.id)}
                                     />
                                 )}
+                            </div>
+                        )}
+
+                        {/* Metode Pembayaran Section (Placeholder) */}
+                        {activeTab === "Metode Pembayaran" && (
+                            <div className="bg-white p-6 rounded-lg shadow">
+                                <p className="text-gray-500">Konten untuk tab "{activeTab}" akan ditampilkan di sini.</p>
+                            </div>
+                        )}
+
+                        {/* Diskon & Beasiswa Section (Placeholder) */}
+                        {activeTab === "Diskon & Beasiswa" && (
+                            <div className="bg-white p-6 rounded-lg shadow">
+                                <p className="text-gray-500">Konten untuk tab "{activeTab}" akan ditampilkan di sini.</p>
                             </div>
                         )}
 

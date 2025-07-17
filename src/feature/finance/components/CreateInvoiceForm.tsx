@@ -15,6 +15,7 @@ import { useConfirm } from "@/core/components/confirmDialog";
 import { invoiceService } from "../service/invoiceService";
 import { useStudentClass } from "@/feature/student/hooks/useStudentClass";
 
+
 export const CreateInvoiceForm = () => {
   const { confirm, ConfirmDialog } = useConfirm();
   const { token } = useContext(AppContext);
@@ -41,10 +42,8 @@ export const CreateInvoiceForm = () => {
   const [searchTermPackage, setSearchTermPackage] = useState("");
   const [searchTermBilling, setSearchTermBilling] = useState("");
   const [addedItemIds, setAddedItemIds] = useState<number[]>([]);
-  // const [addedPackageIds, setAddedPackageIds] = useState<number[]>([]);
+  const [, setAddedPackageIds] = useState<number[]>([]);
   const [, setItemFrequencies] = useState<Record<number, number>>({});
-  // const [selectedPackages, setSelectedPackages] = useState([]);
-  // const [selectedItems, setSelectedItems] = useState([]);
   const [studentList, setStudentList] = useState<any[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -52,8 +51,8 @@ export const CreateInvoiceForm = () => {
   const fetchData = async () => {
       try {
         const [billingData, packageData] = await Promise.all([
-          billingService.getAll(token as string),
-          packageService.getAll(token as string),
+          billingService.getAll(token as any),
+          packageService.getAll(token as any),
         ]);
         setBillings(billingData);
         setPackages(packageData);
@@ -67,33 +66,28 @@ export const CreateInvoiceForm = () => {
 
   const fetchStudents = async (keyword: string) => {
     try {
-      const students = await invoiceService.getStudents(token as string, keyword);
+      const students = await invoiceService.getStudents(token as any, keyword);
       setStudentList(students);
     } catch (error) {
       console.error("Gagal fetch student", error);
     }
   };
 
-  // add item tagihan
   const handleAddPackage = (pkg: RatePackage) => {
     if (pkg.child_rates && pkg.child_rates.length > 0) {
       setForm(prevForm => {
         const existingItems = [...prevForm.selected_items];
         
         pkg.child_rates?.forEach(child => {
-          // Cari apakah child item sudah ada di selected_items
           const existingItemIndex = existingItems.findIndex(item => item.id === child.id);
           
           if (existingItemIndex !== -1) {
-            // Jika sudah ada, tambah frekuensinya
             existingItems[existingItemIndex] = {
               ...existingItems[existingItemIndex],
               frequency: (existingItems[existingItemIndex].frequency || 1) + 1
             };
           } else {
-            // Jika belum ada, tambahkan sebagai item baru
             existingItems.push({ ...child, frequency: 1, nama_tarif: child.service_name || '' });
-
           }
         });
 
@@ -103,10 +97,8 @@ export const CreateInvoiceForm = () => {
         };
       });
       
-      // Tambahkan ID paket ke addedPackageIds
-      // setAddedPackageIds(prev => [...prev, pkg.id]);
+      setAddedPackageIds(prev => [...prev, Number(pkg.id)]);
       
-      // Tambahkan ID child items ke addedItemIds
       pkg.child_rates.forEach(child => {
         if (!addedItemIds.includes(Number(child.id))) {
           setAddedItemIds(prev => [...prev, Number(child.id)]);
@@ -116,12 +108,14 @@ export const CreateInvoiceForm = () => {
   };
 
   const handleAddItem = (item: Billing) => {
-    const existing = form.selected_items.find(i => i.id === item.id);
+    const itemId = item.id.toString();
+    const existing = form.selected_items.find(i => i.id.toString() === itemId);
+
     if (existing) {
       setForm(prevForm => ({
         ...prevForm,
         selected_items: prevForm.selected_items.map(i =>
-          i.id === item.id ? { ...i, frequency: i.frequency + 1 } : i
+          i.id.toString() === itemId ? { ...i, frequency: (i.frequency || 1) + 1 } : i
         )
       }));
     } else {
@@ -130,50 +124,54 @@ export const CreateInvoiceForm = () => {
         selected_items: [...prevForm.selected_items, { ...item, frequency: 1 }]
       }));
       setAddedItemIds(prev => [...prev, Number(item.id)]);
-
     }
   };
-  const increaseFrequency = (id: number) => {
-    setForm(prevForm => ({
-      ...prevForm,
-      selected_items: prevForm.selected_items.map(item =>
-        Number(item.id) === id ? { ...item, frequency: item.frequency + 1 } : item
-      )
-    }));
-  };
   
-  const decreaseFrequency = (id: number) => {
-    const item = form.selected_items.find(item => Number(item.id) === id);
+  // const increaseFrequency = (id: string | number) => {
+  //   const stringId = id.toString();
+    
+  //   setForm(prevForm => ({
+  //     ...prevForm,
+  //     selected_items: prevForm.selected_items.map(item =>
+  //       item.id.toString() === stringId ? { ...item, frequency: item.frequency + 1 } : item
+  //     )
+  //   }));
+  // };
+  
+  const decreaseFrequency = (id: string | number) => {
+    const stringId = id.toString();
+    const item = form.selected_items.find(item => item.id.toString() === stringId);
     if (!item) return;
-  
+
     if (item.frequency <= 1) {
       handleRemoveItem(id);
     } else {
       setForm(prevForm => ({
         ...prevForm,
         selected_items: prevForm.selected_items.map(i =>
-          Number(i.id) === id ? { ...i, frequency: i.frequency - 1 } : i
+          i.id.toString() === stringId ? { ...i, frequency: i.frequency - 1 } : i
         )
       }));
     }
   };
-  
 
-  const handleRemoveItem = (id: number) => {
+  const handleRemoveItem = (id: string | number) => {
+    const stringId = id.toString();
+    
     setItemFrequencies(prev => {
-      const current = prev[id] || 1;
+      const current = prev[Number(id)] || 1;
       const next = Math.max(current - 1, 0);
-      const updated = { ...prev, [id]: next };
-  
+      const updated = { ...prev, [Number(id)]: next };
+
       if (next === 0) {
         setForm(prevForm => ({
           ...prevForm,
-          selected_items: prevForm.selected_items.filter(i => Number(i.id) !== id)
+          selected_items: prevForm.selected_items.filter(i => i.id.toString() !== stringId)
         }));
-        setAddedItemIds(prev => prev.filter(i => Number(i) !== id));
-        delete updated[id];
+        setAddedItemIds(prev => prev.filter(i => i.toString() !== stringId));
+        delete updated[Number(id)];
       }
-  
+
       return updated;
     });
   };
@@ -211,7 +209,6 @@ export const CreateInvoiceForm = () => {
     });
   };
 
-  // Tambahkan useEffect untuk memuat data invoice jika ada ID
   useEffect(() => {
     const fetchInvoiceData = async () => {
       if (invoiceId && token) {
@@ -271,11 +268,10 @@ export const CreateInvoiceForm = () => {
     fetchInvoiceData();
   }, [invoiceId, token]);  
 
-    const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (invoiceId) {
-        // Update existing invoice
         await invoiceService.update(token as string, {
           id: invoiceId,
           ...form,
@@ -294,7 +290,6 @@ export const CreateInvoiceForm = () => {
           navigate('/finance/billingData');
         }, 1000);
       } else {
-        // Create new invoice
         await invoiceService.create(token as string, {
           ...form,
           due_date: new Date(form.due_date),
@@ -324,7 +319,6 @@ export const CreateInvoiceForm = () => {
     }
   };
 
-
   return (
     <BaseLayout>
       <div className="p-6 flex flex-col gap-6">
@@ -342,13 +336,12 @@ export const CreateInvoiceForm = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Kiri: Form */}
           <div className="md:col-span-2 space-y-4">
-            <FormInput
-              name="invoice_number"
+            <FormInput 
               label="Nomor Invoice"
-              placeholder="Akan di generate secara otomatis" 
+              name="invoice_number" 
               value={form.invoice_number}
               onChange={() => {}}
-              disabled 
+              placeholder="Akan di generate secara otomatis"
             />
 
             <FormSelect
@@ -433,7 +426,7 @@ export const CreateInvoiceForm = () => {
               <FormInput 
                 label="Tanggal Penerbitan" 
                 type="date" 
-                value={form.issue_date} 
+                value={invoiceId ? form.issue_date : form.issue_date || new Date().toISOString().split('T')[0]}
                 onChange={(e) => setForm({ ...form, issue_date: e.target.value })} 
               />
               <FormInput 
@@ -467,7 +460,7 @@ export const CreateInvoiceForm = () => {
                 {/* Paket Tagihan */}
                 <TabsContent value="package" className="mt-2 space-y-2">
                 <FormInput
-                    label="Cari paket..."
+                    label= "paket"
                     placeholder="Cari paket..."
                     value={searchTermPackage}
                     onChange={(e) => setSearchTermPackage(e.target.value)}
@@ -487,7 +480,6 @@ export const CreateInvoiceForm = () => {
                     {pkg.child_rates && pkg.child_rates.length > 0 && (
                       <div className="pl-2 mt-1 border-l border-gray-300 space-y-1">
                         {pkg.child_rates.map(child => {
-                          // const frequency = form.selected_items.find(i => i.id === child.id)?.frequency || 0;
                           return (
                             <div key={child.id} className="flex justify-between items-center text-sm text-gray-700">
                               <span>- {child.service_name}</span>
@@ -504,7 +496,7 @@ export const CreateInvoiceForm = () => {
                 {/* Item Individual */}
                 <TabsContent value="individual" className="mt-2 space-y-2">
                 <FormInput
-                    label="Cari item..."
+                    label= "item"
                     placeholder="Cari item..."
                     value={searchTermBilling}
                     onChange={(e) => setSearchTermBilling(e.target.value)}
@@ -517,17 +509,11 @@ export const CreateInvoiceForm = () => {
                         <p className="text-sm text-gray-500">{item.description}</p>
                         <p className="text-sm">Rp {item.price.toLocaleString()}</p>
                         </div>
-                        {addedItemIds.includes((item as any).id) ? (
-                          <div className="flex items-center gap-2">
-                            <Button size="sm" variant="outline" onClick={() => decreaseFrequency((item as any).id)}>-</Button>
-                            <span className="px-2">
-                              {form.selected_items.find(i => i.id === item.id)?.frequency ?? 1}
-                            </span>
-                            <Button size="sm" variant="outline" onClick={() => increaseFrequency((item as any).id)}>+</Button>
-                          </div>
-                        ) : (
-                          <Button size="sm" variant="outline" onClick={() => handleAddItem(item)}>Tambah</Button>
-                        )}
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handleAddItem(item)}
+                          >Tambah</Button>
                     </div>
                     ))}
                 </div>
@@ -572,10 +558,10 @@ export const CreateInvoiceForm = () => {
                       <td className="px-2 py-2 whitespace-nowrap">Rp {item.price.toLocaleString()}</td>
                       <td className="px-2 py-2 text-center">{item.frequency}</td>
                       <td className="px-2 py-2 whitespace-nowrap">
-                        Rp {(item.price * (item as any).frequency).toLocaleString()}
+                        Rp {(item.price * item.frequency).toLocaleString()}
                       </td>
                       <td className="px-2 py-2 text-center">
-                        <button onClick={() => decreaseFrequency((item as any).id)} className="text-red-500 hover:text-red-700">
+                        <button onClick={() => decreaseFrequency(item.id)} className="text-red-500 hover:text-red-700">
                           <Trash2 size={16} />
                         </button>
                       </td>
@@ -585,14 +571,14 @@ export const CreateInvoiceForm = () => {
                       <td colSpan={4}></td>
                       <td className="font-semibold text-right pr-2">Subtotal:</td>
                       <td className="text-left pr-2">
-                          Rp {form.selected_items.reduce((sum, item) => sum + item.price * (item as any).frequency, 0).toLocaleString()}
+                          Rp {form.selected_items.reduce((sum, item) => sum + item.price * item.frequency, 0).toLocaleString()}
                       </td>
                   </tr>
                   <tr>
                       <td colSpan={4}></td>
                       <td className="font-bold text-right pr-2">Total: </td>
                       <td className="font-bold text-left pr-2">
-                          Rp {form.selected_items.reduce((sum, item) => sum + item.price * (item as any).frequency, 0).toLocaleString()}
+                          Rp {form.selected_items.reduce((sum, item) => sum + item.price * item.frequency, 0).toLocaleString()}
                       </td>
                   </tr>
               </tbody>

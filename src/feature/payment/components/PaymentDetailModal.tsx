@@ -63,66 +63,113 @@ export const PaymentDetailModal = ({ isOpen, onClose, payment, invoice }: Paymen
             {/* Kolom 1 */}
             <div>
               <h3 className="font-semibold mb-2">Informasi Pembayaran</h3>
-              <div className="text-sm text-gray-700 space-y-1">
-                <p><strong>ID Pembayaran:</strong> {payment.payment?.code || "-"}</p>
-                <p><strong>ID Faktur:</strong> {payment.code || "-"}</p>
-                <p><strong>Deskripsi:</strong> {payment.description || "-"}</p>
-                <p><strong>Jumlah Tagihan:</strong> Rp {payment.total.toLocaleString() || "-"}</p>
-                <p><strong>Jumlah Bayar:</strong> Rp {payment.payment?.total_payment.toLocaleString() || "-"}</p>
-                <p><strong>Kekurangan:</strong> Rp {(payment.total - (payment.payment?.total_payment || 0)).toLocaleString() || "-"}</p>
-                <p><strong>Metode:</strong> {payment.payment?.payment_method || "-"}</p>
-                <p><strong>Status:</strong> {" "}
-                  {(() => {
-                    const status = payment.payment?.status;
-                    switch (status) {
-                      case "partial":
-                        return (
-                          <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-                            Sebagian
-                          </span>
-                        );
-                      case "late":
-                        return (
-                          <span className="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
-                            Terlambat
-                          </span>
-                        );
-                      case "unpaid":
-                        return (
-                          <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                            Belum Lunas
-                          </span>
-                        );
-                      case "paid":
-                        return (
-                          <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            Lunas
-                          </span>
-                        );
-                      default:
-                        return (
-                          <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">
-                            {status || "-"}
-                          </span>
-                        );
-                    }
-                  })()}
-                </p>
-                <p><strong>Tanggal Faktur:</strong> {formatDate(payment.publication_date)}</p>
-                <p><strong>Tanggal Bayar:</strong> {formatDate(payment.payment?.payment_date)}</p>
-                <p><strong>Nomor Referensi:</strong> {payment.payment?.reference_number || "-"}</p>
-              </div>
+              <table className="text-sm text-gray-700 w-full">
+                <tbody>
+                  <tr>
+                    <td className="py-1 font-semibold w-1/3">ID Pembayaran</td>
+                    <td className="py-1">: {payment.payment?.code || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold">ID Faktur</td>
+                    <td className="py-1">: {payment.code || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold">Deskripsi</td>
+                    <td className="py-1">: {payment.description || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold bg-orange-100">Jumlah Tagihan</td>
+                    <td className="py-1 bg-orange-100">: Rp {payment.total.toLocaleString() || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold bg-orange-100">Jumlah Bayar</td>
+                    <td className="py-1 bg-orange-100">: Rp {payment.payment?.total_payment.toLocaleString() || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold bg-orange-100">Kekurangan</td>
+                    <td className="py-1 bg-orange-100">: Rp {(payment.total - (payment.payment?.total_payment || 0)).toLocaleString() || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold">Metode</td>
+                    <td className="py-1">: {payment.payment?.payment_method || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold">Status</td>
+                    <td className="py-1">: {(() => {
+                      const status = payment.payment?.status;
+                      switch (status) {
+                        case "partial":
+                          return (
+                            <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                              Sebagian
+                            </span>
+                          );
+                        case "late":
+                          return (
+                            <span className="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
+                              Terlambat
+                            </span>
+                          );
+                        case "unpaid":
+                          return (
+                            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                              Belum Lunas
+                            </span>
+                          );
+                        case "paid":
+                          return (
+                            <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                              Lunas
+                            </span>
+                          );
+                        default:
+                          return (
+                            <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">
+                              {status || "-"}
+                            </span>
+                          );
+                      }
+                    })()}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold">Tanggal Faktur</td>
+                    <td className="py-1">: {formatDate(payment.publication_date)}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold">Tanggal Bayar</td>
+                    <td className="py-1">: {formatDate(payment.payment?.payment_date)}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold">Nomor Referensi</td>
+                    <td className="py-1">: {payment.payment?.reference_number || "-"}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
   
             {/* Kolom 2 */}
             <div>
               <h3 className="font-semibold mb-2">Informasi Siswa</h3>
-              <div className="text-sm text-gray-700 space-y-1">
-                <p><strong>Nama:</strong> {payment.entity?.full_name || "-"}</p>
-                <p><strong>NIS:</strong> {payment.entity?.nisn || "-"}</p>
-                <p><strong>Kelas:</strong> {payment.student_class?.name || "-"}</p>
-                <p><strong>No. Telepon:</strong> {payment.entity?.phone || "-"}</p>
-              </div>
+              <table className="text-sm text-gray-700 w-full">
+                <tbody>
+                  <tr>
+                    <td className="py-1 font-semibold w-1/3 bg-green-100">Nama</td>
+                    <td className="py-1 bg-green-100">: {payment.entity?.full_name || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold">NIS</td>
+                    <td className="py-1">: {payment.entity?.nisn || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold w-1/3 bg-green-100">Kelas</td>
+                    <td className="py-1 bg-green-100">: {payment.student_class?.name || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold">No. Telepon</td>
+                    <td className="py-1">: {payment.entity?.phone || "-"}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
   
