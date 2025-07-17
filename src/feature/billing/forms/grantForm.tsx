@@ -68,6 +68,20 @@ export default function GrantForm({ item = null, onClose, onSuccess }: Props) {
         }
     };
 
+    function formatRupiah(value: string | number) {
+        const numberString = value.toString().replace(/[^\d]/g, "");
+        const number = Number(numberString);
+        return number.toLocaleString("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).replace(/,00$/, "");
+    }
+    
+    const [displayFunds, setDisplayFunds] = useState<string>(form.total_funds ? formatRupiah(form.total_funds) : "");
+    
+    const handleFundsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value.replace(/[^\d]/g, "");
+        setDisplayFunds(formatRupiah(raw));
+        setForm(prev => ({ ...prev, total_funds: Number(raw) }));
+    };
+
     const handleSubmit = async () => {
         const isConfirmed = await confirm({
             title: isEdit ? "Perbaharui Data" : "Submit Data",
@@ -151,11 +165,11 @@ export default function GrantForm({ item = null, onClose, onSuccess }: Props) {
 
                     <div className="col-span-2">
                         <FormInput
-                            label={<>Jumlah <span className="text-red-500">*</span></>}
-                            name="total_funds"
-                            type="number"
-                            value={form.total_funds}
-                            onChange={handleChange}
+                          label={<>Jumlah <span className="text-red-500">*</span></>}
+                          name="total_funds"
+                          type="text"
+                          value={displayFunds}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => handleFundsChange(e as React.ChangeEvent<HTMLInputElement>)}
                         />
                     </div>
 

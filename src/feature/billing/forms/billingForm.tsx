@@ -127,6 +127,19 @@ export default function BillingForm({
          setForm({ ...form, program_id: selectedEducationId });
      };
 
+     const formatRupiah = (value: string | number) => {
+        const numberString = value.toString().replace(/[^\d]/g, "");
+        return numberString ? `Rp ${parseInt(numberString, 10).toLocaleString('id-ID')}` : "";
+    };
+
+    const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const rawValue = e.target.value.replace(/[^\d]/g, "");
+        setForm({
+            ...form,
+            price: rawValue ? parseInt(rawValue, 10) : 0
+        });
+    };
+
 
     const handleSubmit = async () => {
         const isConfirmed = await confirm({
@@ -204,14 +217,13 @@ export default function BillingForm({
                             onChange={handleChange}
                         />
                     </div>
-                     {/* Field Deskripsi dari gambar tidak ada di tipe Billing, jadi diabaikan */}
-                     <div className="col-span-2"> {/* Jumlah ambil 2 kolom */}
+                     <div className="col-span-2">
                          <FormInput
-                            label={<>Jumlah <span className="text-red-500">*</span></>} 
+                            label={<>Jumlah <span className="text-red-500">*</span></>}
                             name="price"
-                            type="number"
-                            value={form.price}
-                            onChange={handleChange}
+                            type="text"
+                            value={formatRupiah(form.price || "")}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => handlePriceChange(e as React.ChangeEvent<HTMLInputElement>)}
                         />
                     </div>
                      <div className="col-span-1">

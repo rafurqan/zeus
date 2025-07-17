@@ -8,7 +8,7 @@ export const useInvoice = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm ] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState<string>('Semua Status');
+  const [selectedStatus, setSelectedStatus] = useState<string>('unpaid');
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
 

@@ -11,7 +11,7 @@ export const usePayment = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
-  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string | null>('unpaid');
   
 
   const fetchPayments = async (page = 1, search = "", status: string | null = null) => {

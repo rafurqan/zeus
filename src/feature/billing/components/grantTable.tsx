@@ -1,6 +1,6 @@
 import { Grant } from "@/feature/billing/types/grant";
 import { Table, TableCell, TableHead, TableHeader, TableRow, TableBody } from "@/core/components/ui/table";
-import { FaEdit, FaTimes, FaTrash } from "react-icons/fa";
+import { FaEdit, FaUndo, FaTrash } from "react-icons/fa";
 import { Button } from "@/core/components/ui/button";
 import { useState } from "react";
 
@@ -170,7 +170,7 @@ export default function GrantTable({ items, onDeleted, onEdit, onReset }: Props)
                                         className="text-red-600 hover:text-yellow-800 text-sm font-medium"
                                         onClick={() => handleReset(item)}
                                     >
-                                        <FaTimes />
+                                        <FaUndo />
                                     </button>
                                 </div>
                             </TableCell>

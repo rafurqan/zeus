@@ -30,7 +30,7 @@ export const InvoiceTable = ({
   const { token } = useContext(AppContext);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState("unpaid");
   const { confirm, ConfirmDialog } = useConfirm();
 
   const handleChangeTab = (status: string | null) => {
@@ -60,14 +60,14 @@ export const InvoiceTable = ({
   const handleEdit = (id: number) => navigate(`/finance/billingData/create?id=${id}`);
   const handleDetail = (id: number) => navigate(`/finance/billingData/detail/${id}`);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Lunas": return "bg-green-100 text-green-800";
-      case "Terlambat": return "bg-red-100 text-red-800";
-      case "Menunggu Pembayaran": return "bg-yellow-100 text-yellow-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
+  // const getStatusColor = (status: string) => {
+  //   switch (status) {
+  //     case "paid": return "bg-green-100 text-green-800 px-2 py-1 rounded-full whitespace-nowrap";
+  //     case "unpaid": return "bg-red-100 text-red-800 px-2 py-1 rounded-full whitespace-nowrap";
+  //     case "Menunggu Pembayaran": return "bg-yellow-100 text-yellow-800";
+  //     default: return "bg-gray-100 text-gray-800";
+  //   }
+  // };
 
   return (
     <div className="overflow-x-auto">
@@ -128,9 +128,24 @@ export const InvoiceTable = ({
                 <td className="px-6 py-4 text-sm text-gray-700">{(invoice as { notes: string }).notes || "-"}</td>
                 <td className="px-6 py-4 text-sm text-gray-700">Rp {(invoice as { total: number }).total?.toLocaleString() || "-"}</td>
                 <td className="px-6 py-4">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor((invoice as { status: string }).status)}`}>
-                    {(invoice as { status: string }).status}
-                  </span>
+                  {(invoice as { status: string }).status === 'paid' && (
+                    <span className="px-3 py-1 rounded-full text-white bg-green-600 font-semibold">
+                      Lunas
+                    </span>
+                  )}
+                  {(invoice as { status: string }).status === 'unpaid' && (
+                    <span className="px-3 py-1 rounded-full text-white bg-red-600 font-semibold">
+                      Belum Lunas
+                    </span>
+                  )}
+                  {(invoice as { status: string }).status === 'partial' && (
+                    <span className="px-3 py-1 rounded-full text-white bg-blue-500 font-semibold">
+                      Sebagian
+                    </span>
+                  )}
+                  {!(invoice as { status: string }).status && (
+                    <span className="text-gray-500">-</span>
+                  )}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
                   {new Date((invoice as { due_date: string }).due_date).toLocaleDateString("id-ID", {

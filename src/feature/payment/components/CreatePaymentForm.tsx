@@ -330,23 +330,38 @@ export const CreatePaymentForm = () => {
         <div className="w-full">
             <div className="w-full max-w-20xl mx-auto">
                 <div className="bg-white rounded-lg border p-4 flex justify-between items-start w-full">
-                <div>
-                    <p className="text-sm text-gray-600">Tipe Siswa : {form.student_type}</p>
-                    <p className="text-sm text-gray-600">Nama Siswa : {form.student_name}</p>
-                    <p className="text-sm text-gray-600">No. Registrasi : {(form as any).registration_code}</p>
-                    <p className="text-sm text-gray-600">Kelas : {form.class_name} {form.part_class}</p>
-                    <p className="text-sm mt-1 text-gray-500">
-                        Jatuh Tempo:{' '}
-                        <span className={`${new Date(form.due_date) < new Date(new Date().toDateString()) ? 'bg-red-400 text-white text-xs font-semibold px-3 py-1 rounded-full' : 'text-gray-500'}`}>
-                            {new Date(form.due_date).toLocaleDateString('id-ID', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                            })}
-                        </span>
-                    </p>
-
-                </div>
+                <table className="text-sm">
+                    <tbody>
+                        <tr>
+                            <td className="text-gray-600 pr-4"><b>Tipe Siswa</b></td>
+                            <td className="text-gray-600">: {form.student_type}</td>
+                        </tr>
+                        <tr>
+                            <td className="text-gray-600 pr-4"><b>Nama Siswa</b></td>
+                            <td className="text-gray-600">: {form.student_name}</td>
+                        </tr>
+                        <tr>
+                            <td className="text-gray-600 pr-4"><b>No. Registrasi</b></td>
+                            <td className="text-gray-600">: {(form as any).registration_code}</td>
+                        </tr>
+                        <tr>
+                            <td className="text-gray-600 pr-4"><b>Kelas</b></td>
+                            <td className="text-gray-600">: {form.class_name} {form.part_class}</td>
+                        </tr>
+                        <tr>
+                            <td className="text-gray-600 pr-4 align-top"><b>Jatuh Tempo</b></td>
+                            <td className="text-gray-600">: 
+                                <span className={`${new Date(form.due_date) < new Date(new Date().toDateString()) ? 'bg-red-400 text-white text-xs font-semibold px-3 py-1 rounded-full' : 'text-gray-500'}`}>
+                                    {new Date(form.due_date).toLocaleDateString('id-ID', {
+                                        day: 'numeric',
+                                        month: 'long', 
+                                        year: 'numeric'
+                                    })}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
                 </div>
             </div>
         </div>
@@ -564,7 +579,7 @@ export const CreatePaymentForm = () => {
                 <FormInput 
                     label="Tanggal Pembayaran" 
                     type="date" 
-                    value={paymentDate} 
+                    value={paymentDate || (!isEditMode ? new Date().toISOString().split('T')[0] : '')}
                     onChange={(e) => setPaymentDate(e.target.value)} 
                 />
                 </div>

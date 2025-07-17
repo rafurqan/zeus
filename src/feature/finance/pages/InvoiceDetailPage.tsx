@@ -92,7 +92,6 @@ const InvoiceDetailPage = () => {
         </div>
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Detail Faktur {(invoice as any).code}</h1>
-          <Button variant="outline">Cetak Invoice</Button>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6 w-full">
@@ -100,27 +99,64 @@ const InvoiceDetailPage = () => {
           <div className="flex-1 space-y-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-bold mb-4">Informasi Faktur</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div><b>Nomor Faktur:</b> {(invoice as any).code}</div>
-                <div><b>Siswa:</b> {(invoice as any).entity?.full_name}</div>
-                <div><b>Tanggal Terbit:</b> {new Date((invoice as any).publication_date).toLocaleDateString('id-ID', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                })}</div>
-                <div><b>NIS:</b> {(invoice as any).entity?.nis || '-'}</div>
-                <div><b>Jatuh Tempo:</b> {new Date((invoice as any).due_date).toLocaleDateString('id-ID', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                })}</div>
-                <div><b>Kelas:</b> {(invoice as any).student_class?.name}</div>
-                <div><b>Status:</b> <span className="bg-yellow-200 text-yellow-800 rounded px-2">Menunggu</span></div>
-                <div><b>Tipe:</b> Siswa Reguler</div>
-                <div><b>Jenis Tagihan:</b> Bulanan</div>
-                <div><b>Bulan:</b> April</div>
-                <div className="md:col-span-2"><b>Catatan:</b> <i>{(invoice as any).notes}</i></div>
-              </div>
+              <table className="w-full text-sm">
+                <tbody>
+                  <tr className="border-b">
+                    <td className="py-2 font-semibold w-1/3">Nomor Faktur</td>
+                    <td className="py-2">: {(invoice as any).code}</td>
+                    <td className="py-2 font-semibold w-1/3">Siswa</td>
+                    <td className="py-2">: {(invoice as any).entity?.full_name}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-2 font-semibold">Tanggal Terbit</td>
+                    <td className="py-2">: {new Date((invoice as any).publication_date).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    })}</td>
+                    <td className="py-2 font-semibold">NIS</td>
+                    <td className="py-2">: {(invoice as any).entity?.nis || '-'}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-2 font-semibold">Jatuh Tempo</td>
+                    <td className="py-2">: {new Date((invoice as any).due_date).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    })}</td>
+                    <td className="py-2 font-semibold">Kelas</td>
+                    <td className="py-2">: {(invoice as any).student_class?.name}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-2 font-semibold">Status</td>
+                    <td className="py-2">: <span className={`rounded px-2 ${
+                      (invoice as any).status === 'unpaid' 
+                        ? 'bg-red-200 text-red-800'
+                        : (invoice as any).status === 'paid'
+                        ? 'bg-green-200 text-green-800' 
+                        : 'bg-yellow-200 text-yellow-800'
+                    }`}>{
+                      (invoice as any).status === 'unpaid' 
+                        ? 'Belum Lunas'
+                        : (invoice as any).status === 'paid'
+                        ? 'Lunas'
+                        : 'Sebagian'
+                    }</span></td>
+                    <td className="py-2 font-semibold">Tipe</td>
+                    <td className="py-2">: Siswa Reguler</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-2 font-semibold">Jenis Tagihan</td>
+                    <td className="py-2">: Bulanan</td>
+                    <td className="py-2 font-semibold">Bulan</td>
+                    <td className="py-2">: April</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 font-semibold">Catatan</td>
+                    <td className="py-2 italic" colSpan={3}>: {(invoice as any).notes}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -163,7 +199,6 @@ const InvoiceDetailPage = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-bold mb-4">Informasi Pembayaran</h2>
               <div className="bg-yellow-100 text-yellow-800 p-4 rounded text-sm mb-4">
-                <p><b>Faktur belum dibayar</b></p>
                 <p>Faktur ini jatuh tempo pada {" "}
                 {new Date((invoice as any).due_date).toLocaleDateString('id-ID', {
                   day: 'numeric',
@@ -176,7 +211,19 @@ const InvoiceDetailPage = () => {
                 <span className="font-bold text-lg">Rp {totalAmount.toLocaleString()}</span>
               </div>
               <div className="mb-4">
-                <b>Status:</b> <span className="text-yellow-600 font-semibold">Menunggu</span>
+                <b>Status:</b> <span className={`font-semibold ${
+                  (invoice as any).status === 'unpaid'
+                    ? 'text-red-600'
+                    : (invoice as any).status === 'paid'
+                    ? 'text-green-600'
+                    : 'text-yellow-600'
+                }`}>
+                  {(invoice as any).status === 'unpaid'
+                    ? 'Belum Lunas'
+                    : (invoice as any).status === 'paid'
+                    ? 'Lunas'
+                    : 'Sebagian'}
+                </span>
               </div>
               <div className="text-sm">
                 <p className="mb-1"><b>Instruksi Pembayaran:</b></p>
