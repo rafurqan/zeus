@@ -183,7 +183,7 @@ export default function StudentParentForm({
                         name="parent_type"
                         value={form.parent_type?.id ?? ''}
                         onChange={handleInputParentType}
-                        options={parentTypes.map((type) => ({ label: `${type.code ?? ''} ${type.name}`, value: type.id }))}
+                        options={parentTypes.map((type) => ({ label: `(${type.code ?? ''}) ${type.name}`, value: type.id }))}
                     />
 
                     <FormSelect
@@ -191,7 +191,7 @@ export default function StudentParentForm({
                         name="income_range"
                         value={form.income_range?.id ?? ''}
                         onChange={handleInputIncomeRange}
-                        options={incomeRanges.map((income) => ({ label: `${income.code ?? ''} ${income.name}`, value: income.id }))}
+                        options={incomeRanges.map((income) => ({ label: `(${income.code ?? ''}) ${income.name}`, value: income.id }))}
                     />
 
                     <FormInput
