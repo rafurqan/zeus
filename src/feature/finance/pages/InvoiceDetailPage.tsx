@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { AppContext } from "@/context/AppContext";
 import { invoiceService } from "../service/invoiceService";
 import BaseLayout from "@/core/components/baseLayout";
-import { Button } from "@/core/components/ui/button";
 
 const InvoiceDetailPage = () => {
   const { id } = useParams();
