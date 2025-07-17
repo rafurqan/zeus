@@ -1,13 +1,14 @@
 import http from "@/core/service/https";
-import {
-  createInvoice,
-  Invoice,
-  updateInvoice,
-} from "../types/invoice";
+import { createInvoice, Invoice, updateInvoice } from "../types/invoice";
 
 export const invoiceService = {
-  
-  async getAllPage(token: string, page: number = 1, perPage: number = 10, searchTerm: string = "", status: string = "") {
+  async getAllPage(
+    token: string,
+    page: number = 1,
+    perPage: number = 10,
+    searchTerm: string = "",
+    status: string = ""
+  ) {
     const response = await http(token).get("finance/invoices", {
       params: {
         page,
@@ -25,11 +26,17 @@ export const invoiceService = {
   },
 
   async generateInvoiceCode(token: string): Promise<string> {
-    const response = await http(token).get("finance/invoices/generate-invoice-code");
+    const response = await http(token).get(
+      "finance/invoices/generate-invoice-code"
+    );
     return response.data.data.invoice_code;
   },
 
-  async getStudents(token: string, keyword = "", perPage = 10): Promise<any[]> {
+  async getStudents(
+    token: string,
+    keyword = "",
+    perPage = 10
+  ): Promise<unknown[]> {
     const response = await http(token).get("students", {
       params: {
         keyword,
@@ -38,14 +45,20 @@ export const invoiceService = {
     });
     return response.data.data;
   },
-  
+
   async create(token: string, data: Partial<Invoice>): Promise<createInvoice> {
-    const response = await http(token).post<createInvoice>("finance/invoices", data);
+    const response = await http(token).post<createInvoice>(
+      "finance/invoices",
+      data
+    );
     return response.data;
   },
 
   async update(token: string, data: Partial<Invoice>): Promise<createInvoice> {
-    const response = await http(token).put<updateInvoice>(`finance/invoices/${data.id}`, data);
+    const response = await http(token).put<updateInvoice>(
+      `finance/invoices/${data.id}`,
+      data
+    );
     return response.data;
   },
 

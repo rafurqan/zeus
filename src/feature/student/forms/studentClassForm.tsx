@@ -118,12 +118,15 @@ export default function StudentClassForm({
 
                 <div className="space-y-4">
 
-                    <FormInput
-                        label="Nama Kelas"
+                    <FormSelect
+                        label="Kelas"
                         name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        placeholder="Isi nama kelas"
+                        value={form.name.toString()}
+                        onChange={(e) => setForm({ ...form, name: e.target.value })}
+                        options={Array.from({ length: 12 }, (_, i) => {
+                            const value = (i + 1).toString();
+                            return { label: value, value };
+                        })}
                     />
 
 

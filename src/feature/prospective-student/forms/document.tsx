@@ -111,7 +111,7 @@ export default function StudentDocumentForm({
                         name="document_type"
                         value={form.document_type?.id ?? ""}
                         onChange={handleInputChange}
-                        options={documentTypes.map((type) => ({ label: type.name, value: type.id }))}
+                        options={documentTypes.map((type) => ({ label: `(${type.code ?? ""}) ${type.name}`, value: type.id }))}
                     />
                     <FormInput
                         label="Nama"

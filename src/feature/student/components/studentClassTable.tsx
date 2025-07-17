@@ -16,7 +16,7 @@ export default function StudentClassTable({ items, onDeleted, onEdit }: Props) {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Nama</TableHead>
+                        <TableHead>Kelas</TableHead>
                         <TableHead>Part</TableHead>
                         <TableHead>Program</TableHead>
                         <TableHead>Kapasitas</TableHead>

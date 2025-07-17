@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { FilePlus, FileCheck } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface Props {
     label?: string;
@@ -32,7 +33,7 @@ const PdfUploadWithPreview: React.FC<Props> = ({ label = "Upload PDF", fileUrl, 
             };
             reader.readAsDataURL(file);
         } else {
-            alert("Hanya file PDF yang diperbolehkan.");
+            toast.error("Hanya file PDF yang diperbolehkan.");
         }
     };
 

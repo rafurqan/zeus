@@ -1,6 +1,5 @@
 import http from "./auth";
 
-
 export const listEducationLevel = async () => {
   const response = await http.get("/master/education-levels");
   return response.data;
@@ -10,7 +9,6 @@ export const listProgram = async () => {
   const response = await http.get("/master/programs");
   return response.data;
 };
-
 
 export const deleteEducationLevel = (id: string) => {
   return http.delete(`/api/v1/master/education-levels/${id}`);
@@ -28,6 +26,11 @@ export const listReligion = async () => {
 
 export const listIncomeRange = async () => {
   const response = await http.get("/master/income-ranges");
+  return response.data;
+};
+
+export const listParentType = async () => {
+  const response = await http.get("/master/parent-types");
   return response.data;
 };
 
@@ -66,21 +69,21 @@ export const listSpecialCondition = async () => {
   return response.data;
 };
 
-export const listVillage = async ( id: string) => {
+export const listVillage = async (id: string) => {
   const response = await http.get("/master/villages", {
     params: { sub_district_id: id },
   });
   return response.data;
 };
 
-export const listSubDistrict = async ( id: string) => {
+export const listSubDistrict = async (id: string) => {
   const response = await http.get("/master/sub-districts", {
     params: { city_id: id },
   });
   return response.data;
 };
 
-export const listCity = async ( id: string) => {
+export const listCity = async (id: string) => {
   const response = await http.get("/master/cities", {
     params: { province_id: id },
   });

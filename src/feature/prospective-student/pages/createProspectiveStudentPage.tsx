@@ -26,8 +26,8 @@ import LoadingOverlay from "@/core/components/ui/loading_screen";
 import TableOriginSchool from "../components/originSchoolTable";
 import StudentOriginSchoolForm from "../forms/originSchool";
 import { OriginSchool } from "../types/origin-school";
-import { useGetRegistrationCode } from "../hooks/useGetRegistrationCode";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/core/components/ui/tabs";
+import toast from "react-hot-toast";
 
 
 
@@ -57,11 +57,6 @@ export default function CreateProspectiveStudentsPage() {
     const [selectedSubDistrict, setSelectedSubDistrict] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
     const [preview, setPreview] = useState<string | null>(item?.photo_url ?? null);
-    const {
-        data: registrationCode,
-        loading: registrationCodeLoading,
-        getRegistrationCode: getRegistrationCode,
-    } = useGetRegistrationCode();
 
 
 
@@ -98,7 +93,7 @@ export default function CreateProspectiveStudentsPage() {
         documents: [],
         addresses: [],
         village: null,
-        registration_code: "REG-0002",
+        registration_code: "",
         status: "",
         photo_url: null,
         special_condition: null,
@@ -110,9 +105,6 @@ export default function CreateProspectiveStudentsPage() {
 
     useEffect(() => {
         if (token) {
-            if (!isEdit) {
-                getRegistrationCode();
-            }
             fetchReligionTypes();
             fetchTransportationModes();
             fetchSpecialConditions();
@@ -121,15 +113,6 @@ export default function CreateProspectiveStudentsPage() {
             fetchNationalities();
         }
     }, []);
-
-    useEffect(() => {
-        if (registrationCode) {
-            setForm((prev) => ({
-                ...prev,
-                registration_code: registrationCode.registration_code,
-            }));
-        }
-    }, [registrationCode]);
 
     useEffect(() => {
         if (item) {
@@ -458,13 +441,11 @@ export default function CreateProspectiveStudentsPage() {
                 if (!response.data) {
                     throw new Error("Gagal simpan data");
                 }
-
+                
+                toast.success(`Berhasil ${isEdit ? "memperbarui" : "menambahkan"} calon siswa`);
                 navigate("/students/prospective");
             } catch (error: unknown) {
-                if (error instanceof AxiosError) {
-                    console.log("Fetch failed", error.response?.data.message);
-                }
-                alert(error instanceof AxiosError ? error.response?.data.message : "Terjadi kesalahan");
+                toast.error(error instanceof AxiosError ? error.response?.data.message : "Terjadi kesalahan saat menyimpan data");
             } finally {
                 setLoading(false);
             }
@@ -516,8 +497,8 @@ export default function CreateProspectiveStudentsPage() {
                                             name="registration_code"
                                             value={form.registration_code}
                                             onChange={handleChange}
-                                            disabled={registrationCodeLoading}
-                                            placeholder={registrationCodeLoading ? "Loading..." : "REG"}
+                                            disabled={true}
+                                            placeholder={"Akan Terisi Otomatis"}
                                         />
                                     </div>
                                     <div className="flex flex-col items-center justify-center gap-3 mb-4">
@@ -559,6 +540,7 @@ export default function CreateProspectiveStudentsPage() {
                                             <FormInput
                                                 label="Nama Lengkap"
                                                 name="full_name"
+                                                onlyLetters
                                                 value={form.full_name}
                                                 onChange={handleChange}
                                                 placeholder="John Doe"
@@ -589,7 +571,10 @@ export default function CreateProspectiveStudentsPage() {
                                                 name="child_order"
                                                 value={form.child_order.toString()}
                                                 onChange={(e) => setForm({ ...form, child_order: parseInt(e.target.value) })}
-                                                options={[{ label: '1', value: '1' }, { label: '2', value: '2' }]}
+                                                options={Array.from({ length: 10 }, (_, i) => {
+                                                    const value = (i + 1).toString();
+                                                    return { label: value, value };
+                                                })}
                                             />
                                             <FormSelect
                                                 label="Kondisi Spesial"
@@ -621,6 +606,7 @@ export default function CreateProspectiveStudentsPage() {
                                             <FormInput
                                                 label="Nama Panggilan"
                                                 name="nickname"
+                                                onlyLetters
                                                 value={form.nickname}
                                                 onChange={handleChange}
                                                 placeholder="John Doe"
@@ -688,6 +674,7 @@ export default function CreateProspectiveStudentsPage() {
                                     {
                                         <div className="mt-10">
                                             <h2 className="font-bold mb-4">Alamat Tempat Tinggal</h2>
+                                            {/* <h1 className="mb-4">Pilih dari provinsi dahulu</h1> */}
                                             <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div className="space-y-4">
                                                     <FormSelect
@@ -749,6 +736,7 @@ export default function CreateProspectiveStudentsPage() {
                                                     <FormInput
                                                         label="Nomor Telepon"
                                                         name="phone"
+                                                        onlyNumbers
                                                         value={form.phone}
                                                         onChange={handleChange}
                                                         placeholder="628XXXXX"

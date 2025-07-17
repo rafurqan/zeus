@@ -9,23 +9,11 @@ type Props = {
 };
 
 export default function ParentRow({ item, onDeleted, onEdit }: Props) {
-    function getParentTypeLabel(type: string | null | undefined): string {
-        switch (type) {
-            case 'father':
-                return 'Ayah';
-            case 'mother':
-                return 'Ibu';
-            case 'other':
-                return 'Lainnya';
-            default:
-                return '-';
-        }
-    }
 
     return (
         <tr className="border-b">
             <td className="px-4 py-2">{item.full_name}</td>
-            <td className="px-4 py-2">{getParentTypeLabel(item.parent_type)}</td>
+            <td className="px-4 py-2">{item.parent_type?.name ?? '-'}</td>
             <td className="px-4 py-2">{item.occupation}</td>
             <td className="px-4 py-2">Rp.{item.income_range?.name ?? "0"}</td>
             <td className="px-4 py-2">{item.education_level?.name}</td>

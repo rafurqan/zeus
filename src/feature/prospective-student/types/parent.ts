@@ -3,7 +3,7 @@ import { MasterData } from "@/core/types/master-data";
 
 export type Parent = {
   id: string;
-  parent_type: string;
+  parent_type: MasterData | null;
   full_name: string;
   education_level: EducationLevel | null;
   occupation: string | null;

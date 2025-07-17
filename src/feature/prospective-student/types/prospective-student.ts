@@ -18,6 +18,7 @@ export type ProspectiveStudent = {
   village: Village | null;
   status: string;
   email: string;
+  student_id: string | null;
   photo_url: string | null;
   phone: string;
   child_order: number;
