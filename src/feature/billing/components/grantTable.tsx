@@ -92,9 +92,12 @@ export default function GrantTable({ items, onDeleted, onEdit, onReset }: Props)
                             >
                                 Batal
                             </Button>
-                            <Button variant="default" onClick={confirmReset}>
+                            <button 
+                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md"
+                                onClick={confirmReset}
+                            >
                                 Reset
-                            </Button>
+                            </button>
                         </div>
                     </div>
                 </div>
