@@ -103,12 +103,9 @@ export const useBilling = () => {
     } catch (err: unknown) {
       console.log(err);
       if (err instanceof AxiosError) {
-        toast.error(
-          err.response?.data.message ?? "Terjadi kesalahan saat menghapus data."
-        );
-        setError(
-          err.response?.data.message || "Terjadi kesalahan saat menghapus data."
-        );
+        const errorMessage = `Terjadi kesalahan saat menghapus data. ${err.response?.data.meta.message ?? ''}`;
+        toast.error(errorMessage);
+        setError(errorMessage);
       }
     } finally {
       setLoadingOverlay(false);
