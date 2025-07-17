@@ -328,63 +328,40 @@ export const CreatePaymentForm = () => {
 
         {/* detail invoice */}
         <div className="w-full">
-<<<<<<< HEAD
-            <div className="w-full max-w-20xl mx-auto">
-                <div className="bg-white rounded-lg border p-4 flex justify-between items-start w-full">
-                <table className="text-sm">
-                    <tbody>
-                        <tr>
-                            <td className="text-gray-600 pr-4"><b>Tipe Siswa</b></td>
-                            <td className="text-gray-600">: {form.student_type}</td>
-                        </tr>
-                        <tr>
-                            <td className="text-gray-600 pr-4"><b>Nama Siswa</b></td>
-                            <td className="text-gray-600">: {form.student_name}</td>
-                        </tr>
-                        <tr>
-                            <td className="text-gray-600 pr-4"><b>No. Registrasi</b></td>
-                            <td className="text-gray-600">: {(form as any).registration_code}</td>
-                        </tr>
-                        <tr>
-                            <td className="text-gray-600 pr-4"><b>Kelas</b></td>
-                            <td className="text-gray-600">: {form.class_name} {form.part_class}</td>
-                        </tr>
-                        <tr>
-                            <td className="text-gray-600 pr-4 align-top"><b>Jatuh Tempo</b></td>
-                            <td className="text-gray-600">: 
-                                <span className={`${new Date(form.due_date) < new Date(new Date().toDateString()) ? 'bg-red-400 text-white text-xs font-semibold px-3 py-1 rounded-full' : 'text-gray-500'}`}>
-                                    {new Date(form.due_date).toLocaleDateString('id-ID', {
-                                        day: 'numeric',
-                                        month: 'long', 
-                                        year: 'numeric'
-                                    })}
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                </div>
-=======
           <div className="w-full max-w-20xl mx-auto">
             <div className="bg-white rounded-lg border p-4 flex justify-between items-start w-full">
-              <div>
-                <p className="text-sm text-gray-600">Tipe Siswa : {form.student_type}</p>
-                <p className="text-sm text-gray-600">Nama Siswa : {form.student_name}</p>
-                <p className="text-sm text-gray-600">No. Registrasi : {(form as any).registration_code}</p>
-                <p className="text-sm text-gray-600">Kelas : {form.class_name} {form.part_class}</p>
-                <p className="text-sm mt-1 text-gray-500">
-                  Jatuh Tempo:{' '}
-                  <span className={`${new Date(form.due_date) < new Date(new Date().toDateString()) ? 'bg-red-400 text-white text-xs font-semibold px-3 py-1 rounded-full' : 'text-gray-500'}`}>
-                    {new Date(form.due_date).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric'
-                    })}
-                  </span>
-                </p>
-
-              </div>
->>>>>>> 7521a86 (update several master)
+              <table className="text-sm">
+                <tbody>
+                  <tr>
+                    <td className="text-gray-600 pr-4"><b>Tipe Siswa</b></td>
+                    <td className="text-gray-600">: {form.student_type}</td>
+                  </tr>
+                  <tr>
+                    <td className="text-gray-600 pr-4"><b>Nama Siswa</b></td>
+                    <td className="text-gray-600">: {form.student_name}</td>
+                  </tr>
+                  <tr>
+                    <td className="text-gray-600 pr-4"><b>No. Registrasi</b></td>
+                    <td className="text-gray-600">: {(form as any).registration_code}</td>
+                  </tr>
+                  <tr>
+                    <td className="text-gray-600 pr-4"><b>Kelas</b></td>
+                    <td className="text-gray-600">: {form.class_name} {form.part_class}</td>
+                  </tr>
+                  <tr>
+                    <td className="text-gray-600 pr-4 align-top"><b>Jatuh Tempo</b></td>
+                    <td className="text-gray-600">:
+                      <span className={`${new Date(form.due_date) < new Date(new Date().toDateString()) ? 'bg-red-400 text-white text-xs font-semibold px-3 py-1 rounded-full' : 'text-gray-500'}`}>
+                        {new Date(form.due_date).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        })}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -599,86 +576,12 @@ export const CreatePaymentForm = () => {
                 </div>
 
                 <div>
-<<<<<<< HEAD
-                <FormInput 
-                    label="Tanggal Pembayaran" 
-                    type="date" 
-                    value={paymentDate || (!isEditMode ? new Date().toISOString().split('T')[0] : '')}
-                    onChange={(e) => setPaymentDate(e.target.value)} 
-                />
-                </div>
-            </div>
-
-            {/* Detail Transfer Bank */}
-            {paymentMethod === "Transfer" && (
-              <div className="border rounded-lg p-4 space-y-4 mt-4">
-                <h3 className="text-md font-semibold">Detail Transfer Bank</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm mb-1">Nama Bank</label>
-                      <select
-                        name="bank_name"
-                        className="w-full border rounded px-3 py-2"
-                        value={bankDetails.bank_name}
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleBankDetailsChange(e as unknown as React.ChangeEvent<HTMLInputElement>)}
-                      >
-                        <option value="">Pilih Bank</option>
-                        <option value="BCA">Bank Central Asia (BCA)</option>
-                        <option value="BNI">Bank Negara Indonesia (BNI)</option>
-                        <option value="BRI">Bank Rakyat Indonesia (BRI)</option>
-                        <option value="Mandiri">Bank Mandiri</option>
-                        <option value="BSI">Bank Syariah Indonesia (BSI)</option>
-                        <option value="CIMB">CIMB Niaga</option>
-                        <option value="Permata">Bank Permata</option>
-                        <option value="BTN">Bank Tabungan Negara (BTN)</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm mb-1">Nama Pemilik Rekening</label>
-                      <input
-                        type="text"
-                        name="account_holder"
-                        className="w-full border rounded px-3 py-2"
-                        placeholder="Masukkan nama pemilik rekening"
-                        value={bankDetails.account_holder}
-                        onChange={handleBankDetailsChange}
-                      />
-                    </div>
-                    <p className="text-gray-500 text-sm">Contoh: Nomor transaksi, kode pembayaran, atau nomor virtual account</p>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm mb-1">Nomor Rekening</label>
-                      <input
-                        type="text"
-                        name="account_number"
-                        className="w-full border rounded px-3 py-2"
-                        placeholder="Masukkan nomor rekening"
-                        value={bankDetails.account_number}
-                        onChange={handleBankDetailsChange}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm mb-1">Nomor Referensi</label>
-                      <input
-                        type="text"
-                        name="reference_number"
-                        className="w-full border rounded px-3 py-2"
-                        placeholder="Masukkan nomor referensi"
-                        value={bankDetails.reference_number}
-                        onChange={handleBankDetailsChange}
-                      />
-                    </div>
-                  </div>
-=======
                   <FormInput
                     label="Tanggal Pembayaran"
                     type="date"
-                    value={paymentDate}
+                    value={paymentDate || (!isEditMode ? new Date().toISOString().split('T')[0] : '')}
                     onChange={(e) => setPaymentDate(e.target.value)}
                   />
->>>>>>> 7521a86 (update several master)
                 </div>
               </div>
 

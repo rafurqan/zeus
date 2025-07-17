@@ -36,7 +36,9 @@ export const FormInput = ({
     onChange,
     type = "text",
     placeholder = "",
-    disabled = false
+    disabled = false,
+    onlyLetters = false,
+    onlyNumbers = false
 }: FormInputProps) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (type === "camelcase") {
@@ -50,7 +52,23 @@ export const FormInput = ({
             };
             onChange(event as React.ChangeEvent<HTMLInputElement>);
         } else {
-            onChange(e);
+            const val = e.target.value
+
+            if (onlyLetters) {
+                if (/^[a-zA-Z\s]*$/.test(val)) {
+                    onChange(e)
+                }
+                return
+            }
+
+            if (onlyNumbers) {
+                if (/^\d*$/.test(val)) {
+                    onChange(e)
+                }
+                return
+            }
+
+            onChange(e)
         }
     };
     return (
