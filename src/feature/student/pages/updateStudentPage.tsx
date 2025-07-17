@@ -456,7 +456,7 @@ export default function UpdateStudentPage() {
                 if (!response.data) {
                     throw new Error("Gagal simpan data");
                 }
-
+                toast.success(`Berhasil ${isEdit ? "memperbarui" : "menambahkan"} data siswa`);
                 navigate(`/students/student/${item.id}`);
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {

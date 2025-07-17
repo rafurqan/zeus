@@ -441,7 +441,8 @@ export default function CreateProspectiveStudentsPage() {
                 if (!response.data) {
                     throw new Error("Gagal simpan data");
                 }
-
+                
+                toast.success(`Berhasil ${isEdit ? "memperbarui" : "menambahkan"} calon siswa`);
                 navigate("/students/prospective");
             } catch (error: unknown) {
                 toast.error(error instanceof AxiosError ? error.response?.data.message : "Terjadi kesalahan saat menyimpan data");
