@@ -14,7 +14,7 @@ const handleUnauthorized = () => {
 };
 
 const http = axios.create({
-  baseURL: "/api/v1",
+  baseURL: "http://localhost/api/v1",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
