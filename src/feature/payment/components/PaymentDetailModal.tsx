@@ -71,18 +71,18 @@ export const PaymentDetailModal = ({ isOpen, onClose, payment, invoice }: Paymen
                   </tr>
                   <tr>
                     <td className="py-1 font-semibold">ID Faktur</td>
-                    <td className="py-1">: {payment.code || "-"}</td>
+                    <td className="py-1 whitespace-nowrap">: {payment.code || "-"}</td>
                   </tr>
                   <tr>
                     <td className="py-1 font-semibold">Deskripsi</td>
                     <td className="py-1">: {payment.description || "-"}</td>
                   </tr>
                   <tr>
-                    <td className="py-1 font-semibold bg-orange-100">Jumlah Tagihan</td>
+                    <td className="py-1 font-semibold whitespace-nowrap bg-orange-100">Jumlah Tagihan</td>
                     <td className="py-1 bg-orange-100">: Rp {payment.total.toLocaleString() || "-"}</td>
                   </tr>
                   <tr>
-                    <td className="py-1 font-semibold bg-orange-100">Jumlah Bayar</td>
+                    <td className="py-1 font-semibold whitespace-nowrap bg-orange-100">Jumlah Bayar</td>
                     <td className="py-1 bg-orange-100">: Rp {payment.payment?.total_payment.toLocaleString() || "-"}</td>
                   </tr>
                   <tr>
@@ -140,7 +140,7 @@ export const PaymentDetailModal = ({ isOpen, onClose, payment, invoice }: Paymen
                     <td className="py-1">: {formatDate(payment.payment?.payment_date)}</td>
                   </tr>
                   <tr>
-                    <td className="py-1 font-semibold">Nomor Referensi</td>
+                    <td className="py-1 font-semibold whitespace-nowrap">Nomor Referensi</td>
                     <td className="py-1">: {payment.payment?.reference_number || "-"}</td>
                   </tr>
                 </tbody>

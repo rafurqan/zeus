@@ -194,7 +194,6 @@ export const CreatePaymentForm = () => {
 
   const navigate = useNavigate();
 
-  // Tambahkan useEffect untuk memuat data invoice jika ada ID
   useEffect(() => {
     const fetchInvoiceData = async () => {
       if (invoiceId && token) {
@@ -205,7 +204,6 @@ export const CreatePaymentForm = () => {
               if (!dateString) return "";
               return dateString.split(' ')[0];
             };
-            // Rebuild selected_items from invoice.items
             const selectedItemsFromItems = (invoiceData as any).items.map((item: { rate: { id: number; service: { id: number; name: string; }; category: string; description: string; }; amount_rate: number; frequency: number; }) => ({
               id: item.rate.id,
               rate_id: item.rate.id,
@@ -233,7 +231,6 @@ export const CreatePaymentForm = () => {
               selected_items: selectedItemsFromItems,
             });
 
-            // Set item frequencies dari items
             const frequencies: Record<string, number> = {};
             (invoiceData as any).items.forEach((item: { rate_id: number; frequency: number; }) => {
               if (item.rate_id) {
@@ -280,7 +277,6 @@ export const CreatePaymentForm = () => {
       setPaymentAmount(remainingPayment.toString());
     } else {
       setGrantAmount(value);
-      // Sesuaikan pembayaran wali siswa
       const remainingPayment = Math.max(0, totalBill - numericValue);
       setPaymentAmount(remainingPayment.toString());
     }
@@ -291,10 +287,8 @@ export const CreatePaymentForm = () => {
     if (!e.target.checked) {
       setSelectedGrant(null);
       setGrantAmount("");
-      // Reset pembayaran wali siswa ke total tagihan
       setPaymentAmount(totalBill.toString());
     } else {
-      // Jika checkbox dicentang, set pembayaran wali siswa ke total tagihan dulu
       setPaymentAmount(totalBill.toString());
     }
   };
@@ -304,7 +298,6 @@ export const CreatePaymentForm = () => {
     const grant = grants.find(g => g.id === selectedId);
     setSelectedGrant(grant || null);
     setGrantAmount("");
-    // Reset pembayaran wali siswa ke total tagihan saat ganti dana hibah
     setPaymentAmount(totalBill.toString());
   };
   const totalBill = (form as any).selected_items.reduce((sum: number, item: { price: number; frequency: number; }) => sum + item.price * item.frequency, 0);
@@ -329,35 +322,29 @@ export const CreatePaymentForm = () => {
         {/* detail invoice */}
         <div className="w-full">
           <div className="w-full max-w-20xl mx-auto">
-            <div className="bg-white rounded-lg border p-4 flex justify-between items-start w-full">
-              <table className="text-sm">
+            <div className="bg-white rounded-lg border p-4 w-full">
+              <table className="text-sm table-auto w-full">
                 <tbody>
                   <tr>
-                    <td className="text-gray-600 pr-4"><b>Tipe Siswa</b></td>
-                    <td className="text-gray-600">: {form.student_type}</td>
+                    <td className="w-[15%] whitespace-nowrap text-gray-600 pr-2 align-top"><b>Tipe Siswa</b></td>
+                    <td className="w-[85%] text-gray-700">: {form.student_type}</td>
                   </tr>
                   <tr>
-                    <td className="text-gray-600 pr-4"><b>Nama Siswa</b></td>
-                    <td className="text-gray-600">: {form.student_name}</td>
+                    <td className="w-[15%] whitespace-nowrap text-gray-600 pr-2 align-top"><b>Nama Siswa</b></td>
+                    <td className="w-[85%] text-gray-700">: {form.student_name}</td>
                   </tr>
                   <tr>
-                    <td className="text-gray-600 pr-4"><b>No. Registrasi</b></td>
-                    <td className="text-gray-600">: {(form as any).registration_code}</td>
+                    <td className="w-[15%] whitespace-nowrap text-gray-600 pr-2 align-top"><b>No. Registrasi</b></td>
+                    <td className="w-[85%] text-gray-700">: {(form as any).registration_code}</td>
                   </tr>
                   <tr>
-                    <td className="text-gray-600 pr-4"><b>Kelas</b></td>
-                    <td className="text-gray-600">: {form.class_name} {form.part_class}</td>
+                    <td className="w-[15%] whitespace-nowrap text-gray-600 pr-2 align-top"><b>Kelas</b></td>
+                    <td className="w-[85%] text-gray-700">: {form.class_name} {form.part_class}</td>
                   </tr>
                   <tr>
-                    <td className="text-gray-600 pr-4 align-top"><b>Jatuh Tempo</b></td>
-                    <td className="text-gray-600">:
-                      <span className={`${new Date(form.due_date) < new Date(new Date().toDateString()) ? 'bg-red-400 text-white text-xs font-semibold px-3 py-1 rounded-full' : 'text-gray-500'}`}>
-                        {new Date(form.due_date).toLocaleDateString('id-ID', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric'
-                        })}
-                      </span>
+                    <td className="w-[15%] whitespace-nowrap text-gray-600 pr-2 align-top"><b>Jatuh Tempo</b></td>
+                    <td className="w-[85%] text-gray-700">:
+                      <span className={`${new Date(form.due_date) < new Date(new Date().toDateString()) ? 'px-2 py-1 text-xs rounded-full bg-red-100 text-red-800' : 'text-gray-600'}`}>{new Date(form.due_date).toLocaleDateString('id-ID', {day: 'numeric',month: 'long',year: 'numeric'})}</span>
                     </td>
                   </tr>
                 </tbody>
@@ -365,6 +352,7 @@ export const CreatePaymentForm = () => {
             </div>
           </div>
         </div>
+
 
         {/* Item Tagihan yang Ditambahkan */}
         <div className="bg-white border rounded-lg p-4">

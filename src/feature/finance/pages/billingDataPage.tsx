@@ -2,15 +2,17 @@ import { useInvoice } from "../hook/useInvoice";
 import { InvoiceTable } from "../components/InvoiceTable";
 import BaseLayout from "@/core/components/baseLayout";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export const BillingDataPage = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const {
     invoices,
     page,
     setPage,
     lastPage,
     setSelectedStatus
-  } = useInvoice();
+  } = useInvoice(searchTerm); // <-- pass searchTerm ke hook
 
   const navigate = useNavigate();
   const handleRefresh = () => window.location.reload();
@@ -49,6 +51,8 @@ export const BillingDataPage = () => {
             setPage={setPage} 
             lastPage={lastPage}
             setSelectedStatus={setSelectedStatus}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
           />
         </div>
       </div>

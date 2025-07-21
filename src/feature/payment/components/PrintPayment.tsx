@@ -70,15 +70,18 @@ export const PrintPayment = () => {
       </div>
 
       {/* Header */}
-      <div className="text-center mb-6" style={{ fontFamily: 'Times New Roman, serif' }}>
-        <h1 className="text-xl font-bold">YAYASAN TA'MIRUL MASJID TEGALSARI</h1>
-        <h2 className="text-lg">SD TA'MIRUL ISLAM SURAKARTA</h2>
-        <h3>TAHUN PELAJARAN {new Date().getFullYear()}-{new Date().getFullYear() + 1}</h3>
-        <h2 className="text-lg font-bold mt-4">BUKTI PEMBAYARAN</h2>
+      <div className="flex items-center justify-center mb-6" style={{ fontFamily: 'Times New Roman, serif' }}>
+        <img src="/school-logo.png" alt="Logo Sekolah" className="w-20 h-20 object-contain mr-4 print:mr-8" />
+        <div className="text-center flex-1">
+          <h1 className="text-xl font-bold">YAYASAN TA'MIRUL MASJID TEGALSARI</h1>
+          <h2 className="text-lg">SD TA'MIRUL ISLAM SURAKARTA</h2>
+          <h3>TAHUN PELAJARAN {new Date().getFullYear()}-{new Date().getFullYear() + 1}</h3>
+        </div>
       </div>
 
       {/* Informasi Siswa */}
       <div className="mb-6 text-base" style={{ fontFamily: 'Times New Roman, serif' }}>
+        <h2 className="text-lg font-bold mt-4 text-center">BUKTI PEMBAYARAN</h2> <br />
         <div className="grid grid-cols-2 gap-2">
           <div>
             <p>Telah Terima Dari</p>

@@ -3,11 +3,10 @@ import { invoiceService } from '../service/invoiceService';
 import { Invoice } from '../types/invoice';
 import { AppContext } from "@/context/AppContext";
 
-export const useInvoice = () => {
+export const useInvoice = (searchTerm = "") => {
   const { token } = useContext(AppContext);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchTerm ] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('unpaid');
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
@@ -27,9 +26,11 @@ export const useInvoice = () => {
     }
   };  
 
+  // hapus state searchTerm lokal
+  // tambahkan searchTerm ke dependencies useEffect
   useEffect(() => {
     fetchInvoices();
-  }, [page, searchTerm, selectedStatus, token]); // Tambahkan selectedStatus ke dependencies
+  }, [page, searchTerm, selectedStatus, token]);
 
   return {
     invoices,

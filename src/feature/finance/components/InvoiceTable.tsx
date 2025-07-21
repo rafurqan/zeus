@@ -17,7 +17,9 @@ interface InvoiceTableProps {
   page: number;
   setPage: (page: number) => void;
   lastPage: number;
-  setSelectedStatus: (status: string) => void; // Tambahkan ini
+  setSelectedStatus: (status: string) => void; 
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
 }
 
 export const InvoiceTable = ({ 
@@ -25,11 +27,12 @@ export const InvoiceTable = ({
   page, 
   setPage, 
   lastPage,
-  setSelectedStatus // Tambahkan ini
+  setSelectedStatus,
+  searchTerm,
+  setSearchTerm
 }: InvoiceTableProps) => {
   const { token } = useContext(AppContext);
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("unpaid");
   const { confirm, ConfirmDialog } = useConfirm();
 
@@ -59,15 +62,6 @@ export const InvoiceTable = ({
 
   const handleEdit = (id: number) => navigate(`/finance/billingData/create?id=${id}`);
   const handleDetail = (id: number) => navigate(`/finance/billingData/detail/${id}`);
-
-  // const getStatusColor = (status: string) => {
-  //   switch (status) {
-  //     case "paid": return "bg-green-100 text-green-800 px-2 py-1 rounded-full whitespace-nowrap";
-  //     case "unpaid": return "bg-red-100 text-red-800 px-2 py-1 rounded-full whitespace-nowrap";
-  //     case "Menunggu Pembayaran": return "bg-yellow-100 text-yellow-800";
-  //     default: return "bg-gray-100 text-gray-800";
-  //   }
-  // };
 
   return (
     <div className="overflow-x-auto">
@@ -129,17 +123,17 @@ export const InvoiceTable = ({
                 <td className="px-6 py-4 text-sm text-gray-700">Rp {(invoice as { total: number }).total?.toLocaleString() || "-"}</td>
                 <td className="px-6 py-4">
                   {(invoice as { status: string }).status === 'paid' && (
-                    <span className="px-3 py-1 rounded-full text-white bg-green-600 font-semibold">
+                    <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
                       Lunas
                     </span>
                   )}
                   {(invoice as { status: string }).status === 'unpaid' && (
-                    <span className="px-3 py-1 rounded-full text-white bg-red-600 font-semibold">
+                    <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
                       Belum Lunas
                     </span>
                   )}
                   {(invoice as { status: string }).status === 'partial' && (
-                    <span className="px-3 py-1 rounded-full text-white bg-blue-500 font-semibold">
+                    <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
                       Sebagian
                     </span>
                   )}
