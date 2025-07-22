@@ -160,7 +160,7 @@ export default function ProspectiveStudentsPage() {
                                     name="Status"
                                     value={statusFilter}
                                     onChange={handleStatusChange}
-                                    options={[{ label: 'Semua', value: 'Semua' }, { label: 'Waiting', value: 'waiting' }, { label: 'Approved', value: 'approved' }, { label: 'Rejected', value: 'rejected' }]}
+                                    options={[{ label: 'Semua', value: 'Semua' }, { label: 'Menunggu', value: 'waiting' }, { label: 'Disetujui', value: 'approved' }, { label: 'Ditolak', value: 'rejected' }]}
                                 />
 
                             </div>
