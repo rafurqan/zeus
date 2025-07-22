@@ -155,22 +155,22 @@ export const PaymentTable  = ({
               <td className="px-6 py-4 text-sm text-gray-700">{payment.payment?.payment_method || '-'}</td>
               <td className="px-6 py-4 text-sm">
                 {payment.payment?.status === 'paid' && (
-                    <span className="px-3 py-1 rounded-full text-white bg-green-600 font-semibold">
+                    <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
                     Lunas
                     </span>
                 )}
                 {payment.payment?.status === 'unpaid' && (
-                    <span className="px-3 py-1 rounded-full text-white bg-yellow-600 font-semibold">
+                    <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
                     Belum Lunas
                     </span>
                 )}
                 {payment.payment?.status === 'late' && (
-                    <span className="px-3 py-1 rounded-full text-white bg-red-500 font-semibold">
+                    <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
                     Terlambat
                     </span>
                 )}
                 {payment.payment?.status === 'partial' && (
-                    <span className="px-3 py-1 rounded-full text-white bg-blue-500 font-semibold">
+                    <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
                     Sebagian
                     </span>
                 )}
