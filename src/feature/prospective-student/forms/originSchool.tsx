@@ -32,7 +32,7 @@ export default function StudentOriginSchoolForm({
 
     const [form, setForm] = useState<OriginSchool>(item || {
         address_name: "",
-        education_level: null,
+        education: null,
         id: "",
         npsn: "",
         school_name: "",
@@ -153,7 +153,7 @@ export default function StudentOriginSchoolForm({
                     <FormSelect
                         label="Pendidikan"
                         name="education_level"
-                        value={form.education_level?.id ?? ''}
+                        value={form.education?.id ?? ''}
                         onChange={handleInputEducationLevel}
                         options={educationLevels.map((education) => ({ label: education.name, value: education.id }))}
                     />
