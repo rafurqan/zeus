@@ -1,4 +1,4 @@
-import { EducationLevel } from "@/core/types/education-level";
+import { Education } from "@/core/types/education";
 import { MasterData } from "@/core/types/master-data";
 
 export type OriginSchool = {
@@ -9,5 +9,5 @@ export type OriginSchool = {
   address_name: string;
   graduation_year: string;
   aggregate_id: string;
-  education_level: EducationLevel | null;
+  education_level: Education | null;
 };

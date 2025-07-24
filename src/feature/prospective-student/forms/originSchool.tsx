@@ -3,11 +3,11 @@ import { AppContext } from "@/context/AppContext";
 import { AxiosError } from "axios";
 import { useConfirm } from "@/core/components/confirmDialog";
 import { MasterData } from "@/core/types/master-data";
-import { listEducationLevel, listSchoolType } from "@/core/service/master";
-import { EducationLevel } from "@/core/types/education-level";
+import { listEducation, listSchoolType } from "@/core/service/master";
 import { FormInput } from "@/core/components/forms/formInput";
 import { FormSelect } from "@/core/components/forms/formSelect";
 import { OriginSchool } from "../types/origin-school";
+import { Education } from "@/core/types/education";
 
 
 
@@ -28,7 +28,7 @@ export default function StudentOriginSchoolForm({
 
     const { token, setUser, setToken } = useContext(AppContext);
     const [schoolTypes, setSchoolTypes] = useState<MasterData[]>([]);
-    const [educationLevels, setEducationLevels] = useState<EducationLevel[]>([]);
+    const [educationLevels, setEducationLevels] = useState<Education[]>([]);
 
     const [form, setForm] = useState<OriginSchool>(item || {
         address_name: "",
@@ -69,7 +69,7 @@ export default function StudentOriginSchoolForm({
 
     async function fetchEducationLevels() {
         try {
-            const res = await listEducationLevel();
+            const res = await listEducation();
 
             if (res.status === 401) {
                 setUser(null);

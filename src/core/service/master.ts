@@ -95,8 +95,12 @@ export const listProvince = async () => {
   return response.data;
 };
 
-
 export const listOccupations = async () => {
   const response = await http.get("/master/occupations");
+  return response.data;
+};
+
+export const listEducation = async () => {
+  const response = await http.get("/master/educations");
   return response.data;
 };
