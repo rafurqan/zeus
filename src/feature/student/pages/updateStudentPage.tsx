@@ -590,6 +590,16 @@ export default function UpdateStudentPage() {
                                                 placeholder="Masukkan nisn"
                                             />
                                             <FormSelect
+                                                label="Tahun Masuk"
+                                                name="entry_year"
+                                                value={form.entry_year ?? ''}
+                                                onChange={handleChange}
+                                                options={Array.from({ length: 10 }, (_, i) => {
+                                                    const year = new Date().getFullYear() - 4 + i;
+                                                    return { label: `${year.toString()}`, value: `${year.toString()}` };
+                                                })}
+                                            />
+                                            <FormSelect
                                                 label="Anak ke"
                                                 name="child_order"
                                                 value={form.child_order.toString()}

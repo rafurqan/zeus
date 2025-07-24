@@ -40,7 +40,7 @@ import PDFPreviewModal from "@/core/components/ui/pdf_viewer"
 
 type PDFSource = { type: 'url'; value: string } | { type: 'base64'; value: string };
 type LocationState = {
-  from?: string;
+    from?: string;
 };
 
 export default function StudentDetailPage() {
@@ -172,6 +172,15 @@ export default function StudentDetailPage() {
                                         </div>
 
                                         <div className="space-y-3 pt-3">
+                                            <div className="flex items-start gap-2">
+                                                <User className="h-4 w-4 text-muted-foreground mt-0.5" />
+                                                <div className="space-y-1">
+                                                    <p className="text-xs text-gray-400">Tahun Masuk</p>
+                                                    <p className="text-sm font-medium">
+                                                        {data?.entry_year ?? "-"}
+                                                    </p>
+                                                </div>
+                                            </div>
                                             <div className="flex items-start gap-2">
                                                 <User className="h-4 w-4 text-muted-foreground mt-0.5" />
                                                 <div className="space-y-1">

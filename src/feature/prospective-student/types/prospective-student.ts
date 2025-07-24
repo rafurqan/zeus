@@ -15,6 +15,7 @@ export type ProspectiveStudent = {
   birth_place: string;
   birth_date: string;
   nisn: string;
+  entry_year: string | null;
   village: Village | null;
   status: string;
   email: string;

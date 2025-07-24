@@ -70,6 +70,7 @@ export default function CreateProspectiveStudentsPage() {
         nickname: "",
         email: "",
         phone: "",
+        entry_year: null,
         street: "",
         nisn: "",
         gender: "",
@@ -441,7 +442,7 @@ export default function CreateProspectiveStudentsPage() {
                 if (!response.data) {
                     throw new Error("Gagal simpan data");
                 }
-                
+
                 toast.success(`Berhasil ${isEdit ? "memperbarui" : "menambahkan"} calon siswa`);
                 navigate("/students/prospective");
             } catch (error: unknown) {
@@ -565,6 +566,16 @@ export default function CreateProspectiveStudentsPage() {
                                                 value={form.nisn}
                                                 onChange={handleChange}
                                                 placeholder="Masukkan nisn"
+                                            />
+                                            <FormSelect
+                                                label="Tahun Masuk"
+                                                name="entry_year"
+                                                value={form.entry_year ?? ''}
+                                                onChange={handleChange}
+                                                options={Array.from({ length: 10 }, (_, i) => {
+                                                    const year = new Date().getFullYear() - 4 + i;
+                                                    return { label: `${year.toString()}`, value: `${year.toString()}` };
+                                                })}
                                             />
                                             <FormSelect
                                                 label="Anak ke"
