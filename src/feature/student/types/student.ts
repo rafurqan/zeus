@@ -19,6 +19,7 @@ export type Student = {
   village: Village | null;
   status: string;
   email: string;
+  entry_year: string | null;
   phone: string;
   child_order: number;
   street: string;
