@@ -14,7 +14,7 @@ export default function ParentRow({ item, onDeleted, onEdit }: Props) {
         <tr className="border-b">
             <td className="px-4 py-2">{item.full_name}</td>
             <td className="px-4 py-2">{item.parent_type?.name ?? '-'}</td>
-            <td className="px-4 py-2">{item.occupation}</td>
+            <td className="px-4 py-2">{item.occupation?.name ?? "-"}</td>
             <td className="px-4 py-2">Rp.{item.income_range?.name ?? "0"}</td>
             <td className="px-4 py-2">{item.education_level?.name}</td>
             <td className="px-4 py-2">{item.phone}</td>

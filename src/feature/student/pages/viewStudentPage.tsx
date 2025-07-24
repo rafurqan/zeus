@@ -615,7 +615,7 @@ export default function StudentDetailPage() {
 
                                                                                     <div className="space-y-1">
                                                                                         <p className="text-sm text-gray-400">Pekerjaan</p>
-                                                                                        <p className="font-medium">{member.occupation || "-"}</p>
+                                                                                        <p className="font-medium">{member.occupation?.name || "-"}</p>
                                                                                     </div>
 
                                                                                     <div className="space-y-1">
