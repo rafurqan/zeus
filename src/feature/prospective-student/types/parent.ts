@@ -6,7 +6,7 @@ export type Parent = {
   parent_type: MasterData | null;
   full_name: string;
   education_level: EducationLevel | null;
-  occupation: string | null;
+  occupation: MasterData | null;
   income_range: MasterData | null;
   phone: string | null;
   email: string | null;
