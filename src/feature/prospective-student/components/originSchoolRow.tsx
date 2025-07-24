@@ -15,7 +15,7 @@ export default function OriginSchoolRow({ item, onDeleted, onEdit }: Props) {
         <tr className="border-b">
 
             <td className="px-4 py-2">{item.school_name}</td>
-            <td className="px-4 py-2">{item.education_level?.name}</td>
+            <td className="px-4 py-2">{item.education?.name}</td>
             <td className="px-4 py-2">{item.school_type?.name}</td>
             <td className="px-4 py-2">{item.npsn}</td>
             <td className="px-4 py-2">{item.graduation_year}</td>

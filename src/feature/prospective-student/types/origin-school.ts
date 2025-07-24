@@ -9,5 +9,5 @@ export type OriginSchool = {
   address_name: string;
   graduation_year: string;
   aggregate_id: string;
-  education_level: Education | null;
+  education: Education | null;
 };

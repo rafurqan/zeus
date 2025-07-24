@@ -483,7 +483,7 @@ export default function StudentDetailPage() {
                                                                         </Badge>
                                                                         <span className="font-medium">
                                                                             {school.school_name}
-                                                                            {school.education_level?.name ? ` - ${school.education_level?.level}` : ""}
+                                                                            {school.education?.name ? ` - ${school.education?.level}` : ""}
                                                                         </span>
                                                                     </div>
                                                                 </AccordionTrigger>
@@ -496,7 +496,7 @@ export default function StudentDetailPage() {
 
                                                                         <div className="space-y-1">
                                                                             <p className="text-sm text-gray-400">Tingkat Sekolah</p>
-                                                                            <p className="font-medium">{school.education_level?.name}</p>
+                                                                            <p className="font-medium">{school.education?.name}</p>
                                                                         </div>
 
                                                                         <div className="space-y-1">
