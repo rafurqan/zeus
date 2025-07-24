@@ -94,3 +94,9 @@ export const listProvince = async () => {
   const response = await http.get("/master/provinces");
   return response.data;
 };
+
+
+export const listOccupations = async () => {
+  const response = await http.get("/master/occupations");
+  return response.data;
+};
