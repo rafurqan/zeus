@@ -21,7 +21,7 @@ if (isDevelopment) {
   BACKEND_URL =
     process.env.BACKEND_URL ||
     process.env.LARAVEL_URL ||
-    "https://eudora.onrender.com";
+    "https://eudora-production.up.railway.app";
 } else {
   BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8080";
 }

@@ -152,7 +152,7 @@ export default function StudentOriginSchoolForm({
 
                     <FormSelect
                         label="Pendidikan"
-                        name="education_level"
+                        name="education"
                         value={form.education?.id ?? ''}
                         onChange={handleInputEducationLevel}
                         options={educationLevels.map((education) => ({ label: education.name, value: education.id }))}
