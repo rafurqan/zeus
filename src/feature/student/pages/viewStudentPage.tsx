@@ -40,7 +40,7 @@ import PDFPreviewModal from "@/core/components/ui/pdf_viewer"
 
 type PDFSource = { type: 'url'; value: string } | { type: 'base64'; value: string };
 type LocationState = {
-  from?: string;
+    from?: string;
 };
 
 export default function StudentDetailPage() {
@@ -172,6 +172,15 @@ export default function StudentDetailPage() {
                                         </div>
 
                                         <div className="space-y-3 pt-3">
+                                            <div className="flex items-start gap-2">
+                                                <User className="h-4 w-4 text-muted-foreground mt-0.5" />
+                                                <div className="space-y-1">
+                                                    <p className="text-xs text-gray-400">Tahun Masuk</p>
+                                                    <p className="text-sm font-medium">
+                                                        {data?.entry_year ?? "-"}
+                                                    </p>
+                                                </div>
+                                            </div>
                                             <div className="flex items-start gap-2">
                                                 <User className="h-4 w-4 text-muted-foreground mt-0.5" />
                                                 <div className="space-y-1">
@@ -474,7 +483,7 @@ export default function StudentDetailPage() {
                                                                         </Badge>
                                                                         <span className="font-medium">
                                                                             {school.school_name}
-                                                                            {school.education_level?.name ? ` - ${school.education_level?.level}` : ""}
+                                                                            {school.education?.name ? ` - ${school.education?.level}` : ""}
                                                                         </span>
                                                                     </div>
                                                                 </AccordionTrigger>
@@ -487,7 +496,7 @@ export default function StudentDetailPage() {
 
                                                                         <div className="space-y-1">
                                                                             <p className="text-sm text-gray-400">Tingkat Sekolah</p>
-                                                                            <p className="font-medium">{school.education_level?.name}</p>
+                                                                            <p className="font-medium">{school.education?.name}</p>
                                                                         </div>
 
                                                                         <div className="space-y-1">
@@ -606,7 +615,7 @@ export default function StudentDetailPage() {
 
                                                                                     <div className="space-y-1">
                                                                                         <p className="text-sm text-gray-400">Pekerjaan</p>
-                                                                                        <p className="font-medium">{member.occupation || "-"}</p>
+                                                                                        <p className="font-medium">{member.occupation?.name || "-"}</p>
                                                                                     </div>
 
                                                                                     <div className="space-y-1">

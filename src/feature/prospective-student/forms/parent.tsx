@@ -4,7 +4,7 @@ import { AxiosError } from "axios";
 import { useConfirm } from "@/core/components/confirmDialog";
 import { Parent } from "../types/parent";
 import { MasterData } from "@/core/types/master-data";
-import { listEducationLevel, listIncomeRange, listParentType } from "@/core/service/master";
+import { listEducationLevel, listIncomeRange, listOccupations, listParentType } from "@/core/service/master";
 import { EducationLevel } from "@/core/types/education-level";
 import { FormInput } from "@/core/components/forms/formInput";
 import { FormSelect } from "@/core/components/forms/formSelect";
@@ -26,10 +26,11 @@ export default function StudentParentForm({
     const { token, setUser, setToken } = useContext(AppContext);
     const [incomeRanges, setIncomeRanges] = useState<MasterData[]>([]);
     const [parentTypes, setParentTypes] = useState<MasterData[]>([]);
+    const [occupations, setOccupations] = useState<MasterData[]>([]);
     const [educationLevels, setEducationLevels] = useState<EducationLevel[]>([]);
 
     const [form, setForm] = useState<Parent>(item || {
-        id: "", full_name: "", parent_type: null, education_level: null, income_range: null, occupation: "", phone: "", address: "", is_main_contact: false, is_emergency_contact: false, email: null, nik: null
+        id: "", full_name: "", parent_type: null, education_level: null, income_range: null, occupation: null, phone: "", address: "", is_main_contact: false, is_emergency_contact: false, email: null, nik: null
     });
 
     useEffect(() => {
@@ -37,6 +38,7 @@ export default function StudentParentForm({
             fetchIncomeRange();
             fetchEducationLevels();
             fetchParentType();
+            fetchOccupations();
         }
     }, []);
 
@@ -82,6 +84,23 @@ export default function StudentParentForm({
         }
     }
 
+    async function fetchOccupations() {
+        try {
+            const res = await listOccupations();
+
+            if (res.status === 401) {
+                setUser(null);
+                setToken(null);
+            }
+            setOccupations(res.data || []);
+        } catch (err: unknown) {
+            if (err instanceof AxiosError && err.status === 401) {
+                console.error("Fetch failed", err);
+                setUser(null);
+            }
+        }
+    }
+
     async function fetchEducationLevels() {
         try {
             const res = await listEducationLevel();
@@ -114,6 +133,13 @@ export default function StudentParentForm({
 
     const handleInputParentType = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const selected = parentTypes.find(value => value.id === e.target.value);
+        if (selected) {
+            setForm({ ...form, [e.target.name]: selected });
+        }
+    };
+
+    const handleInputOccupation = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const selected = occupations.find(value => value.id === e.target.value);
         if (selected) {
             setForm({ ...form, [e.target.name]: selected });
         }
@@ -183,7 +209,7 @@ export default function StudentParentForm({
                         name="parent_type"
                         value={form.parent_type?.id ?? ''}
                         onChange={handleInputParentType}
-                        options={parentTypes.map((type) => ({ label: `(${type.code ?? ''}) ${type.name}`, value: type.id }))}
+                        options={parentTypes.map((type) => ({ label: `${type.name}`, value: type.id }))}
                     />
 
                     <FormSelect
@@ -191,15 +217,15 @@ export default function StudentParentForm({
                         name="income_range"
                         value={form.income_range?.id ?? ''}
                         onChange={handleInputIncomeRange}
-                        options={incomeRanges.map((income) => ({ label: `(${income.code ?? ''}) ${income.name}`, value: income.id }))}
+                        options={incomeRanges.map((income) => ({ label: `${income.name}`, value: income.id }))}
                     />
 
-                    <FormInput
+                    <FormSelect
                         label="Pekerjaan"
                         name="occupation"
-                        value={form.occupation ?? ""}
-                        onChange={handleChange}
-                        placeholder="Contoh: Wiraswasta"
+                        value={form.occupation?.id ?? ''}
+                        onChange={handleInputOccupation}
+                        options={occupations.map((value) => ({ label: `${value.name}`, value: value.id }))}
                     />
 
                     <FormSelect

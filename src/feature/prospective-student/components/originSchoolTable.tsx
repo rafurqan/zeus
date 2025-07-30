@@ -30,7 +30,7 @@ export default function TableOriginSchool({ items, onDeleted, onEdit }: Props) {
                     {items.map((item) => (
                         <TableRow key={item.id}>
                             <TableCell>{item.school_name}</TableCell>
-                            <TableCell>{item.education_level?.name}</TableCell>
+                            <TableCell>{item.education?.name}</TableCell>
                             <TableCell>{item.school_type?.name}</TableCell>
                             <TableCell>{item.npsn}</TableCell>
                             <TableCell>{item.graduation_year}</TableCell>
