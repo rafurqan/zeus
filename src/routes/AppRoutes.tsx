@@ -22,6 +22,7 @@ import StudentsPage from "@/feature/student/pages/studentPage";
 import UpdateStudentPage from '@/feature/student/pages/updateStudentPage';
 import StudentDetailPage from '@/feature/student/pages/viewStudentPage';
 import MessageTemplatePage from '@/feature/message-template/pages/MessageTemplatePage';
+import LogsPage from '@/feature/logs/pages/logs';
 
 const ProtectedRoute = () => {
   const { user, loading } = useContext(AppContext);
@@ -71,6 +72,7 @@ const AppRoutes = () => {
           <Route path="/students/student/:id/edit" element={<UpdateStudentPage />} />
           <Route path="/students/student/:id" element={<StudentDetailPage />} />
           <Route path="master/message-templates" element={<MessageTemplatePage />} />
+          <Route path="/logs" element={<LogsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

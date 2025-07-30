@@ -1,5 +1,5 @@
 import { BookOpen, PersonStanding, Users } from "lucide-react";
-import { FaMoneyBill } from "react-icons/fa";
+import { FaClipboardList, FaMoneyBill } from "react-icons/fa";
 
 export const menus = [
   {
@@ -41,5 +41,11 @@ export const menus = [
       { name: "Tagihan", path: "/finance/billingData" },
       { name: "Pembayaran", path: "/payment/paymentData" },
     ],
+  },
+  {
+    name: "Logs",
+    icon: FaClipboardList,
+    path: "/logs",
+    children: [],
   },
 ];
