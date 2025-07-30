@@ -1,9 +1,11 @@
 // src/api/http.ts
 import axios from "axios";
 
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
 const http = (token: string | null) => {
   return axios.create({
-    baseURL: "http://localhost/api/v1",
+    baseURL,
     withCredentials: true,
     headers: {
       Authorization: token ? `Bearer ${token}` : null,

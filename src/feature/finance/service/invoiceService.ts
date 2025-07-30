@@ -1,5 +1,5 @@
 import http from "@/core/service/https";
-import { createInvoice, Invoice, updateInvoice } from "../types/invoice";
+import { createInvoice, Invoice, updateInvoice, SendWaRequest, WaResponse } from "../types/invoice";
 
 export const invoiceService = {
   async getAllPage(
@@ -67,7 +67,12 @@ export const invoiceService = {
     return response.data;
   },
 
-  // ✅ Tambahan: ambil statistik invoice
+  async sendWa(token: string, data: SendWaRequest): Promise<WaResponse> {
+    const response = await http(token).post<WaResponse>("wa/single-send", data);
+    return response.data;
+  },
+  
+
   async getStatistics(token: string): Promise<{
     total: number;
     total_amount: number;

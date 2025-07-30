@@ -28,3 +28,27 @@ export type updateInvoice = {
   message: string;
   data: Invoice;
 };
+
+export interface SendWaRequest {
+  phones: string[];
+  invoice_id?: string;
+}
+
+export interface WaResponse {
+  success: boolean;
+  message: string;
+  response: {
+    detail: string;
+    id: string[];
+    process: string;
+    quota: Record<string, {
+      details: string;
+      quota: number;
+      remaining: number;
+      used: number;
+    }>;
+    requestid: number;
+    status: boolean;
+    target: string[];
+  };
+}

@@ -426,7 +426,11 @@ export const CreateInvoiceForm = () => {
               <FormInput 
                 label="Tanggal Penerbitan" 
                 type="date" 
-                value={invoiceId ? form.issue_date : form.issue_date || new Date().toISOString().split('T')[0]}
+                value={invoiceId ? form.issue_date : (form.issue_date || (() => {
+                  const today = new Date().toISOString().split('T')[0];
+                  setForm(prev => ({...prev, issue_date: today}));
+                  return today;
+                })())}
                 onChange={(e) => setForm({ ...form, issue_date: e.target.value })} 
               />
               <FormInput 
