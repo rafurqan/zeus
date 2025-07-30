@@ -13,8 +13,10 @@ const handleUnauthorized = () => {
   window.location.href = "/login";
 };
 
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
 const http = axios.create({
-  baseURL: "http://localhost/api/v1",
+  baseURL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

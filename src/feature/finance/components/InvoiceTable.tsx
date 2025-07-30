@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import { invoiceService } from "../service/invoiceService";
 import { AppContext } from "@/context/AppContext";
 import { useNavigate } from "react-router-dom";
-import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+import { FaEdit, FaTrash, FaEye, FaWhatsapp } from "react-icons/fa";
 import { useConfirm } from "@/core/components/confirmDialog";
 
 const TAB_LIST = [
@@ -59,6 +59,65 @@ export const InvoiceTable = ({
       }
     }
   };
+
+  const handleSendWa = async (invoice: any) => {
+    const mainParent = invoice.entity?.main_parent;
+    
+    if (!mainParent?.phone) {
+      await confirm({
+        title: "Error",
+        message: "Nomor WA Wali tidak tersedia",
+        confirmText: "OK",
+        cancelText: ""
+      });
+      return;
+    }
+
+    const result = await confirm({
+      title: "Konfirmasi Pengiriman WA",
+      message: `Kirim Invoice ke wali ${invoice.entity.full_name} (${mainParent.phone}) ?`,
+      confirmText: "Kirim",
+      cancelText: "Batal"
+    });
+    
+    if (!result) return;
+
+    try {
+      const waData = {
+        phones: [mainParent.phone],
+        invoice_id: invoice.id
+      };
+
+      const res = await invoiceService.sendWa(token as any, waData);
+
+      if (res.success) {
+        await confirm({
+          title: "Sukses",
+          message: res.message || "Invoice berhasil dikirim",
+          confirmText: "OK",
+          cancelText: ""
+        });
+        
+        console.log("WA response details:", res.response);
+      } else {
+        await confirm({
+          title: "Gagal",
+          message: "Gagal mengirim WA",
+          confirmText: "OK",
+          cancelText: ""
+        });
+      }
+    } catch (err) {
+      console.error("WA error:", err);
+      await confirm({
+        title: "Error",
+        message: "Terjadi kesalahan saat mengirim WA Invoice",
+        confirmText: "OK",
+        cancelText: ""
+      });
+    }
+  };
+
 
   const handleEdit = (id: number) => navigate(`/finance/billingData/create?id=${id}`);
   const handleDetail = (id: number) => navigate(`/finance/billingData/detail/${id}`);
@@ -160,6 +219,9 @@ export const InvoiceTable = ({
                       </button>
                     </>
                   )}
+                  <button onClick={() => handleSendWa(invoice)} className="text-green-500 hover:text-green-700" title="Kirim Wa">
+                    <FaWhatsapp />
+                  </button>
                   
                 </td>
               </tr>
