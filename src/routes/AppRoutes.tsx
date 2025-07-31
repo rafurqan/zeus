@@ -21,7 +21,7 @@ import { PrintPayment } from '@/feature/payment/components/PrintPayment';
 import StudentsPage from "@/feature/student/pages/studentPage";
 import UpdateStudentPage from '@/feature/student/pages/updateStudentPage';
 import StudentDetailPage from '@/feature/student/pages/viewStudentPage';
-import LogsPage from '@/feature/logs/pages/logs';
+import LogsPage from '@/feature/log-data/pages/logs';
 
 const ProtectedRoute = () => {
   const { user, loading } = useContext(AppContext);
