@@ -37,7 +37,7 @@ export const invoiceService = {
     keyword = "",
     perPage = 10
   ): Promise<unknown[]> {
-    const response = await http(token).get("students", {
+    const response = await http(token).get("students/all", {
       params: {
         keyword,
         per_page: perPage,

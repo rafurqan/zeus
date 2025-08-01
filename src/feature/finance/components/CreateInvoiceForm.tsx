@@ -26,7 +26,7 @@ export const CreateInvoiceForm = () => {
     invoice_number: "",
     student_name: "",
     entity_id: "",
-    entity_type: "",
+    student_type: "",
     class: "",
     class_name: "",
     issue_date: "",
@@ -51,8 +51,8 @@ export const CreateInvoiceForm = () => {
   const fetchData = async () => {
       try {
         const [billingData, packageData] = await Promise.all([
-          billingService.getAll(token as any),
-          packageService.getAll(token as any),
+          billingService.getAllActive(token as any),
+          packageService.getAllActive(token as any),
         ]);
         setBillings(billingData);
         setPackages(packageData);
@@ -236,6 +236,12 @@ export const CreateInvoiceForm = () => {
               ...form,
               invoice_number: invoiceData.code,
               student_name: (invoiceData as any).entity?.full_name || "",
+              entity_id: (invoiceData as any).entity?.id || "",
+              student_type: (invoiceData as any).entity_type === "App\\Models\\ProspectiveStudent" 
+                ? "prospective_student" 
+                : (invoiceData as any).entity_type === "App\\Models\\Student"
+                ? "student"
+                : "",
               class: (invoiceData as any).student_class?.id || "",
               class_name: (invoiceData as any).student_class?.name || "",
               issue_date: formatDate((invoiceData as any).publication_date),
@@ -371,7 +377,12 @@ export const CreateInvoiceForm = () => {
                   value={form.student_name}
                   onChange={(e) => {
                     const value = e.target.value;
-                    setForm({ ...form, student_name: value });
+                    setForm({ 
+                      ...form, 
+                      student_name: value,
+                      entity_id: form.entity_id,
+                      student_type: form.student_type
+                    });
                     if (value.length >= 2) {
                       fetchStudents(value);
                       setShowDropdown(true);
@@ -379,6 +390,7 @@ export const CreateInvoiceForm = () => {
                       setShowDropdown(false);
                     }
                   }}
+                  readOnly={!!invoiceId}
                 />
               </div>
 
@@ -394,7 +406,7 @@ export const CreateInvoiceForm = () => {
                           ...form,
                           student_name: student.full_name,
                           entity_id: student.id,
-                          entity_type: "student",
+                          student_type: student.type,
                         });
                         setShowDropdown(false);
                       }}

@@ -54,10 +54,10 @@ export default function BillingForm({
     });
 
     const frequencyOptions = [
-        { value: "Bulanan", label: "Bulanan" },
-        { value: "Per Semester", label: "Per Semester" },
-        { value: "Tahunan", label: "Tahunan" },
-        { value: "Satu Kali", label: "Satu Kali" }
+        { value: 0, label: "Bulanan" },
+        { value: 1, label: "Per Semester" },
+        { value: 2, label: "Tahunan" },
+        { value: 3, label: "Satu Kali" }
     ];
 
     const berlakuUntukOptions = [
@@ -231,7 +231,7 @@ export default function BillingForm({
                             label="Frekuensi"
                             name="frequency"
                             value={form.frequency.toString()}
-                            options={frequencyOptions}
+                            options={frequencyOptions.map(option => ({ ...option, value: option.value.toString() }))}
                             onChange={handleChange}
                         />
                     </div>
