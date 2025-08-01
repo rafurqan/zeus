@@ -8,7 +8,11 @@ import {
 export const packageService = {
   async getAll(token: string): Promise<RatePackage[]> {
     const response = await http(token).get("master/rates-package");
-    // console.log(response.data.data);
+    return response.data.data;
+  },
+
+  async getAllActive(token: string): Promise<RatePackage[]> {
+    const response = await http(token).get("master/rates-package/active");
     return response.data.data;
   },
 

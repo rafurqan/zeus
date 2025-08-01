@@ -28,6 +28,7 @@ export const PrintPayment = () => {
         if (idInvoice && idPayment && token) {
           
           const invoiceResponse = await invoiceService.showDataById(idInvoice, token);
+          console.log(invoiceResponse);
           const paymentResponse = await paymentService.showDataById(idPayment, token);
           
           // Periksa apakah response memiliki data dan tidak kosong
@@ -90,7 +91,7 @@ export const PrintPayment = () => {
             <p>No Pembayaran</p>
             <p>Guna Membayar</p>
             <p>Kelas</p>
-            <p>Tanggal Pemabayaran</p>
+            <p>Tanggal Pembayaran</p>
           </div>
           <div>
             <br />
@@ -109,14 +110,27 @@ export const PrintPayment = () => {
       </div>
 
       {/* Rincian Biaya */}
-      <div className="mb-4 space-y-1 text-base">
-        {invoiceData?.selected_items?.map((item: any, index: number) => (
-            <div key={index} className="flex justify-between border-b border-gray-300 py-1">
-            <div>{index + 1}. {item.service_name}</div>
-            <div>Rp {item.price?.toLocaleString()}</div>
-            </div>
-        ))}
+      <div className="mb-4 text-base">
+        <div className="border-b-2 border-black font-semibold mb-2">
+          <div className="grid grid-cols-5 gap-2 py-1">
+            <div>No</div>
+            <div>Nama Layanan</div>
+            <div className="text-right">Harga Satuan</div>
+            <div className="text-center">Frekuensi</div>
+            <div className="text-right">Total</div>
+          </div>
         </div>
+        
+        {invoiceData?.items?.map((item: any, index: number) => (
+          <div key={index} className="grid grid-cols-5 gap-2 border-b border-gray-300 py-1">
+            <div>{index + 1}</div>
+            <div>{item.rate.service.name}</div>
+            <div className="text-right">Rp {item.amount_rate?.toLocaleString()}</div>
+            <div className="text-center">{item.frequency}</div>
+            <div className="text-right">Rp {(item.amount_rate * item.frequency)?.toLocaleString()}</div>
+          </div>
+        ))}
+      </div>
         
       {/* Payment Summary */}
       <div className="mb-4">
@@ -171,12 +185,14 @@ export const PrintPayment = () => {
       {/* Tanda Tangan */}
       <div className="grid grid-cols-2 mt-8 text-center text-base">
         <div>
+          <p className="invisible">Surakarta,</p> {/* untuk menyamakan baris pertama */}
           <p>Pembayar,</p>
           <div className="h-16" />
-          <p>__________________</p>
+          <p className="font-semibold underline">__________________</p>
+          <p className="invisible">NIP.</p> {/* untuk menyamakan tinggi baris */}
         </div>
         <div>
-          <p>Surakarta, {new Date(paymentData?.payment_date).toLocaleDateString('id-ID', {
+          <p>Surakarta, {new Date().toLocaleDateString('id-ID', {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
@@ -187,6 +203,7 @@ export const PrintPayment = () => {
           <p>NIP.</p>
         </div>
       </div>
+
 
       <p className="mt-6 italic text-base">Nb. Harap disimpan.</p>
     </div>

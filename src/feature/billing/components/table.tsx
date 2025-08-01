@@ -111,7 +111,17 @@ export default function BillingTable({ items, onDeleted, onEdit }: Props) {
                                 style: 'currency',
                                 currency: 'IDR'
                             }).format(item.price)}</TableCell>
-                            <TableCell>{item.frequency ?? '-'}</TableCell>
+                            <TableCell>
+                                {(() => {
+                                    const frequencyMap: Record<string, string> = {
+                                        "0": "Bulanan",
+                                        "1": "Per Semester", 
+                                        "2": "Tahunan",
+                                        "3": "Satu Kali"
+                                    };
+                                    return frequencyMap[item.frequency] || "-";
+                                })()}
+                            </TableCell>
                             <TableCell>{item.applies_to ?? '-'}</TableCell>
                             <TableCell>
                                 {item.is_active === 'Y' ? (

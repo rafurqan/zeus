@@ -11,6 +11,11 @@ export const billingService = {
     return response.data.data;
   },
 
+  async getAllActive(token: string): Promise<Billing[]> {
+    const response = await http(token).get("master/rates/active");
+    return response.data.data;
+  },
+
   async create(token: string, data: Billing): Promise<CreateBillingResponse> {
     const response = await http(token).post<CreateBillingResponse>(
       "master/rates",
