@@ -76,7 +76,7 @@ export default function CreateProspectiveStudentsPage() {
         gender: "",
         birth_date: "",
         birth_place: "",
-        child_order: 0,
+        child_order: 1,
         family_status: "",
         document_status: "",
         photo_filename: null,
@@ -446,7 +446,7 @@ export default function CreateProspectiveStudentsPage() {
                 toast.success(`Berhasil ${isEdit ? "memperbarui" : "menambahkan"} calon siswa`);
                 navigate("/students/prospective");
             } catch (error: unknown) {
-                toast.error(error instanceof AxiosError ? error.response?.data.message : "Terjadi kesalahan saat menyimpan data");
+                toast.error(error instanceof AxiosError ? error.response?.data?.message : "Terjadi kesalahan saat menyimpan data");
             } finally {
                 setLoading(false);
             }
@@ -833,6 +833,15 @@ export default function CreateProspectiveStudentsPage() {
                                     {showModal && (
                                         <StudentParentForm
                                             item={selectedParent}
+                                            currentStudentParents={
+                                                selectedParent
+                                                    ? form.parents.filter(p =>
+                                                        selectedParent.id
+                                                            ? p.id !== selectedParent.id
+                                                            : p !== selectedParent
+                                                    )
+                                                    : form.parents
+                                            }
                                             onClose={() => {
                                                 setShowModal(false);
                                                 setSelectedParent(null);

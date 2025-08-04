@@ -8,15 +8,18 @@ import { listEducationLevel, listIncomeRange, listOccupations, listParentType } 
 import { EducationLevel } from "@/core/types/education-level";
 import { FormInput } from "@/core/components/forms/formInput";
 import { FormSelect } from "@/core/components/forms/formSelect";
+import toast from "react-hot-toast";
 
 type Props = {
     item?: Parent | null;
+    currentStudentParents?: Parent[] | null;
     onClose: () => void;
     onSuccess: (item: Parent) => void;
 };
 
 export default function StudentParentForm({
     item = null,
+    currentStudentParents = null,
     onClose,
     onSuccess,
 }: Props) {
@@ -42,7 +45,6 @@ export default function StudentParentForm({
         }
     }, []);
 
-    // Prevent body scroll when modal is open
     useEffect(() => {
         document.body.style.overflow = 'hidden';
         return () => {
@@ -153,12 +155,22 @@ export default function StudentParentForm({
     };
 
     const handleSubmit = async () => {
+        const alreadyHasMainContact = currentStudentParents?.some(p => p.is_main_contact);
+
+        const isFormMainContact = form.is_main_contact === true;
+
+        if (alreadyHasMainContact && isFormMainContact) {
+            toast.error("Sudah ada kontak utama. Hanya boleh satu kontak utama untuk data orang tua siswa.");
+            return;
+        }
+
         const isConfirmed = await confirm({
             title: isEdit ? "Perbaharui Data" : "Submit Data",
             message: `Apakah Anda yakin ingin ${isEdit ? "perbaharui" : "menambahkan data"} keluarga ini?`,
             confirmText: "Ya, Lanjutkan",
             cancelText: "Batal",
         });
+
         if (isConfirmed) {
             onSuccess(form);
         }
