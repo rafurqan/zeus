@@ -1,4 +1,5 @@
 import http from "./auth";
+import { EducationLevel } from "../types/education-level";
 
 export const listEducationLevel = async () => {
   const response = await http.get("/master/education-levels");
@@ -11,7 +12,15 @@ export const listProgram = async () => {
 };
 
 export const deleteEducationLevel = (id: string) => {
-  return http.delete(`/api/v1/master/education-levels/${id}`);
+  return http.delete(`/master/education-levels/${id}`);
+};
+
+export const addEducationLevel = (data: EducationLevel) => {
+  return http.post(`/master/education-levels`, data);
+};
+
+export const updateEducationLevel = (data: EducationLevel) => {
+  return http.put(`/master/education-levels/${data.id}`, data);
 };
 
 export const listNationality = async () => {

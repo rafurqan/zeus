@@ -113,7 +113,7 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
-                        <div className="bg-black h-2 rounded-full" style={{ width: "78.5%" }}></div>
+                        <div className="bg-black h-2 rounded-full" style={{ width: `${dashboardData?.collection_rate_percent ?? 0}%` }}></div>
                       </div>
                     </CardContent>
                   </Card>

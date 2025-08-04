@@ -56,7 +56,6 @@ export default function StudentOriginSchoolForm({
             if (res.status === 401) {
                 setUser(null);
                 setToken(null);
-                // toast.error("Akses ditolak. Silakan login ulang.");
             }
             setSchoolTypes(res.data || []);
         } catch (err: unknown) {
@@ -74,7 +73,6 @@ export default function StudentOriginSchoolForm({
             if (res.status === 401) {
                 setUser(null);
                 setToken(null);
-                // toast.error("Akses ditolak. Silakan login ulang.");
             }
             setEducationLevels(res.data || []);
         } catch (err: unknown) {

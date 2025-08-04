@@ -1,7 +1,8 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { EducationLevel } from "@/core/types/education-level";
-import { AppContext } from "@/context/AppContext";
 import toast from "react-hot-toast";
+import { addEducationLevel, updateEducationLevel } from "@/core/service/master";
+import { AxiosError } from "axios";
 
 
 
@@ -17,12 +18,11 @@ export default function EducationLevelForm({
   onSuccess,
 }: Props) {
   const isEdit = !!item;
-  const { token } = useContext(AppContext);
 
   const [form, setForm] = useState({
     name: item?.name || "",
     description: item?.description || "",
-    level: item?.level || "",
+    level: item?.level || "Dasar",
     status: item?.status || "ACTIVE",
   });
 
@@ -37,30 +37,32 @@ export default function EducationLevelForm({
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const url = isEdit
-        ? `/api/v1/master/education-levels/${item?.id}`
-        : "/api/v1/master/education-levels";
-      const method = isEdit ? "PUT" : "POST";
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-        body: JSON.stringify(form),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Gagal simpan data");
+      if (isEdit) {
+        await updateEducationLevel({
+          id: item?.id || "",
+          description: form.description,
+          level: form.level,
+          name: form.name,
+          status: form.status,
+        });
+      } else {
+        await addEducationLevel({
+          id: "",
+          description: form.description,
+          level: form.level,
+          name: form.name,
+          status: form.status,
+        });
       }
 
-      onSuccess(); // fetch data ulang dan tutup modal
-    } catch (error: unknown) {
-      toast.error(
-        error instanceof Error ? error.message : "Terjadi kesalahan saat menyimpan data");
+      onSuccess();
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        toast.error(
+          err.response?.data.message ?? "Terjadi kesalahan saat menyimpan data."
+        );
+      }
     } finally {
       setLoading(false);
     }
