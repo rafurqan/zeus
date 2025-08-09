@@ -6,18 +6,28 @@ import { AppContext } from "@/context/AppContext";
 import { RatePackage } from "../types/ratePackage";
 import toast from "react-hot-toast";
 
-export const usePackage = () => {
+export const usePackage = (searchTerm = "") => {
     const [data, setData] = useState<RatePackage[]>([]);
     const [loading, setLoading] = useState(false);
     const [loadingOverlay, setLoadingOverlay] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { token } = useContext(AppContext);
+    const [page, setPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
+    const [meta, setMeta] = useState<any>(null);
 
-    const fetchAll = async () => {
+    const fetchWithPagination = async (search = searchTerm) => {
         try {
             setLoading(true);
-            const result = await packageService.getAll(token ?? "");
-            setData(result);
+            const response = await packageService.getAllWithPagination(
+                token ?? "",
+                page,
+                10,
+                search
+            );
+            setData(response.data.data);
+            setLastPage(response.data.last_page || 1);
+            setMeta(response.data);
         } catch (err: unknown) {
             if (err instanceof AxiosError) {
                 setError(err.message || "Gagal memuat data");
@@ -31,7 +41,7 @@ export const usePackage = () => {
         try {
             setLoadingOverlay(true);
             const result = await packageService.create(token ?? "", payload);
-            await fetchAll(); // Pastikan ada fetchAll setelah create
+            await fetchWithPagination(); // Ganti fetchAll dengan fetchWithPagination
             toast.success("Berhasil menambah data.");
             return result;
         } catch (err: unknown) {
@@ -53,7 +63,7 @@ export const usePackage = () => {
         try {
             setLoadingOverlay(true);
             const result = await packageService.update(token ?? "", payload);
-            await fetchAll(); // Pastikan ada fetchAll setelah update
+            await fetchWithPagination(); // Ganti fetchAll dengan fetchWithPagination
             toast.success("Berhasil perbaharui data.");
             return result;
         } catch (err: unknown) {
@@ -75,7 +85,7 @@ export const usePackage = () => {
         try {
             setLoadingOverlay(true);
             await packageService.remove(token ?? "", id);
-            await fetchAll(); // sudah ada fetchAll
+            await fetchWithPagination(); // Ganti fetchAll dengan fetchWithPagination
             toast.success("Berhasil menghapus data.");
         } catch (err: unknown) {
             console.log(err);
@@ -93,8 +103,8 @@ export const usePackage = () => {
     };
 
     useEffect(() => {
-        fetchAll();
-    }, []);
+        fetchWithPagination();
+    }, [page, searchTerm]);
 
     return {
         data,
@@ -104,5 +114,10 @@ export const usePackage = () => {
         create,
         update,
         remove,
+        page,
+        setPage,
+        lastPage,
+        meta,
+        fetchWithPagination
     };
 };

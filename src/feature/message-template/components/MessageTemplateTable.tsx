@@ -1,32 +1,31 @@
-import { RatePackage } from "@/feature/billing/types/ratePackage";
+import { MessageTemplate } from "../types/messageTemplate";
 import { Table, TableCell, TableHead, TableHeader, TableRow, TableBody } from "@/core/components/ui/table";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { Button } from "@/core/components/ui/button";
 
 type Props = {
-    items: RatePackage[];
-    onDeleted: (item: RatePackage) => void;
-    onEdit: (item: RatePackage) => void;
+    items: MessageTemplate[];
+    onDeleted: (item: MessageTemplate) => void;
+    onEdit: (item: MessageTemplate) => void;
     currentPage?: number;
     totalPages?: number;
     onPageChange?: (page: number) => void;
     meta?: any;
 };
 
-export default function BillingPackageTable({ 
+export default function MessageTemplateTable({ 
     items, 
     onDeleted, 
-    onEdit,
+    onEdit, 
     currentPage = 1, 
     totalPages = 1, 
-    onPageChange,
-    meta
+    onPageChange 
 }: Props) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const [selectedItem, setSelectedItem] = useState<RatePackage | null>(null);
+    const [selectedItem, setSelectedItem] = useState<MessageTemplate | null>(null);
 
-    const handleDelete = (item: RatePackage) => {
+    const handleDelete = (item: MessageTemplate) => {
         setSelectedItem(item);
         setShowDeleteConfirm(true);
     };
@@ -39,9 +38,6 @@ export default function BillingPackageTable({
         }
     };
 
-    // Menghitung informasi paginasi
-    const startItem = meta ? ((currentPage - 1) * 10) + 1 : 0;
-
     return (
         <div className="overflow-x-auto">
             {/* Delete Confirmation Modal */}
@@ -50,11 +46,10 @@ export default function BillingPackageTable({
                     <div className="fixed inset-0 bg-black/30" onClick={() => setShowDeleteConfirm(false)} />
                     <div className="relative bg-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
                         <h3 className="text-lg font-semibold mb-4">Konfirmasi Hapus</h3>
-                        <p className="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus item ini?</p>
+                        <p className="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus template pesan ini?</p>
                         <div className="flex justify-end gap-2">
                             <Button
                                 variant="outline"
-                                className="text-blue-600 hover:text-blue-800 border-blue-600 hover:border-blue-800"
                                 onClick={() => {
                                     setShowDeleteConfirm(false);
                                     setSelectedItem(null);
@@ -63,8 +58,7 @@ export default function BillingPackageTable({
                                 Batal
                             </Button>
                             <Button
-                                variant="outline"
-                                className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
+                                variant="destructive"
                                 onClick={confirmDelete}
                             >
                                 Hapus
@@ -73,47 +67,21 @@ export default function BillingPackageTable({
                     </div>
                 </div>
             )}
-
             <Table>
                 <TableHeader>
                     <TableRow>
                         <TableHead>No</TableHead>
-                        <TableHead>ID</TableHead>
                         <TableHead>Nama</TableHead>
-                        <TableHead>Program</TableHead>
-                        <TableHead>Jumlah Item</TableHead>
-                        <TableHead>Total</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead>Body</TableHead>
                         <TableHead>Aksi</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {items.map((item, index) => (
                         <TableRow key={item.id}>
-                            <TableCell className="font-medium">{startItem + index}</TableCell>
-                            <TableCell className="font-medium">{item.code ?? '-'}</TableCell>
-                            <TableCell>{item.service_name ?? '-'}</TableCell>
-                            <TableCell>{item.program ?? '-'}</TableCell>
-                            <TableCell>
-                                {item.child_ids ? 
-                                    (typeof item.child_ids === 'string' 
-                                        ? JSON.parse(item.child_ids).length 
-                                        : Array.isArray(item.child_ids) 
-                                            ? item.child_ids.length 
-                                            : Object.keys(item.child_ids).length) + ' Item'
-                                    : '-'}
-                            </TableCell>
-                            <TableCell>{new Intl.NumberFormat('id-ID', {
-                                style: 'currency',
-                                currency: 'IDR'
-                            }).format(item.total_price ? Number(item.total_price) : 0)}</TableCell>
-                            <TableCell>
-                                {item.is_active === 'Y' ? (
-                                    <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Aktif</span>
-                                ) : (
-                                    <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Tidak Aktif</span>
-                                )}
-                            </TableCell>
+                            <TableCell className="font-medium">{((currentPage - 1) * 10) + index + 1}</TableCell>
+                            <TableCell>{item.name}</TableCell>
+                            <TableCell><div className="truncate">{item.body}</div></TableCell>
                             <TableCell>
                                 <div className="flex items-center gap-2">
                                     <button
@@ -134,8 +102,7 @@ export default function BillingPackageTable({
                     ))}
                 </TableBody>
             </Table>
-
-            {/* Pagination */}
+            {/* Pagination Controls */}
             <div className="flex justify-between items-center mt-4">
                 <button
                     onClick={() => onPageChange && onPageChange(Math.max(currentPage - 1, 1))}

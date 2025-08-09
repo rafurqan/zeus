@@ -6,18 +6,28 @@ import { AppContext } from "@/context/AppContext";
 import { Grant } from "../types/grant";
 import toast from "react-hot-toast";
 
-export const useGrant = () => {
+export const useGrant = (searchTerm = "") => {
     const [data, setData] = useState<Grant[]>([]);
     const [loading, setLoading] = useState(false);
     const [loadingOverlay, setLoadingOverlay] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { token } = useContext(AppContext);
+    const [page, setPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
+    const [meta, setMeta] = useState<any>(null);
 
-    const fetchAll = async () => {
+    const fetchWithPagination = async (search = searchTerm) => {
         try {
             setLoading(true);
-            const result = await grantService.getAll(token ?? "");
-            setData(result);
+            const response = await grantService.getAllWithPagination(
+                token ?? "",
+                page,
+                10,
+                search
+            );
+            setData(response.data.data); 
+            setLastPage(response.data.last_page || 1);
+            setMeta(response.data);
         } catch (err: unknown) {
             if (err instanceof AxiosError) {
                 setError(err.message || "Gagal memuat data");
@@ -31,7 +41,7 @@ export const useGrant = () => {
         try {
             setLoadingOverlay(true);
             const result = await grantService.create(token ?? "", payload);
-            await fetchAll(); // Pastikan ada fetchAll setelah create
+            await fetchWithPagination(); // Menggunakan fetchWithPagination
             toast.success("Berhasil menambah data.");
             return result;
         } catch (err: unknown) {
@@ -53,7 +63,7 @@ export const useGrant = () => {
         try {
             setLoadingOverlay(true);
             const result = await grantService.update(token ?? "", payload);
-            await fetchAll(); // Pastikan ada fetchAll setelah update
+            await fetchWithPagination(); // Menggunakan fetchWithPagination
             toast.success("Berhasil perbaharui data.");
             return result;
         } catch (err: unknown) {
@@ -75,7 +85,7 @@ export const useGrant = () => {
         try {
             setLoadingOverlay(true);
             await grantService.remove(token ?? "", id);
-            await fetchAll(); // sudah ada fetchAll
+            await fetchWithPagination(); // Menggunakan fetchWithPagination
             toast.success("Berhasil menghapus data.");
         } catch (err: unknown) {
             console.log(err);
@@ -96,7 +106,7 @@ export const useGrant = () => {
         try {
         setLoadingOverlay(true);
         await grantService.reset(token ?? "", id);
-        await fetchAll();
+        await fetchWithPagination(); // Menggunakan fetchWithPagination
         toast.success("Dana hibah berhasil direset.");
         } catch (err: unknown) {
         if (err instanceof AxiosError) {
@@ -113,8 +123,8 @@ export const useGrant = () => {
     };
 
     useEffect(() => {
-        fetchAll();
-    }, []);
+        fetchWithPagination();
+    }, [page, searchTerm]);
 
     return {
         data,
@@ -125,5 +135,10 @@ export const useGrant = () => {
         update,
         remove,
         reset,
+        page,
+        setPage,
+        lastPage,
+        meta,
+        fetchWithPagination
     };
 };

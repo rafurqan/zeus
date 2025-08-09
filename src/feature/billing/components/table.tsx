@@ -3,14 +3,27 @@ import { Table, TableCell, TableHead, TableHeader, TableRow, TableBody } from "@
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { Button } from "@/core/components/ui/button";
+// import Pagination from "@/core/components/forms/pagination";
 
 type Props = {
     items: Billing[];
     onDeleted: (item: Billing) => void;
     onEdit: (item: Billing) => void;
+    currentPage?: number;
+    totalPages?: number;
+    onPageChange?: (page: number) => void;
+    meta?: any;
 };
 
-export default function BillingTable({ items, onDeleted, onEdit }: Props) {
+export default function BillingTable({ 
+    items, 
+    onDeleted, 
+    onEdit, 
+    currentPage = 1, 
+    totalPages = 1, 
+    onPageChange,
+    meta 
+}: Props) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [selectedItem, setSelectedItem] = useState<Billing | null>(null);
 
@@ -26,6 +39,8 @@ export default function BillingTable({ items, onDeleted, onEdit }: Props) {
             setSelectedItem(null);
         }
     };
+
+    const startItem = meta ? ((currentPage - 1) * 10) + 1 : 0;
 
     return (
         <div className="overflow-x-auto">
@@ -77,7 +92,7 @@ export default function BillingTable({ items, onDeleted, onEdit }: Props) {
                 <TableBody>
                     {items.map((item, index) => (
                         <TableRow key={item.id}>
-                            <TableCell className="font-medium">{index + 1}</TableCell>
+                            <TableCell className="font-medium">{startItem + index}</TableCell>
                             <TableCell className="font-medium">{item.code ?? '-'}</TableCell>
                             <TableCell>{item.service_name ?? '-'}</TableCell>
                             <TableCell>
@@ -150,6 +165,25 @@ export default function BillingTable({ items, onDeleted, onEdit }: Props) {
                     ))}
                 </TableBody>
             </Table>
+
+            {/* Pagination */}
+            <div className="flex justify-between items-center mt-4">
+                <button
+                    onClick={() => onPageChange && onPageChange(Math.max(currentPage - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                >
+                    Previous
+                </button>
+                <span className="text-sm">Halaman {currentPage} dari {totalPages}</span>
+                <button
+                    onClick={() => onPageChange && onPageChange(Math.min(currentPage + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                >
+                    Next
+                </button>
+            </div>
         </div>
     );
 }

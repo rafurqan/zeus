@@ -12,6 +12,22 @@ export const grantService = {
     return response.data.data;
   },
 
+  async getAllWithPagination(
+    token: string,
+    page: number = 1,
+    perPage: number = 10,
+    search: string = ""
+  ) {
+    const response = await http(token).get("master/grants", {
+      params: {
+        page,
+        per_page: perPage,
+        search,
+      },
+    });
+    return response.data;
+  },
+
   async create(token: string, data: Grant): Promise<CreateGrantResponse> {
     const response = await http(token).post<CreateGrantResponse>(
       "master/grants",
