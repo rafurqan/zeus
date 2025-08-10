@@ -11,6 +11,22 @@ export const packageService = {
     return response.data.data;
   },
 
+  async getAllWithPagination(
+    token: string,
+    page: number = 1,
+    perPage: number = 10,
+    search: string = ""
+  ) {
+    const response = await http(token).get("master/rates-package", {
+      params: {
+        page,
+        per_page: perPage,
+        search,
+      },
+    });
+    return response.data;
+  },
+
   async getAllActive(token: string): Promise<RatePackage[]> {
     const response = await http(token).get("master/rates-package/active");
     return response.data.data;

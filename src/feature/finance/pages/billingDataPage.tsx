@@ -3,6 +3,7 @@ import { InvoiceTable } from "../components/InvoiceTable";
 import BaseLayout from "@/core/components/baseLayout";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { FaUndo } from "react-icons/fa";
 
 export const BillingDataPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,15 +26,11 @@ export const BillingDataPage = () => {
       <div className="p-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Faktur</h1>
-          <div className="space-x-2">
-            <button className="px-4 py-2 bg-white text-black-700 border border-black-300 rounded-md shadow-sm hover:bg-black-50" onClick={handleRefresh}>
-              Segarkan
-            </button>
-            <button 
-              onClick={() => navigate("/finance/billingData/create")} 
-              className="px-4 py-2 bg-black text-white rounded-md shadow-sm hover:bg-black-800"
-            >
-              Buat Faktur
+          <div className="space-x-2 flex">
+          <button className="px-4 py-2 bg-white text-black-700 border border-black-300 rounded-md shadow-sm hover:bg-black-50 flex items-center gap-2" onClick={handleRefresh}><FaUndo className="h-4 w-4" /> 
+            <span>Segarkan</span>
+          </button>
+          <button onClick={() => navigate("/finance/billingData/create")} className="px-4 py-2 bg-black text-white rounded-md shadow-sm hover:bg-black-800">Buat Faktur
             </button>
           </div>
         </div>
@@ -54,6 +51,22 @@ export const BillingDataPage = () => {
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />
+          
+          {/* Pagination Info */}
+          {invoices.length > 0 && (
+            <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <p className="text-sm text-gray-700">
+                Menampilkan <span className="font-medium">{((page - 1) * 10) + 1}</span>
+                {' '}sampai <span className="font-medium">{Math.min(page * 10, invoices.length)}</span>
+                {' '}dari <span className="font-medium">{invoices.length}</span> hasil
+                {searchTerm && (
+                  <span className="text-gray-500">
+                    {' '}(difilter berdasarkan "{searchTerm}")
+                  </span>
+                )}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </BaseLayout>

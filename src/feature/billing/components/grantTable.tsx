@@ -9,9 +9,21 @@ type Props = {
     onDeleted: (item: Grant) => void;
     onEdit: (item: Grant) => void;
     onReset: (item: Grant) => void;
+    currentPage?: number;
+    totalPages?: number;
+    onPageChange?: (page: number) => void;
+    meta?: any;
 };
 
-export default function GrantTable({ items, onDeleted, onEdit, onReset }: Props) {
+export default function GrantTable({ 
+    items, 
+    onDeleted, 
+    onEdit, 
+    onReset, 
+    currentPage = 1, 
+    totalPages = 1, 
+    onPageChange 
+}: Props) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [selectedItem, setSelectedItem] = useState<Grant | null>(null);
     const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -43,6 +55,9 @@ export default function GrantTable({ items, onDeleted, onEdit, onReset }: Props)
             setSelectedItem(null);
         }
     };
+
+    // Menghitung indeks awal dan akhir untuk pagination
+    const startItem = currentPage ? (currentPage - 1) * 10 + 1 : 1;
 
     return (
         <div className="overflow-x-auto">
@@ -122,7 +137,7 @@ export default function GrantTable({ items, onDeleted, onEdit, onReset }: Props)
                 <TableBody>
                     {items.map((item, index) => (
                         <TableRow key={item.id}>
-                            <TableCell className="font-medium">{index + 1}</TableCell>
+                            <TableCell className="font-medium">{startItem + index}</TableCell>
                             <TableCell className="font-medium">{item.code}</TableCell>
                             <TableCell>{item.grants_name}</TableCell>
                             <TableCell>{item.donor_name}</TableCell>
@@ -181,6 +196,25 @@ export default function GrantTable({ items, onDeleted, onEdit, onReset }: Props)
                     ))}
                 </TableBody>
             </Table>
+
+            {/* Pagination Controls */}
+            <div className="flex justify-between items-center mt-4">
+                <button
+                    onClick={() => onPageChange && onPageChange(Math.max(currentPage - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                >
+                    Previous
+                </button>
+                <span className="text-sm">Halaman {currentPage} dari {totalPages}</span>
+                <button
+                    onClick={() => onPageChange && onPageChange(Math.min(currentPage + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                >
+                    Next
+                </button>
+            </div>
         </div>
     );
 }

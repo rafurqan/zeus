@@ -121,8 +121,10 @@ export default function BillingPackageForm({ item = null, onClose, onSuccess }: 
 
   const fetchRates = async () => {
     try {
-      const data = await billingService.getAll(token!);
-      setRates(data);
+      // Gunakan getAllWithPagination dengan parameter default
+      const response = await billingService.getAllWithPagination(token!, 1, 100, "");
+      // Ambil data dari response.data.data (sesuai struktur paginasi)
+      setRates(response.data.data);
     } catch (error) {
       console.error('Error fetching rates:', error);
     }

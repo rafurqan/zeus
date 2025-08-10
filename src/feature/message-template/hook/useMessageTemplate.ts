@@ -1,13 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-
-import { billingService } from "../service/billingService";
+import { messageTemplateService } from "../services/messageTemplateService";
 import { AxiosError } from "axios";
 import { AppContext } from "@/context/AppContext";
-import { Billing } from "../types/billing";
+import { MessageTemplate } from "../types/messageTemplate";
 import toast from "react-hot-toast";
 
-export const useBilling = (searchTerm = "") => {
-  const [data, setData] = useState<Billing[]>([]);
+export const useMessageTemplate = (searchTerm = "") => {
+  const [data, setData] = useState<MessageTemplate[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingOverlay, setLoadingOverlay] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,13 +18,13 @@ export const useBilling = (searchTerm = "") => {
   const fetchWithPagination = async (search = searchTerm) => {
     try {
       setLoading(true);
-      const response = await billingService.getAllWithPagination(
+      const response = await messageTemplateService.getAllWithPagination(
         token ?? "",
         page,
         10,
         search
       );
-      setData(response.data.data); 
+      setData(response.data.data);
       setLastPage(response.data.last_page || 1);
       setMeta(response.data);
     } catch (err: unknown) {
@@ -37,13 +36,13 @@ export const useBilling = (searchTerm = "") => {
     }
   };
 
-  const create = async (payload: Billing) => {
+  const create = async (payload: MessageTemplate) => {
     try {
       setLoadingOverlay(true);
-      const result = await billingService.create(token ?? "", payload);
+      const result = await messageTemplateService.create(token ?? "", payload);
       setLoadingOverlay(false);
       await fetchWithPagination();
-      toast.success("Berhasil menambah data.");
+      toast.success("Berhasil menambah template.");
       return result;
     } catch (err: unknown) {
       console.log(err);
@@ -60,13 +59,13 @@ export const useBilling = (searchTerm = "") => {
     }
   };
 
-  const update = async (payload: Billing) => {
+  const update = async (payload: MessageTemplate) => {
     try {
       setLoadingOverlay(true);
-      const result = await billingService.update(token ?? "", payload);
+      const result = await messageTemplateService.update(token ?? "", payload);
       setLoadingOverlay(false);
       await fetchWithPagination();
-      toast.success("Berhasil perbaharui data.");
+      toast.success("Berhasil perbaharui template.");
       return result;
     } catch (err: unknown) {
       console.log(err);
@@ -86,10 +85,10 @@ export const useBilling = (searchTerm = "") => {
   const remove = async (id: string) => {
     try {
       setLoadingOverlay(true);
-      await billingService.remove(token ?? "", id);
+      await messageTemplateService.remove(token ?? "", id);
       setLoadingOverlay(false);
       await fetchWithPagination();
-      toast.success("Berhasil menghapus data.");
+      toast.success("Berhasil menghapus template.");
     } catch (err: unknown) {
       console.log(err);
       if (err instanceof AxiosError) {
@@ -118,6 +117,6 @@ export const useBilling = (searchTerm = "") => {
     setPage,
     lastPage,
     meta,
-    fetchWithPagination  // Tambahkan ini
+    fetchWithPagination
   };
 };

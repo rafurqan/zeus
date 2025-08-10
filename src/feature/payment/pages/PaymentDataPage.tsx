@@ -46,6 +46,22 @@ export const PaymentDataPage = () => {
               setActiveTab={setActiveTab}
               lastPage={lastPage}
             />
+            
+            {/* Pagination Info */}
+            {payments.length > 0 && (
+              <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p className="text-sm text-gray-700">
+                  Menampilkan <span className="font-medium">{((page - 1) * 10) + 1}</span>
+                  {' '}sampai <span className="font-medium">{Math.min(page * 10, payments.length)}</span>
+                  {' '}dari <span className="font-medium">{payments.length}</span> hasil
+                  {searchTerm && (
+                    <span className="text-gray-500">
+                      {' '}(difilter berdasarkan "{searchTerm}")
+                    </span>
+                  )}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

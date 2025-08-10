@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Button } from "@/core/components/ui/button"
 import { Navigate } from "react-router-dom";
 import { AppContext } from "@/context/AppContext";
@@ -11,6 +11,7 @@ import { Plus, Search } from "lucide-react";
 import { useBilling } from "../hook/useBilling";
 import { useGrant } from "../hook/useGrant";
 import { usePackage } from "../hook/usePackage";
+import { FaUndo } from "react-icons/fa";
 
 
 import LoadingOverlay from "@/core/components/ui/loading_screen";
@@ -23,13 +24,50 @@ const tabs = ['Biaya', 'Paket Biaya', 'Dana Hibah', 'Metode Pembayaran', 'Diskon
 
 export default function BillingPage() {
     const { user, setUser } = useContext(AppContext);
-    const { data, loading, loadingOverlay, remove, create, update } = useBilling();
-    const { data: grantData, remove: removeGrant, reset, create: createGrant, update: updateGrant } = useGrant();
-    const { data: packageData, remove: removePackage, create: createPackage, update: updatePackage } = usePackage();
+    const { 
+        data, 
+        loading, 
+        loadingOverlay, 
+        remove, 
+        create, 
+        update,
+        page,
+        setPage,
+        lastPage,
+        meta,
+        fetchWithPagination
+    } = useBilling();
+    
+    const [searchTerm, setSearchTerm] = useState("");
+    
+    useEffect(() => {
+        fetchWithPagination(searchTerm);
+    }, [searchTerm]);
+    
+    const { 
+        data: grantData, 
+        remove: removeGrant, 
+        reset, 
+        create: createGrant, 
+        update: updateGrant,
+        page: grantPage,
+        setPage: setGrantPage,
+        lastPage: grantLastPage,
+        meta: grantMeta,
+    } = useGrant();
+    const { 
+        data: packageData, 
+        remove: removePackage, 
+        create: createPackage, 
+        update: updatePackage,
+        page: packagePage,
+        setPage: setPackagePage,
+        lastPage: packageLastPage,
+        meta: packageMeta,
+    } = usePackage();
     const [showModal, setShowModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>(null);
     const [modalType, setModalType] = useState<"billing" | "grant" | "package">("billing");
-    const [searchTerm, setSearchTerm] = useState("");
     const [activeTab, setActiveTab] = useState("Biaya");
     const handleRefresh = () => window.location.reload();
 
@@ -38,7 +76,6 @@ export default function BillingPage() {
         return <Navigate to="/login" />;
     }
     
-    //create dan update dari hook useBilling, useGrant, dan usePackage
     const handleSuccess = (item: any) => {
         if (modalType === "grant") {
             if (selectedItem) {
@@ -63,13 +100,7 @@ export default function BillingPage() {
         setSelectedItem(null);
     };
 
-
-    const filteredData = data?.filter(item =>
-        (item?.service_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (item?.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (item?.applies_to || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (item?.code || '').toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
+    const filteredData = data || [];
 
     const filteredGrantData = grantData.filter(item =>
         item.grants_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -97,8 +128,8 @@ export default function BillingPage() {
                         <div className="flex justify-between items-center mb-6">
                             <h1 className="text-3xl font-bold">Master Data Penagihan</h1>
                             <div className="flex space-x-2">
-                                <button className="px-4 py-2 bg-white text-black-700 border border-black-300 rounded-md shadow-sm hover:bg-black-50" onClick={handleRefresh}>
-                                    Segarkan
+                                <button className="px-4 py-2 bg-white text-black-700 border border-black-300 rounded-md shadow-sm hover:bg-black-50 flex items-center gap-2" onClick={handleRefresh}>
+                                    <FaUndo className="h-4 w-4" /> <span>Segarkan</span>
                                 </button>
                             </div>
                         </div>
@@ -155,12 +186,30 @@ export default function BillingPage() {
                                     onDeleted={(item) => {
                                         remove(item.id)
                                     }}
-
                                     onEdit={(item) => {
                                         setSelectedItem(item);
                                         setShowModal(true);
                                     }}
+                                    currentPage={page}
+                                    totalPages={lastPage}
+                                    onPageChange={setPage}
+                                    meta={meta}
                                 />}
+                                {/* Pagination Info */}
+                                {meta && filteredData.length > 0 && (
+                                  <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                                    <p className="text-sm text-gray-700">
+                                      Menampilkan <span className="font-medium">{((page - 1) * 10) + 1}</span>
+                                      {' '}sampai <span className="font-medium">{Math.min(page * 10, meta.total || 0)}</span>
+                                      {' '}dari <span className="font-medium">{meta.total || 0}</span> hasil
+                                      {searchTerm && (
+                                        <span className="text-gray-500">
+                                          {' '}(difilter berdasarkan "{searchTerm}")
+                                        </span>
+                                      )}
+                                    </p>
+                                  </div>
+                                )}
                             </div>
                         )}
 
@@ -206,12 +255,30 @@ export default function BillingPage() {
                                     onDeleted={(item) => {
                                         removePackage(item.id)
                                     }}
-
                                     onEdit={(item) => {
                                         setSelectedItem(item);
                                         setShowModal(true);
                                     }}
+                                    currentPage={packagePage}
+                                    totalPages={packageLastPage}
+                                    onPageChange={setPackagePage}
+                                    meta={packageMeta}
                                 />}
+                                {/* Pagination Info */}
+                                {packageMeta && filteredPackageData.length > 0 && (
+                                  <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                                    <p className="text-sm text-gray-700">
+                                      Menampilkan <span className="font-medium">{((packagePage - 1) * 10) + 1}</span>
+                                      {' '}sampai <span className="font-medium">{Math.min(packagePage * 10, packageMeta.total || 0)}</span>
+                                      {' '}dari <span className="font-medium">{packageMeta.total || 0}</span> hasil
+                                      {searchTerm && (
+                                        <span className="text-gray-500">
+                                          {' '}(difilter berdasarkan "{searchTerm}")
+                                        </span>
+                                      )}
+                                    </p>
+                                  </div>
+                                )}
                             </div>
                         )}
 
@@ -265,7 +332,26 @@ export default function BillingPage() {
                                             setShowModal(true);
                                         }}
                                         onReset={(item) => reset(item.id)}
+                                        currentPage={grantPage}
+                                        totalPages={grantLastPage}
+                                        onPageChange={setGrantPage}
+                                        meta={grantMeta}
                                     />
+                                )}
+                                {/* Pagination Info */}
+                                {meta && filteredData.length > 0 && (
+                                  <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                                    <p className="text-sm text-gray-700">
+                                      Menampilkan <span className="font-medium">{((page - 1) * 10) + 1}</span>
+                                      {' '}sampai <span className="font-medium">{Math.min(page * 10, meta.total || 0)}</span>
+                                      {' '}dari <span className="font-medium">{meta.total || 0}</span> hasil
+                                      {searchTerm && (
+                                        <span className="text-gray-500">
+                                          {' '}(difilter berdasarkan "{searchTerm}")
+                                        </span>
+                                      )}
+                                    </p>
+                                  </div>
                                 )}
                             </div>
                         )}
