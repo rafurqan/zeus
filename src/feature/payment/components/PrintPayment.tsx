@@ -141,7 +141,7 @@ export const PrintPayment = () => {
               <span className="text-xs">Rp {paymentData?.total_payment?.toLocaleString()}</span>
             </p>
             <p className="italic flex justify-end text-xs">
-              ({convertToRupiah(invoiceData?.total || 0).substring(0, 20)}...)
+              ({convertToRupiah(invoiceData?.total || 0)})
             </p>
             <p className="flex justify-between">
               <span>:</span>
