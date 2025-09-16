@@ -144,6 +144,7 @@ export type Summary = {
   orphan: number | null;
   teacher_child: number | null;
   special_needs: number | null;
+  surrounding_environment: number | null;
 };
 
 export interface ChangeStatusRequest {

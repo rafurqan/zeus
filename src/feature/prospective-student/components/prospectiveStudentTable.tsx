@@ -143,7 +143,7 @@ export default function ProspectiveStudentTable({ items, onEdit, onApproved, onD
                             <TableCell className="py-4">
                                 <span className={getStatusBadge(item.status)}>
                                     {item.status === "approved" ? "Disetujui" :
-                                        item.status === "rejected" ? "Ditolak" :
+                                        item.status === "rejected" ? "Mundur" :
                                             item.status === "waiting" ? "Menunggu" :
                                                 item.status === "active" ? "Aktif" :
                                                     item.status === "inactive" ? "Tidak Aktif" : item.status}

@@ -50,6 +50,8 @@ export default function StudentTable({ items, onEdit, onStatusChange, currentPag
             return "bg-purple-50";
         } else if (item.special_condition?.name === "Anak Yatim") {
             return "bg-yellow-50";
+        } else if (item.special_condition?.name === "Bina Lingkungan") {
+            return "bg-green-50";
         } else {
             return "bg-white";
         }

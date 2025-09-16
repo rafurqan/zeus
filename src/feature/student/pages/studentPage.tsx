@@ -3,7 +3,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { AppContext } from "@/context/AppContext";
 import BaseLayout from "@/core/components/baseLayout";
 import EducationLevelTableSkeleton from "@/core/components/ui/education_level_table_shimmer";
-import { Search } from "lucide-react";
+import { LeafIcon, Search } from "lucide-react";
 import Pagination from "@/core/components/forms/pagination";
 import { useStudent } from "../hooks/useStudent";
 import StudentTable from "../components/studentTable";
@@ -108,7 +108,7 @@ export default function StudentsPage() {
 
 
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4 mb-4">
                             <div className="bg-white p-4 rounded-md shadow-md flex items-center">
                                 <div className="mr-4">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -116,7 +116,7 @@ export default function StudentsPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-semibold">Total Siswa</h3>
+                                    <h3 className="text-sm font-semibold">Total Siswa</h3>
                                     {getCardValue(studentSummary?.total ?? 0, studentLoading)}
                                 </div>
                             </div>
@@ -127,7 +127,7 @@ export default function StudentsPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-semibold">Siswa Aktif</h3>
+                                    <h3 className="text-sm font-semibold">Siswa Aktif</h3>
                                     {getCardValue(studentSummary?.approved ?? 0, studentLoading)}
                                 </div>
                             </div>
@@ -138,8 +138,17 @@ export default function StudentsPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-semibold">Siswa Yatim</h3>
+                                    <h3 className="text-sm font-semibold">Siswa Yatim</h3>
                                     {getCardValue(studentSummary?.orphan ?? 0, studentLoading)}
+                                </div>
+                            </div>
+                            <div className="bg-green-50 p-4 rounded-md shadow-md flex items-center">
+                                <div className="mr-4">
+                                    <LeafIcon className="h-8 w-8 text-green-500" />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-semibold">Bina Lingkungan</h3>
+                                    {getCardValue(studentSummary?.surrounding_environment ?? 0, studentLoading)}
                                 </div>
                             </div>
                             <div className="bg-purple-50 p-4 rounded-md shadow-md flex items-center">
@@ -150,7 +159,7 @@ export default function StudentsPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-semibold">Anak Guru</h3>
+                                    <h3 className="text-sm font-semibold">Anak Guru</h3>
                                     {getCardValue(studentSummary?.teacher_child ?? 0, studentLoading)}
                                 </div>
                             </div>
@@ -162,7 +171,7 @@ export default function StudentsPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-semibold">Berkebutuhan Khusus</h3>
+                                    <h3 className="text-sm font-semibold">Berkebutuhan Khusus</h3>
                                     {getCardValue(studentSummary?.special_needs ?? 0, studentLoading)}
                                 </div>
                             </div>

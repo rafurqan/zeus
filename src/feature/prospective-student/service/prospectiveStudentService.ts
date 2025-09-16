@@ -22,13 +22,11 @@ export const createProspectiveStudent = async (data: ProspectiveStudent) => {
 };
 
 export const updateProspectiveStudent = async (data: ProspectiveStudent) => {
-  console.log(JSON.stringify(data));
   const response = await http.put(`/prospective-students/${data.id}`, data);
   return response.data;
 };
 
 export const updateStudent = async (data: Student) => {
-  console.log(JSON.stringify(data));
   const response = await http.put(`/students/${data.id}`, data);
   return response.data;
 };
