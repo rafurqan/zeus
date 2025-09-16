@@ -113,3 +113,130 @@
     @apply flex flex-col space-y-1 bg-white rounded-md shadow-md;
   }
 }
+
+
+/* Print Payment Styles - Tambahkan ke app.css */
+
+/* Preview container styles */
+.preview-container {
+  display: block;
+}
+
+.print-container {
+  display: none;
+}
+
+/* Print media styles */
+@media print {
+  @page {
+    size: A4;
+    margin: 0.2in;
+  }
+  
+  .preview-container {
+    display: none !important;
+  }
+  
+  .print-container {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: 1fr 1fr !important;
+    gap: 0.1in !important;
+    width: 100% !important;
+    height: 100vh !important;
+    page-break-inside: avoid !important;
+  }
+  
+  .print-slip {
+    padding: 0.1in !important;
+    border: 1px solid black !important;
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+    overflow: hidden !important;
+  }
+  
+  .print-slip * {
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .print-slip h1 {
+    font-size: 10px !important;
+    font-weight: bold !important;
+    margin-bottom: 2px !important;
+  }
+  
+  .print-slip h2 {
+    font-size: 9px !important;
+    font-weight: bold !important;
+    margin-bottom: 2px !important;
+  }
+  
+  .print-slip h3 {
+    font-size: 8px !important;
+    margin-bottom: 3px !important;
+  }
+  
+  .print-slip p {
+    font-size: 8px !important;
+    margin-bottom: 1px !important;
+  }
+  
+  .print-slip img {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  
+  .print-slip .mb-4 {
+    margin-bottom: 8px !important;
+  }
+  
+  .print-slip .mb-3 {
+    margin-bottom: 6px !important;
+  }
+  
+  .print-slip .mt-4 {
+    margin-top: 8px !important;
+  }
+  
+  .print-slip .mt-3 {
+    margin-top: 6px !important;
+  }
+  
+  .print-slip .mt-2 {
+    margin-top: 4px !important;
+  }
+  
+  .print-slip .h-8 {
+    height: 16px !important;
+  }
+  
+  .print-slip .space-y-1 > * + * {
+    margin-top: 2px !important;
+  }
+  
+  .print-slip .gap-1 {
+    gap: 2px !important;
+  }
+  
+  .print-slip .py-1 {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+  }
+  
+  .print-slip .px-1 {
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+  }
+  
+  .print-slip .border-b-2 {
+    border-bottom-width: 1px !important;
+  }
+  
+  .empty-quadrant {
+    border: 1px solid black !important;
+    background: white !important;
+  }
+}
