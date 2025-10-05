@@ -28,6 +28,9 @@ import StudentOriginSchoolForm from "../forms/originSchool";
 import { OriginSchool } from "../types/origin-school";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/core/components/ui/tabs";
 import toast from "react-hot-toast";
+import { FormLabel } from "@/core/components/ui/label_form";
+
+type ErrorState = Partial<Record<keyof ProspectiveStudent, string>>;
 
 
 
@@ -57,6 +60,7 @@ export default function CreateProspectiveStudentsPage() {
     const [selectedSubDistrict, setSelectedSubDistrict] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
     const [preview, setPreview] = useState<string | null>(item?.photo_url ?? null);
+    const [errors, setErrors] = useState<ErrorState>({});
 
 
 
@@ -426,7 +430,27 @@ export default function CreateProspectiveStudentsPage() {
         }
     }
 
+    const validate = (): boolean => {
+        const newErrors: ErrorState = {};
+
+        if (!form.full_name.trim()) newErrors.full_name = "Nama Lengkap wajib diisi";
+        if (!form.gender) newErrors.gender = "Jenis Kelamin wajib dipilih";
+        if (!form.birth_place) newErrors.birth_place = "Tempat Lahir wajib dipilih";
+        if (!form.birth_date) newErrors.birth_date = "Tanggal Lahir  wajib diisi";
+        if (!form.religion) newErrors.religion = "Agama wajib diisi";
+        if (!form.entry_year) newErrors.entry_year = "Tahun Masuk wajib diisi";
+        if (!form.nationality) newErrors.nationality = "Kewarganegaraan wajib diisi";
+        if (!form.village) newErrors.village = "kelurahan wajib diisi";
+        if (!form.street) newErrors.street = "Jalan wajib diisi";
+        if (!form.phone) newErrors.phone = "Nomor Telepon wajib diisi";
+
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = async () => {
+        if (!validate()) return;
         const isConfirmed = await confirm({
             title: "Submit Data",
             message: `Apakah Anda yakin ingin menambahkan calon siswa ini?`,
@@ -539,25 +563,28 @@ export default function CreateProspectiveStudentsPage() {
                                         {/* Kolom Kiri */}
                                         <div className="space-y-4">
                                             <FormInput
-                                                label="Nama Lengkap"
+                                                label={<FormLabel text="Nama Lengkap" required />}
                                                 name="full_name"
                                                 onlyLetters
                                                 value={form.full_name}
                                                 onChange={handleChange}
                                                 placeholder="John Doe"
+                                                error={errors.full_name}
                                             />
                                             <FormSelect
-                                                label="Jenis Kelamin"
+                                                label={<FormLabel text="Jenis Kelamin" required />}
                                                 name="gender"
                                                 value={form.gender}
                                                 onChange={handleChange}
+                                                error={errors.gender}
                                                 options={[{ label: 'Laki Laki', value: 'male' }, { label: 'Perempuan', value: 'female' }]}
                                             />
                                             <FormInput
-                                                label="Tempat Lahir"
+                                                label={<FormLabel text="Tempat Lahir" required />}
                                                 name="birth_place"
                                                 value={form.birth_place}
                                                 onChange={handleChange}
+                                                error={errors.birth_place}
                                                 placeholder="Masukkan tempat lahir"
                                             />
                                             <FormInput
@@ -568,10 +595,11 @@ export default function CreateProspectiveStudentsPage() {
                                                 placeholder="Masukkan nisn"
                                             />
                                             <FormSelect
-                                                label="Tahun Masuk"
+                                                label={<FormLabel text="Tahun Masuk" required />}
                                                 name="entry_year"
                                                 value={form.entry_year ?? ''}
                                                 onChange={handleChange}
+                                                error={errors.entry_year}
                                                 options={Array.from({ length: 10 }, (_, i) => {
                                                     const year = new Date().getFullYear() - 4 + i;
                                                     return { label: `${year.toString()}`, value: `${year.toString()}` };
@@ -624,26 +652,29 @@ export default function CreateProspectiveStudentsPage() {
                                             />
 
                                             <FormSelect
-                                                label="Agama"
+                                                label={<FormLabel text="Agama" required />}
                                                 name="religion"
                                                 value={form.religion?.id ?? ''}
                                                 onChange={handleReligionChange}
+                                                error={errors.religion}
                                                 options={religionTypes.map((religion) => ({ label: religion.name, value: religion.id }))}
                                             />
 
                                             <FormInput
-                                                label="Tanggal Lahir"
+                                                label={<FormLabel text="Tanggal Lahir" required />}
                                                 name="birth_date"
                                                 value={form.birth_date}
                                                 onChange={handleChange}
                                                 type="date"
+                                                error={errors.birth_date}
                                             />
 
                                             <FormSelect
-                                                label="Kewarganegaraan"
+                                                label={<FormLabel text="Kewarganegaraan" required />}
                                                 name="nationality"
                                                 value={form.nationality?.id ?? ''}
                                                 onChange={handleNationalityChange}
+                                                error={errors.nationality}
                                                 options={nationalities.map((nationality) => ({ label: nationality.name, value: nationality.id }))}
                                             />
 
@@ -689,7 +720,7 @@ export default function CreateProspectiveStudentsPage() {
                                             <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div className="space-y-4">
                                                     <FormSelect
-                                                        label="Provinsi"
+                                                        label={<FormLabel text="Provinsi" required />}
                                                         name="province_id"
                                                         value={selectedProvince}
                                                         options={provinces.map((province) => ({ label: province.name, value: province.id }))}
@@ -697,7 +728,7 @@ export default function CreateProspectiveStudentsPage() {
                                                     />
 
                                                     <FormSelect
-                                                        label="Kecamatan"
+                                                        label={<FormLabel text="Kecamatan" required />}
                                                         name="sub_district_id"
                                                         value={selectedSubDistrict}
                                                         options={subDistricts.map((sub_district) => ({ label: sub_district.name, value: sub_district.id }))}
@@ -708,7 +739,7 @@ export default function CreateProspectiveStudentsPage() {
 
                                                 <div className="space-y-4">
                                                     <FormSelect
-                                                        label="Kota/Kabupaten"
+                                                        label={<FormLabel text="Kota/Kabupaten" required />}
                                                         name="city_id"
                                                         value={selectedCity}
                                                         options={cities.map((city) => ({ label: city.name, value: city.id }))}
@@ -717,9 +748,10 @@ export default function CreateProspectiveStudentsPage() {
                                                     />
 
                                                     <FormSelect
-                                                        label="Desa/Kelurahan"
+                                                        label={<FormLabel text="Desa/Kelurahan" required />}
                                                         name="village"
                                                         value={form.village?.id ?? ''}
+                                                        error={errors.village}
                                                         options={villages.map((village) => ({ label: village.name, value: village.id }))}
                                                         onChange={handleVillageChange}
                                                         disabled={!selectedSubDistrict}
@@ -727,14 +759,18 @@ export default function CreateProspectiveStudentsPage() {
                                                 </div>
                                             </form>
                                             <div>
-                                                <label className="block font-medium mt-3 mb-1">Jalan</label>
+                                                <label className="block font-medium mt-3 mb-1">{<FormLabel text="Jalan" required />}</label>
                                                 <textarea
                                                     name="street"
                                                     value={form.street}
                                                     onChange={handleChange}
                                                     placeholder="isi alamat jalan"
-                                                    className="w-full border border-gray-100 shadow-none rounded px-3 py-2 focus:outline-none focus:border-black hover:border-black focus:ring-0"
+                                                    className={`w-full border ${errors.street
+                                                        ? "border-red-500 focus:border-red-500"
+                                                        : "border-gray-100 shadow-none rounded px-3 py-2 focus:outline-none focus:border-black"
+                                                        } hover:border-black focus:ring-0`}
                                                 />
+                                                {errors.street && <p className="text-xs text-red-500 mt-1">{errors.street}</p>}
                                             </div>
                                         </div>
                                     }
@@ -745,10 +781,11 @@ export default function CreateProspectiveStudentsPage() {
                                             <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div className="space-y-4">
                                                     <FormInput
-                                                        label="Nomor Telepon"
+                                                        label={<FormLabel text="Nomor Telepon" required />}
                                                         name="phone"
                                                         onlyNumbers
                                                         value={form.phone}
+                                                        error={errors.phone}
                                                         onChange={handleChange}
                                                         placeholder="628XXXXX"
                                                     />

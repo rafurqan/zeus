@@ -150,6 +150,8 @@ export type Summary = {
 export interface ChangeStatusRequest {
   id: string;
   status: string;
+  reason_id: string | null;
+  description: string | null;
 }
 
 export interface ChangeStatusResponse {

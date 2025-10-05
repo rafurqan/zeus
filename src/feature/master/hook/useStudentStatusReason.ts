@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import toast from "react-hot-toast";
+import { StudentStatusReason } from "../types/studentStatusReason";
+import { studentStatusReasonService } from "../services/studentStatusReasonService";
 
-import { programService } from "../services/programService";
-import { Program } from "../types/program";
-
-export const useProgram = () => {
-  const [data, setData] = useState<Program[]>([]);
+export const useStudentStatusReason = () => {
+  const [data, setData] = useState<StudentStatusReason[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingOverlay, setLoadingOverlay] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -14,14 +13,14 @@ export const useProgram = () => {
   const fetchAll = async () => {
     try {
       setLoading(true);
-      const result = await programService.getAll();
+      const result = await studentStatusReasonService.getAll();
       setData(result);
       setError(null);
     } catch (err: unknown) {
-      console.error("Gagal memuat data program:", err);
+      console.error("Gagal memuat data status reason:", err);
       if (err instanceof AxiosError) {
         const errorMessage =
-          err.response?.data?.message || "Gagal memuat data program.";
+          err.response?.data?.message || "Gagal memuat data status reason.";
         setError(errorMessage);
         toast.error(errorMessage);
       } else {
@@ -33,18 +32,18 @@ export const useProgram = () => {
     }
   };
 
-  const create = async (payload: Program) => {
+  const create = async (payload: StudentStatusReason) => {
     try {
       setLoadingOverlay(true);
-      const result = await programService.create(payload);
+      const result = await studentStatusReasonService.create(payload);
       await fetchAll(); // Refresh data
-      toast.success("Berhasil menambah data program.");
+      toast.success("Berhasil menambah data status reason.");
       return result;
     } catch (err: unknown) {
-      console.error("Gagal membuat data program:", err);
+      console.error("Gagal membuat data status reason:", err);
       if (err instanceof AxiosError) {
         const errorMessage =
-          err.response?.data?.message ?? "Gagal menyimpan data program.";
+          err.response?.data?.message ?? "Gagal menyimpan data status reason.";
         toast.error(errorMessage);
         setError(errorMessage);
       } else {
@@ -57,18 +56,19 @@ export const useProgram = () => {
     }
   };
 
-  const update = async (payload: Program) => {
+  const update = async (payload: StudentStatusReason) => {
     try {
       setLoadingOverlay(true);
-      const result = await programService.update(payload);
+      const result = await studentStatusReasonService.update(payload);
       await fetchAll(); // Refresh data
-      toast.success("Berhasil memperbarui data program.");
+      toast.success("Berhasil memperbarui data status reason.");
       return result;
     } catch (err: unknown) {
-      console.error("Gagal memperbarui data program:", err);
+      console.error("Gagal memperbarui data status reason:", err);
       if (err instanceof AxiosError) {
         const errorMessage =
-          err.response?.data?.message ?? "Gagal memperbarui data program.";
+          err.response?.data?.message ??
+          "Gagal memperbarui data status reason.";
         toast.error(errorMessage);
         setError(errorMessage);
       } else {
@@ -84,14 +84,14 @@ export const useProgram = () => {
   const remove = async (id: string) => {
     try {
       setLoadingOverlay(true);
-      await programService.remove(id);
+      await studentStatusReasonService.remove(id);
       await fetchAll(); // Refresh data
-      toast.success("Berhasil menghapus data program.");
+      toast.success("Berhasil menghapus data status reason.");
     } catch (err: unknown) {
-      console.error("Gagal menghapus data program:", err);
+      console.error("Gagal menghapus data status reason:", err);
       if (err instanceof AxiosError) {
         const errorMessage =
-          err.response?.data?.message ?? "Gagal menghapus data program.";
+          err.response?.data?.message ?? "Gagal menghapus data status reason.";
         toast.error(errorMessage);
         setError(errorMessage);
       } else {

@@ -8,8 +8,7 @@ import { DocumentType } from "@/core/types/document-type";
 import { FormInput } from "@/core/components/forms/formInput";
 import { FormSelect } from "@/core/components/forms/formSelect";
 import PdfUploadWithPreview from "./pdfInput";
-
-
+import { FormLabel } from "@/core/components/ui/label_form";
 
 type Props = {
     item?: DocumentStudent | null;
@@ -24,13 +23,22 @@ export default function StudentDocumentForm({
 }: Props) {
     const isEdit = !!item;
     const { confirm, ConfirmDialog } = useConfirm();
-
     const { token, setUser, setToken } = useContext(AppContext);
-    const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
 
-    const [form, setForm] = useState<DocumentStudent>(item || {
-        id: "", name: "", file: "", file_name: "", created_at: null, document_type: null, file_url: null
-    });
+    const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const [form, setForm] = useState<DocumentStudent>(
+        item || {
+            id: "",
+            name: "",
+            file: "",
+            file_name: "",
+            created_at: null,
+            document_type: null,
+            file_url: null,
+        }
+    );
 
     useEffect(() => {
         if (token) {
@@ -41,11 +49,9 @@ export default function StudentDocumentForm({
     async function fetchDocumentTypes() {
         try {
             const res = await listDocumentType();
-
             if (res.status === 401) {
                 setUser(null);
                 setToken(null);
-                // toast.error("Akses ditolak. Silakan login ulang.");
             }
             setDocumentTypes(res.data || []);
         } catch (err: unknown) {
@@ -57,7 +63,9 @@ export default function StudentDocumentForm({
     }
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
     ) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -66,24 +74,41 @@ export default function StudentDocumentForm({
         setForm({ ...form, file: base64 });
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const selectedEducation = documentTypes.find(level => level.id === e.target.value);
-        if (selectedEducation) {
-            setForm({ ...form, [e.target.name]: selectedEducation });
+    const handleInputChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
+        const selectedType = documentTypes.find((t) => t.id === e.target.value);
+        if (selectedType) {
+            setForm({ ...form, [e.target.name]: selectedType });
         }
     };
 
+    const validate = () => {
+        const newErrors: Record<string, string> = {};
+
+        if (!form.document_type?.id)
+            newErrors.document_type = "Tipe dokumen wajib dipilih";
+        if (!form.name) newErrors.name = "Nama dokumen wajib diisi";
+        if (!form.file && !form.file_name)
+            newErrors.file = "File dokumen wajib diunggah";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = async () => {
+        if (!validate()) return;
+
         const isConfirmed = await confirm({
             title: isEdit ? "Perbaharui Data" : "Submit Data",
-            message: `Apakah Anda yakin ingin ${isEdit ? "perbaharui" : "menambahkan data"} dokumen ini?`,
+            message: `Apakah Anda yakin ingin ${isEdit ? "memperbarui" : "menambahkan"
+                } dokumen ini?`,
             confirmText: "Ya, Lanjutkan",
             cancelText: "Batal",
         });
         if (isConfirmed) {
             onSuccess(form);
         }
-
     };
 
     return (
@@ -106,28 +131,46 @@ export default function StudentDocumentForm({
                 </div>
 
                 <div className="space-y-4">
-                    <FormSelect
-                        label="Tipe Dokumen"
-                        name="document_type"
-                        value={form.document_type?.id ?? ""}
-                        onChange={handleInputChange}
-                        options={documentTypes.map((type) => ({ label: `(${type.code ?? ""}) ${type.name}`, value: type.id }))}
-                    />
-                    <FormInput
-                        label="Nama"
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        placeholder="Contoh: ktp siswa"
-                    />
-                    <PdfUploadWithPreview
-                        label="Upload Dokumen PDF"
-                        fileUrl={((form.file_name ?? "") !== "" ? (form.file_name ?? "") : (form.file ?? "") !== "" ? form.file : "") ?? ""}
-                        onChange={handleFileChange}
-                    />
+                    {/* Tipe Dokumen */}
+                    <div>
 
+                        <FormSelect
+                            label={<FormLabel text="Tipe Dokumen" required />}
+                            name="document_type"
+                            value={form.document_type?.id ?? ""}
+                            onChange={handleInputChange}
+                            options={documentTypes.map((type) => ({
+                                label: `(${type.code ?? ""}) ${type.name}`,
+                                value: type.id,
+                            }))}
+                            error={errors.document_type}
+                        />
+                    </div>
 
+                    {/* Nama Dokumen */}
+                    <div>
 
+                        <FormInput
+                            label={<FormLabel text="Nama Dokumen" required />}
+                            name="name"
+                            value={form.name}
+                            onChange={handleChange}
+                            placeholder="Contoh: KTP Siswa"
+                            error={errors.name}
+                        />
+                    </div>
+
+                    {/* Upload Dokumen */}
+                    <div>
+                        <PdfUploadWithPreview
+                            label={<FormLabel text="Upload Dokumen PDF" required />}
+                            fileUrl={((form.file_name ?? "") !== "" ? (form.file_name ?? "") : (form.file ?? "") !== "" ? form.file : "") ?? ""}
+                            onChange={handleFileChange}
+                        />
+                        {errors.file && (
+                            <p className="text-xs text-red-500 mt-1">{errors.file}</p>
+                        )}
+                    </div>
                 </div>
 
                 <div className="mt-6 flex justify-end space-x-2">
@@ -146,7 +189,6 @@ export default function StudentDocumentForm({
                 </div>
                 {ConfirmDialog}
             </div>
-
         </div>
     );
 }

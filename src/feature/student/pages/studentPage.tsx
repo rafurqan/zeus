@@ -12,6 +12,10 @@ import { useConfirm } from "@/core/components/confirmDialog";
 import LoadingOverlay from "@/core/components/ui/loading_screen";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
+import { FormSelect } from "@/core/components/forms/formSelect";
+import { FormLabel } from "@/core/components/ui/label_form";
+import { FormInput } from "@/core/components/forms/formInput";
+import { useStudentStatusReason } from "@/feature/master/hook/useStudentStatusReason";
 
 
 export default function StudentsPage() {
@@ -22,6 +26,7 @@ export default function StudentsPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [loadingOverlay, setLoadingOverlay] = useState(false);
     const { confirm, ConfirmDialog } = useConfirm();
+    const { data: statusReasons } = useStudentStatusReason()
     const itemsPerPage = 10;
     const {
         data: studentData,
@@ -61,17 +66,114 @@ export default function StudentsPage() {
         setSearchKeyword(e.target.value);
     };
 
+    // const handleChangeStatus = async (data: ChangeStatusRequest) => {
+    //     const isConfirmed = await confirm({
+    //         title: `Ubah status jadi ${data.status}`,
+    //         message: `Apakah Anda yakin ingin ubah status siswa ini?`,
+    //         confirmText: "Ya, Lanjutkan",
+    //         cancelText: "Batal",
+    //     });
+    //     if (isConfirmed) {
+    //         setLoadingOverlay(true);
+    //         try {
+    //             await changeStatusStudent(data);
+    //         } catch (error: unknown) {
+    //             if (error instanceof AxiosError) {
+    //                 toast.error(error.message || "Terjadi kesalahan");
+    //             }
+    //         } finally {
+    //             setLoadingOverlay(false);
+    //         }
+    //     }
+
+    // };
+
     const handleChangeStatus = async (data: ChangeStatusRequest) => {
-        const isConfirmed = await confirm({
-            title: `Ubah status jadi ${data.status}`,
-            message: `Apakah Anda yakin ingin ubah status siswa ini?`,
-            confirmText: "Ya, Lanjutkan",
+        if (data.status === "active") {
+            const isConfirmed = await confirm({
+                title: `Ubah status jadi ${data.status}`,
+                message: `Apakah Anda yakin ingin ubah status siswa ini?`,
+                confirmText: "Ya, Lanjutkan",
+                cancelText: "Batal",
+            });
+
+            if (isConfirmed) {
+                setLoadingOverlay(true);
+                try {
+                    await changeStatusStudent(data);
+                } catch (error: unknown) {
+                    if (error instanceof AxiosError) {
+                        toast.error(error.message || "Terjadi kesalahan");
+                    }
+                } finally {
+                    setLoadingOverlay(false);
+                }
+            }
+            return;
+        }
+
+        // Jika status = nonaktif → confirm dengan form
+        const result = await confirm({
+            title: `Nonaktifkan Siswa`,
+            message: `Silakan isi alasan dan deskripsi nonaktif:`,
+            confirmText: "Simpan",
             cancelText: "Batal",
+            content: ({ formData, setFormData }) => (
+                <div className="space-y-4">
+                    <FormSelect
+                        label={<FormLabel text="Alasan" required />}
+                        name="status_reason"
+                        value={String(formData.status_reason ?? "")}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                status_reason: e.target.value,
+                            })
+                        }
+                        options={statusReasons.map((t) => ({
+                            label: t.name,
+                            value: t.id,
+                        }))}
+                    />
+                    <FormInput
+                        label="Deskripsi"
+                        name="description"
+                        placeholder="Isi keterangan lebih lanjut"
+                        value={String(formData.description ?? "")}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                description: e.target.value,
+                            })
+                        }
+                    />
+                </div>
+            ),
         });
-        if (isConfirmed) {
+
+        if (result !== false) {
+            const reason_id =
+                typeof result === "object" && "status_reason" in result
+                    ? String(result.status_reason ?? "")
+                    : null;
+
+            const description =
+                typeof result === "object" && "description" in result
+                    ? String(result.description ?? "")
+                    : null;
+
+            if (data.status === "inactive" && (!reason_id || reason_id.trim() === "")) {
+                toast.error("Alasan wajib diisi ketika menonaktifkan siswa.");
+                return;
+            }
+
             setLoadingOverlay(true);
             try {
-                await changeStatusStudent(data);
+                await changeStatusStudent({
+                    ...data,
+                    reason_id,
+                    description,
+                });
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
                     toast.error(error.message || "Terjadi kesalahan");
@@ -82,6 +184,8 @@ export default function StudentsPage() {
         }
 
     };
+
+
 
     const getCardValue = (value: number, loading: boolean) => {
         if (loading) {
@@ -206,7 +310,7 @@ export default function StudentsPage() {
                                     });
                                 }}
                                 onStatusChange={(item, checked) => {
-                                    handleChangeStatus({ id: item.id, status: checked ? "active" : "inactive" })
+                                    handleChangeStatus({ id: item.id, status: checked ? "active" : "inactive", description: "", reason_id: null })
                                 }}
                             />
                         )}

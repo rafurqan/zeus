@@ -1,12 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import { Billing } from "@/feature/billing/types/billing";
-import { AppContext } from "@/context/AppContext";
-import { EducationLevel } from "@/core/types/education-level";
-import { AxiosError } from "axios";
 import { useConfirm } from "@/core/components/confirmDialog";
-import { listEducationLevel } from "@/core/service/master";
 import { FormInput } from "@/core/components/forms/formInput";
 import { FormSelect } from "@/core/components/forms/formSelect";
+import { FormLabel } from "@/core/components/ui/label_form";
+import { useProgram } from "@/feature/master/hook/useProgram";
 
 
 type Props = {
@@ -23,9 +21,9 @@ export default function BillingForm({
     const isEdit = !!item;
     const [loading] = useState(false); // Gunakan loading dari hook useBilling jika tersedia
     const { confirm, ConfirmDialog } = useConfirm();
+    const { data: programs } = useProgram();
 
-    const { token, setUser, setToken } = useContext(AppContext);
-    const [educationLevels, setEducationLevel] = useState<EducationLevel[]>([]);
+
 
     const [form, setForm] = useState<Billing & { isActiveCheckbox: boolean }>(() => {
         if (item) {
@@ -34,7 +32,7 @@ export default function BillingForm({
                 isActiveCheckbox: item.is_active === "Y"
             };
         }
-        
+
         return {
             id: "",
             nama_tarif: "",
@@ -79,42 +77,16 @@ export default function BillingForm({
     ];
 
 
-    useEffect(() => {
-        if (token) {
-            fetchEducationLevels();
-        }
-    }, [token]); // Tambahkan token sebagai dependency
-
-    async function fetchEducationLevels() {
-        try {
-            const res = await listEducationLevel();
-
-            if (res.status === 401) {
-                setUser(null);
-                setToken(null);
-            }
-            setEducationLevel(res.data || []);
-        } catch (err: unknown) {
-            if (err instanceof AxiosError && err.response?.status === 401) { 
-                console.error("Fetch failed", err);
-                setUser(null);
-                setToken(null);
-            } else {
-                 console.error("Fetch failed", err);
-            }
-        }
-    }
-
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
-        const { name, value, type, checked } = e.target as HTMLInputElement; 
+        const { name, value, type, checked } = e.target as HTMLInputElement;
 
         if (type === 'checkbox') {
             setForm({
                 ...form,
                 isActiveCheckbox: checked,
-                is_active: checked ? "Y" : "N" 
+                is_active: checked ? "Y" : "N"
             });
         } else {
             setForm({ ...form, [name]: value });
@@ -122,12 +94,12 @@ export default function BillingForm({
     };
 
     const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-         const selectedEducationId = e.target.value;
-         // Simpan hanya ID program, bukan objek EducationLevel
-         setForm({ ...form, program_id: selectedEducationId });
-     };
+        const selectedEducationId = e.target.value;
+        // Simpan hanya ID program, bukan objek EducationLevel
+        setForm({ ...form, program_id: selectedEducationId });
+    };
 
-     const formatRupiah = (value: string | number) => {
+    const formatRupiah = (value: string | number) => {
         const numberString = value.toString().replace(/[^\d]/g, "");
         return numberString ? `Rp ${parseInt(numberString, 10).toLocaleString('id-ID')}` : "";
     };
@@ -181,16 +153,16 @@ export default function BillingForm({
 
                 <div className="grid grid-cols-2 gap-4"> {/* Gunakan grid untuk layout 2 kolom */}
                     <div className="col-span-1">
-                         <FormInput
-                            label={<>Nama <span className="text-red-500">*</span></>} 
+                        <FormInput
+                            label={<>Nama <span className="text-red-500">*</span></>}
                             placeholder="Cth: SPP Bulanan"
                             name="service_name"
                             value={form.service_name || ''}
                             onChange={handleChange}
                         />
                     </div>
-                     <div className="col-span-1">
-                         <FormSelect
+                    <div className="col-span-1">
+                        <FormSelect
                             label="Kategori *"
                             name="category"
                             value={form.category || ''}
@@ -199,17 +171,17 @@ export default function BillingForm({
                             disabled={isEdit}
                         />
                     </div>
-                     <div className="col-span-2"> {/* Program ambil 2 kolom */}
-                         <FormSelect
-                            label="Program *"
+                    <div className="col-span-2"> {/* Program ambil 2 kolom */}
+                        <FormSelect
+                            label={<FormLabel text="Program" required />}
                             name="program_id"
                             value={form.program_id}
-                            options={educationLevels.map(level => ({ value: level.id, label: level.name }))}
-                            onChange={handleProgramChange} 
+                            options={programs.map(program => ({ value: program.id, label: program.name }))}
+                            onChange={handleProgramChange}
                         />
                     </div>
                     <div className="col-span-2">
-                         <FormInput
+                        <FormInput
                             label="Deskripsi"
                             name="description"
                             placeholder="Deskripsi biaya"
@@ -217,8 +189,8 @@ export default function BillingForm({
                             onChange={handleChange}
                         />
                     </div>
-                     <div className="col-span-2">
-                         <FormInput
+                    <div className="col-span-2">
+                        <FormInput
                             label={<>Jumlah <span className="text-red-500">*</span></>}
                             name="price"
                             type="text"
@@ -226,8 +198,8 @@ export default function BillingForm({
                             onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => handlePriceChange(e as React.ChangeEvent<HTMLInputElement>)}
                         />
                     </div>
-                     <div className="col-span-1">
-                         <FormSelect
+                    <div className="col-span-1">
+                        <FormSelect
                             label="Frekuensi"
                             name="frequency"
                             value={form.frequency.toString()}
@@ -235,8 +207,8 @@ export default function BillingForm({
                             onChange={handleChange}
                         />
                     </div>
-                     <div className="col-span-1">
-                         <FormSelect
+                    <div className="col-span-1">
+                        <FormSelect
                             label="Berlaku Untuk"
                             name="applies_to"
                             value={form.applies_to}
@@ -244,18 +216,18 @@ export default function BillingForm({
                             onChange={handleChange}
                         />
                     </div>
-                     <div className="col-span-2 flex items-center"> {/* Checkbox ambil 2 kolom */}
-                         <input
+                    <div className="col-span-2 flex items-center"> {/* Checkbox ambil 2 kolom */}
+                        <input
                             type="checkbox"
-                            name="isActiveCheckbox" 
-                            checked={form.isActiveCheckbox} 
+                            name="isActiveCheckbox"
+                            checked={form.isActiveCheckbox}
                             onChange={handleChange}
                             className="mr-2 h-4 w-4 text-black border-gray-300 rounded focus:ring-black"
-                         />
-                         <label htmlFor="isActiveCheckbox" className="text-sm font-medium text-gray-700">
+                        />
+                        <label htmlFor="isActiveCheckbox" className="text-sm font-medium text-gray-700">
                             Aktif
-                         </label>
-                     </div>
+                        </label>
+                    </div>
                 </div>
 
                 <div className="mt-6 flex justify-end space-x-2">

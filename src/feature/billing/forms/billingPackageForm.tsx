@@ -1,14 +1,12 @@
 import { useContext, useEffect, useState, useMemo } from "react";
 import { AppContext } from "@/context/AppContext";
-import { EducationLevel } from "@/core/types/education-level";
 import { Billing } from "@/feature/billing/types/billing";
 import { billingService } from "@/feature/billing/service/billingService";
-import { AxiosError } from "axios";
 import { useConfirm } from "@/core/components/confirmDialog";
-import { listEducationLevel } from "@/core/service/master";
 import { FormInput } from "@/core/components/forms/formInput";
 import { FormSelect } from "@/core/components/forms/formSelect";
 import { DollarSign } from "lucide-react";
+import { useProgram } from "@/feature/master/hook/useProgram";
 
 type BillingPackage = {
   id: string;
@@ -35,9 +33,9 @@ type Props = {
 export default function BillingPackageForm({ item = null, onClose, onSuccess }: Props) {
   const isEdit = !!item;
   const { confirm, ConfirmDialog } = useConfirm();
-  const { token, setUser, setToken } = useContext(AppContext);
+  const { token } = useContext(AppContext);
 
-  const [educationLevels, setEducationLevel] = useState<EducationLevel[]>([]);
+  const { data: programs } = useProgram();
   const [rates, setRates] = useState<Billing[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading] = useState(false);
@@ -62,7 +60,6 @@ export default function BillingPackageForm({ item = null, onClose, onSuccess }: 
 
   useEffect(() => {
     if (token) {
-      fetchEducationLevels();
       fetchRates();
     }
   }, [token]);
@@ -80,9 +77,9 @@ export default function BillingPackageForm({ item = null, onClose, onSuccess }: 
       const validRates = item.rates.filter(rateId =>
         rates.some(rate => rate.id === rateId)
       );
-  
+
       const totalPrice = calculateTotalPrice(validRates);
-  
+
       setForm(prev => ({
         ...prev,
         rates: validRates,
@@ -90,7 +87,7 @@ export default function BillingPackageForm({ item = null, onClose, onSuccess }: 
       }));
     }
   }, [rates, item]);
-  
+
   // Update useEffect yang menghitung harga dari rates dan form.rates agar sinkron:
   useEffect(() => {
     if (form.rates.length && rates.length) {
@@ -101,23 +98,7 @@ export default function BillingPackageForm({ item = null, onClose, onSuccess }: 
     }
   }, [form.rates, rates]);
 
-  const fetchEducationLevels = async () => {
-    try {
-      const res = await listEducationLevel();
-      if (res.status === 401) {
-        setUser(null);
-        setToken(null);
-      } else {
-        setEducationLevel(res.data || []);
-      }
-    } catch (err) {
-      if (err instanceof AxiosError && err.response?.status === 401) {
-        setUser(null);
-        setToken(null);
-      }
-      console.error("Fetch education level failed", err);
-    }
-  };
+
 
   const fetchRates = async () => {
     try {
@@ -215,12 +196,12 @@ export default function BillingPackageForm({ item = null, onClose, onSuccess }: 
           <button onClick={onClose} className="text-gray-500 text-xl">×</button>
         </div>
         {/* hidden category */}
-          <input 
-            type="hidden"
-            name="category"
-            value={form.category}
-            onChange={handleChange}
-          />
+        <input
+          type="hidden"
+          name="category"
+          value={form.category}
+          onChange={handleChange}
+        />
         {/* end  */}
         <div className="space-y-4">
           <FormInput
@@ -235,7 +216,7 @@ export default function BillingPackageForm({ item = null, onClose, onSuccess }: 
             label="Program *"
             name="program_id"
             value={form.program_id}
-            options={educationLevels.map(level => ({ value: level.id, label: level.name }))}
+            options={programs.map(program => ({ value: program.id, label: program.name }))}
             onChange={handleChange}
           />
 

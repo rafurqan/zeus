@@ -8,15 +8,15 @@ import { FormInput } from "@/core/components/forms/formInput";
 import { FormSelect } from "@/core/components/forms/formSelect";
 import { OriginSchool } from "../types/origin-school";
 import { Education } from "@/core/types/education";
-
-
-
+import { FormLabel } from "@/core/components/ui/label_form";
 
 type Props = {
     item?: OriginSchool | null;
     onClose: () => void;
     onSuccess: (item: OriginSchool) => void;
 };
+
+type ErrorState = Partial<Record<keyof OriginSchool, string>>;
 
 export default function StudentOriginSchoolForm({
     item = null,
@@ -29,18 +29,20 @@ export default function StudentOriginSchoolForm({
     const { token, setUser, setToken } = useContext(AppContext);
     const [schoolTypes, setSchoolTypes] = useState<MasterData[]>([]);
     const [educationLevels, setEducationLevels] = useState<Education[]>([]);
+    const [errors, setErrors] = useState<ErrorState>({});
 
-    const [form, setForm] = useState<OriginSchool>(item || {
-        address_name: "",
-        education: null,
-        id: "",
-        npsn: "",
-        school_name: "",
-        graduation_year: "",
-        aggregate_id: "",
-        school_type: null,
-    });
-
+    const [form, setForm] = useState<OriginSchool>(
+        item || {
+            address_name: "",
+            education: null,
+            id: "",
+            npsn: "",
+            school_name: "",
+            graduation_year: "",
+            aggregate_id: "",
+            school_type: null,
+        }
+    );
 
     useEffect(() => {
         if (token) {
@@ -52,7 +54,6 @@ export default function StudentOriginSchoolForm({
     async function fetchSchoolType() {
         try {
             const res = await listSchoolType();
-
             if (res.status === 401) {
                 setUser(null);
                 setToken(null);
@@ -69,7 +70,6 @@ export default function StudentOriginSchoolForm({
     async function fetchEducationLevels() {
         try {
             const res = await listEducation();
-
             if (res.status === 401) {
                 setUser(null);
                 setToken(null);
@@ -84,40 +84,62 @@ export default function StudentOriginSchoolForm({
     }
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
     ) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
-
-    const handleInputSchoolType = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const selected = schoolTypes.find(value => value.id === e.target.value);
-        if (selected) {
-            setForm({ ...form, [e.target.name]: selected });
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
+        if (errors[name as keyof OriginSchool]) {
+            setErrors((prev) => ({ ...prev, [name]: "" }));
         }
     };
 
-    const handleInputEducationLevel = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const selected = educationLevels.find(value => value.id === e.target.value);
-        if (selected) {
-            setForm({ ...form, [e.target.name]: selected });
-        }
+    const handleInputSchoolType = (
+        e: React.ChangeEvent<HTMLSelectElement>
+    ) => {
+        const selected = schoolTypes.find((value) => value.id === e.target.value);
+        setForm({ ...form, school_type: selected || null });
+        if (errors.school_type) setErrors((prev) => ({ ...prev, school_type: "" }));
+    };
+
+    const handleInputEducationLevel = (
+        e: React.ChangeEvent<HTMLSelectElement>
+    ) => {
+        const selected = educationLevels.find(
+            (value) => value.id === e.target.value
+        );
+        setForm({ ...form, education: selected || null });
+        if (errors.education) setErrors((prev) => ({ ...prev, education: "" }));
+    };
+
+    const validate = (): boolean => {
+        const newErrors: ErrorState = {};
+
+        if (!form.school_name.trim()) newErrors.school_name = "Nama sekolah wajib diisi";
+        if (!form.education) newErrors.education = "Pendidikan wajib dipilih";
+        if (!form.school_type) newErrors.school_type = "Jenis sekolah wajib dipilih";
+        if (!form.graduation_year) newErrors.graduation_year = "Tahun lulus wajib diisi";
+        if (!form.address_name.trim()) newErrors.address_name = "Alamat wajib diisi";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async () => {
+        if (!validate()) return;
+
         const isConfirmed = await confirm({
             title: isEdit ? "Perbaharui Data" : "Submit Data",
-            message: `Apakah Anda yakin ingin ${isEdit ? "perbaharui" : "menambahkan data"} asal sekolah ini?`,
+            message: `Apakah Anda yakin ingin ${isEdit ? "memperbarui" : "menambahkan"
+                } asal sekolah ini?`,
             confirmText: "Ya, Lanjutkan",
             cancelText: "Batal",
         });
         if (isConfirmed) {
             onSuccess(form);
         }
-
     };
-
-
-    const labelClass = "block text-sm font-medium mb-1";
 
     return (
         <div className="fixed inset-0 z-50 bg-black/30 flex justify-center items-center">
@@ -125,7 +147,7 @@ export default function StudentOriginSchoolForm({
                 <div className="flex justify-between items-start mb-4">
                     <div>
                         <h2 className="text-xl font-bold">
-                            {isEdit ? "Edit Data asal sekolah" : "Tambah asal sekolah Baru"}
+                            {isEdit ? "Edit Data Asal Sekolah" : "Tambah Asal Sekolah Baru"}
                         </h2>
                         <p className="text-sm text-gray-500">
                             {isEdit
@@ -139,33 +161,41 @@ export default function StudentOriginSchoolForm({
                 </div>
 
                 <div className="space-y-4">
-
                     <FormInput
-                        label="Nama"
+                        label={<FormLabel text="Nama Sekolah" required />}
                         name="school_name"
                         value={form.school_name}
                         onChange={handleChange}
                         placeholder="Isi nama asal sekolah"
+                        error={errors.school_name}
                     />
 
                     <FormSelect
-                        label="Pendidikan"
+                        label={<FormLabel text="Pendidikan" required />}
                         name="education"
-                        value={form.education?.id ?? ''}
+                        value={form.education?.id ?? ""}
                         onChange={handleInputEducationLevel}
-                        options={educationLevels.map((education) => ({ label: education.name, value: education.id }))}
+                        options={educationLevels.map((education) => ({
+                            label: education.name,
+                            value: education.id,
+                        }))}
+                        error={errors.education}
                     />
 
                     <FormSelect
-                        label="Jenis Sekolah"
+                        label={<FormLabel text="Jenis Sekolah" required />}
                         name="school_type"
-                        value={form.school_type?.id ?? ''}
+                        value={form.school_type?.id ?? ""}
                         onChange={handleInputSchoolType}
-                        options={schoolTypes.map((type) => ({ label: type.name, value: type.id }))}
+                        options={schoolTypes.map((type) => ({
+                            label: type.name,
+                            value: type.id,
+                        }))}
+                        error={errors.school_type}
                     />
 
                     <FormInput
-                        label="NPSN Sekolah"
+                        label="NPSN Sekolah (Opsional)"
                         name="npsn"
                         value={form.npsn ?? ""}
                         onChange={handleChange}
@@ -173,29 +203,33 @@ export default function StudentOriginSchoolForm({
                     />
 
                     <FormSelect
-                        label="Tahun Lulus"
+                        label={<FormLabel text="Tahun Lulus" required />}
                         name="graduation_year"
-                        value={form.graduation_year ?? ''}
+                        value={form.graduation_year ?? ""}
                         onChange={handleChange}
                         options={Array.from({ length: 16 }, (_, i) => {
                             const year = new Date().getFullYear() - i;
                             return { label: year.toString(), value: year.toString() };
                         })}
+                        error={errors.graduation_year}
                     />
 
-
-
                     <div>
-                        <label className={labelClass}>Alamat Sekolah</label>
+                        <FormLabel text="Alamat Sekolah" required />
                         <textarea
                             name="address_name"
                             value={form.address_name ?? ""}
                             onChange={handleChange}
                             placeholder="Tulis alamat lengkap"
-                            className="w-full border border-gray-100 shadow-none rounded px-3 py-2 focus:outline-none focus:border-black hover:border-black focus:ring-0"
+                            className={`w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-0 ${errors.address_name
+                                    ? "border-red-500"
+                                    : "border-gray-300 focus:border-black"
+                                }`}
                         />
+                        {errors.address_name && (
+                            <p className="text-xs text-red-500 mt-1">{errors.address_name}</p>
+                        )}
                     </div>
-
                 </div>
 
                 <div className="mt-6 flex justify-end space-x-2">
@@ -215,7 +249,6 @@ export default function StudentOriginSchoolForm({
 
                 {ConfirmDialog}
             </div>
-
         </div>
     );
 }

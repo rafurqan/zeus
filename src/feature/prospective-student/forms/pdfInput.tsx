@@ -1,9 +1,10 @@
 import React, { useRef, useState, useEffect } from "react";
 import { FilePlus, FileCheck } from "lucide-react";
 import toast from "react-hot-toast";
+import { JSX } from "react"
 
 interface Props {
-    label?: string;
+    label?: string | JSX.Element;
     fileUrl?: string;
     onChange: (base64: string) => void;
 }

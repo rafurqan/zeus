@@ -4,11 +4,17 @@ import { AxiosError } from "axios";
 import { useConfirm } from "@/core/components/confirmDialog";
 import { Parent } from "../types/parent";
 import { MasterData } from "@/core/types/master-data";
-import { listEducationLevel, listIncomeRange, listOccupations, listParentType } from "@/core/service/master";
+import {
+    listEducationLevel,
+    listIncomeRange,
+    listOccupations,
+    listParentType,
+} from "@/core/service/master";
 import { EducationLevel } from "@/core/types/education-level";
 import { FormInput } from "@/core/components/forms/formInput";
 import { FormSelect } from "@/core/components/forms/formSelect";
 import toast from "react-hot-toast";
+import { FormLabel } from "@/core/components/ui/label_form";
 
 type Props = {
     item?: Parent | null;
@@ -25,16 +31,31 @@ export default function StudentParentForm({
 }: Props) {
     const isEdit = !!item;
     const { confirm, ConfirmDialog } = useConfirm();
-
     const { token, setUser, setToken } = useContext(AppContext);
+
     const [incomeRanges, setIncomeRanges] = useState<MasterData[]>([]);
     const [parentTypes, setParentTypes] = useState<MasterData[]>([]);
     const [occupations, setOccupations] = useState<MasterData[]>([]);
     const [educationLevels, setEducationLevels] = useState<EducationLevel[]>([]);
 
-    const [form, setForm] = useState<Parent>(item || {
-        id: "", full_name: "", parent_type: null, education_level: null, income_range: null, occupation: null, phone: "", address: "", is_main_contact: false, is_emergency_contact: false, email: null, nik: null
-    });
+    const [form, setForm] = useState<Parent>(
+        item || {
+            id: "",
+            full_name: "",
+            parent_type: null,
+            education_level: null,
+            income_range: null,
+            occupation: null,
+            phone: "",
+            address: "",
+            is_main_contact: false,
+            is_emergency_contact: false,
+            email: "",
+            nik: "",
+        }
+    );
+
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (token) {
@@ -46,16 +67,15 @@ export default function StudentParentForm({
     }, []);
 
     useEffect(() => {
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = "hidden";
         return () => {
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = "unset";
         };
     }, []);
 
     async function fetchIncomeRange() {
         try {
             const res = await listIncomeRange();
-
             if (res.status === 401) {
                 setUser(null);
                 setToken(null);
@@ -72,7 +92,6 @@ export default function StudentParentForm({
     async function fetchParentType() {
         try {
             const res = await listParentType();
-
             if (res.status === 401) {
                 setUser(null);
                 setToken(null);
@@ -89,7 +108,6 @@ export default function StudentParentForm({
     async function fetchOccupations() {
         try {
             const res = await listOccupations();
-
             if (res.status === 401) {
                 setUser(null);
                 setToken(null);
@@ -106,7 +124,6 @@ export default function StudentParentForm({
     async function fetchEducationLevels() {
         try {
             const res = await listEducationLevel();
-
             if (res.status === 401) {
                 setUser(null);
                 setToken(null);
@@ -121,52 +138,61 @@ export default function StudentParentForm({
     }
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
     ) => {
         setForm({ ...form, [e.target.name]: e.target.value });
+        setErrors({ ...errors, [e.target.name]: "" });
     };
 
-    const handleInputIncomeRange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const selected = incomeRanges.find(value => value.id === e.target.value);
-        if (selected) {
-            setForm({ ...form, [e.target.name]: selected });
-        }
+    const handleSelectChange = (
+        e: React.ChangeEvent<HTMLSelectElement>,
+        list: MasterData[] | EducationLevel[],
+        key: keyof Parent
+    ) => {
+        const selected = list.find((val) => val.id === e.target.value);
+        setForm({ ...form, [key]: selected || null });
+        setErrors({ ...errors, [key]: "" });
     };
 
-    const handleInputParentType = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const selected = parentTypes.find(value => value.id === e.target.value);
-        if (selected) {
-            setForm({ ...form, [e.target.name]: selected });
-        }
-    };
+    const validateForm = (): boolean => {
+        const newErrors: Record<string, string> = {};
 
-    const handleInputOccupation = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const selected = occupations.find(value => value.id === e.target.value);
-        if (selected) {
-            setForm({ ...form, [e.target.name]: selected });
-        }
-    };
+        if (!form.full_name) newErrors.full_name = "Nama wajib diisi";
+        if (!form.nik) newErrors.nik = "NIK wajib diisi";
+        if (!form.parent_type) newErrors.parent_type = "Hubungan keluarga wajib dipilih";
+        if (!form.income_range) newErrors.income_range = "Rentang penghasilan wajib dipilih";
+        if (!form.occupation) newErrors.occupation = "Pekerjaan wajib dipilih";
+        if (!form.education_level) newErrors.education_level = "Pendidikan wajib dipilih";
+        if (!form.phone) newErrors.phone = "Nomor telepon wajib diisi";
 
-    const handleInputEducationLevel = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const selected = educationLevels.find(value => value.id === e.target.value);
-        if (selected) {
-            setForm({ ...form, [e.target.name]: selected });
-        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async () => {
-        const alreadyHasMainContact = currentStudentParents?.some(p => p.is_main_contact);
+        if (!validateForm()) {
+            toast.error("Mohon lengkapi semua field wajib.");
+            return;
+        }
 
-        const isFormMainContact = form.is_main_contact === true;
+        const alreadyHasMainContact = currentStudentParents?.some(
+            (p) => p.is_main_contact
+        );
 
-        if (alreadyHasMainContact && isFormMainContact) {
-            toast.error("Sudah ada kontak utama. Hanya boleh satu kontak utama untuk data orang tua siswa.");
+        if (alreadyHasMainContact && form.is_main_contact) {
+            toast.error(
+                "Sudah ada kontak utama. Hanya boleh satu kontak utama untuk data orang tua siswa."
+            );
             return;
         }
 
         const isConfirmed = await confirm({
             title: isEdit ? "Perbaharui Data" : "Submit Data",
-            message: `Apakah Anda yakin ingin ${isEdit ? "perbaharui" : "menambahkan data"} keluarga ini?`,
+            message: `Apakah Anda yakin ingin ${isEdit ? "perbaharui" : "menambahkan data"
+                } keluarga ini?`,
             confirmText: "Ya, Lanjutkan",
             cancelText: "Batal",
         });
@@ -176,13 +202,11 @@ export default function StudentParentForm({
         }
     };
 
-    const labelClass = "block text-sm font-medium mb-1";
-
     return (
         <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4 overflow-y-auto">
             <div className="bg-white rounded-xl shadow-lg w-full max-w-md max-h-[90vh] min-h-[60vh] flex flex-col">
-                {/* Header - Fixed */}
-                <div className="flex justify-between items-start p-6 border-b border-gray-100 flex-shrink-0">
+                {/* Header */}
+                <div className="flex justify-between items-start p-6 border-b border-gray-100">
                     <div>
                         <h2 className="text-xl font-bold">
                             {isEdit ? "Edit Data Keluarga" : "Tambah Keluarga Baru"}
@@ -193,69 +217,101 @@ export default function StudentParentForm({
                                 : "Tambahkan data keluarga baru ke dalam sistem"}
                         </p>
                     </div>
-                    <button onClick={onClose} className="text-gray-500 text-xl hover:text-gray-700">
+                    <button
+                        onClick={onClose}
+                        className="text-gray-500 text-xl hover:text-gray-700"
+                    >
                         ×
                     </button>
                 </div>
 
-                {/* Content - Scrollable */}
-                <div className="p-6 space-y-4 flex-1 overflow-y-auto">
+                {/* Content */}
+                <div className="p-6 space-y-4 overflow-y-auto flex-1">
                     <FormInput
-                        label="Nama"
+                        label={<FormLabel text="Nama" required />}
                         name="full_name"
                         value={form.full_name}
                         onChange={handleChange}
                         placeholder="Contoh: Fulan"
+                        error={errors.full_name}
                     />
 
                     <FormInput
-                        label="Nik"
+                        label={<FormLabel text="NIK" required />}
                         name="nik"
                         value={form.nik ?? ""}
                         onChange={handleChange}
+                        onlyNumbers
                         placeholder="12345"
+                        error={errors.nik}
                     />
 
                     <FormSelect
-                        label="Hubungan Keluarga"
+                        label={<FormLabel text="Hubungan Keluarga" required />}
                         name="parent_type"
-                        value={form.parent_type?.id ?? ''}
-                        onChange={handleInputParentType}
-                        options={parentTypes.map((type) => ({ label: `${type.name}`, value: type.id }))}
+                        value={form.parent_type?.id ?? ""}
+                        onChange={(e) =>
+                            handleSelectChange(e, parentTypes, "parent_type")
+                        }
+                        options={parentTypes.map((t) => ({
+                            label: t.name,
+                            value: t.id,
+                        }))}
+                        error={errors.parent_type}
                     />
 
                     <FormSelect
-                        label="Pilih Penghasilan"
+                        label={<FormLabel text="Pilih Penghasilan" required />}
                         name="income_range"
-                        value={form.income_range?.id ?? ''}
-                        onChange={handleInputIncomeRange}
-                        options={incomeRanges.map((income) => ({ label: `${income.name}`, value: income.id }))}
+                        value={form.income_range?.id ?? ""}
+                        onChange={(e) =>
+                            handleSelectChange(e, incomeRanges, "income_range")
+                        }
+                        options={incomeRanges.map((i) => ({
+                            label: i.name,
+                            value: i.id,
+                        }))}
+                        error={errors.income_range}
                     />
 
                     <FormSelect
-                        label="Pekerjaan"
+                        label={<FormLabel text="Pekerjaan" required />}
                         name="occupation"
-                        value={form.occupation?.id ?? ''}
-                        onChange={handleInputOccupation}
-                        options={occupations.map((value) => ({ label: `${value.name}`, value: value.id }))}
+                        value={form.occupation?.id ?? ""}
+                        onChange={(e) =>
+                            handleSelectChange(e, occupations, "occupation")
+                        }
+                        options={occupations.map((o) => ({
+                            label: o.name,
+                            value: o.id,
+                        }))}
+                        error={errors.occupation}
                     />
 
                     <FormSelect
-                        label="Pendidikan Terakhir"
+                        label={<FormLabel text="Pendidikan Terakhir" required />}
                         name="education_level"
-                        value={form.education_level?.id ?? ''}
-                        onChange={handleInputEducationLevel}
-                        options={educationLevels.map((education) => ({ label: education.name, value: education.id }))}
+                        value={form.education_level?.id ?? ""}
+                        onChange={(e) =>
+                            handleSelectChange(e, educationLevels, "education_level")
+                        }
+                        options={educationLevels.map((e) => ({
+                            label: e.name,
+                            value: e.id,
+                        }))}
+                        error={errors.education_level}
                     />
 
                     <div>
-                        <label className={labelClass}>Alamat (Opsional)</label>
+                        <label className="block text-sm font-medium mb-1 text-gray-700">
+                            Alamat (Opsional)
+                        </label>
                         <textarea
                             name="address"
                             value={form.address ?? ""}
                             onChange={handleChange}
                             placeholder="Tulis alamat lengkap"
-                            className="w-full border border-gray-100 shadow-none rounded px-3 py-2 focus:outline-none focus:border-black hover:border-black focus:ring-0"
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500 text-sm"
                             rows={3}
                         />
                     </div>
@@ -264,20 +320,22 @@ export default function StudentParentForm({
                         <h3 className="font-bold">Kontak</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormInput
-                                label="Nomor Telephon"
+                                label={<FormLabel text="Nomor Telepon" required />}
                                 name="phone"
                                 onlyNumbers
                                 value={form.phone ?? ""}
                                 onChange={handleChange}
                                 placeholder="Contoh: 081283xxx"
+                                error={errors.phone}
                             />
 
                             <FormInput
-                                label="Email"
+                                label={<FormLabel text="Email" />}
                                 name="email"
                                 value={form.email ?? ""}
                                 onChange={handleChange}
                                 placeholder="xxx@gmail.com"
+                                error={errors.email}
                             />
                         </div>
 
@@ -287,7 +345,9 @@ export default function StudentParentForm({
                                     type="checkbox"
                                     name="is_main_contact"
                                     checked={form.is_main_contact}
-                                    onChange={(e) => setForm({ ...form, is_main_contact: e.target.checked })}
+                                    onChange={(e) =>
+                                        setForm({ ...form, is_main_contact: e.target.checked })
+                                    }
                                     className="form-checkbox h-5 w-5 text-blue-600"
                                 />
                                 <span className="text-sm text-gray-700">Kontak Utama</span>
@@ -298,7 +358,12 @@ export default function StudentParentForm({
                                     type="checkbox"
                                     name="is_emergency_contact"
                                     checked={form.is_emergency_contact}
-                                    onChange={(e) => setForm({ ...form, is_emergency_contact: e.target.checked })}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            is_emergency_contact: e.target.checked,
+                                        })
+                                    }
                                     className="form-checkbox h-5 w-5 text-blue-600"
                                 />
                                 <span className="text-sm text-gray-700">Kontak Darurat</span>
@@ -307,8 +372,8 @@ export default function StudentParentForm({
                     </div>
                 </div>
 
-                {/* Footer - Fixed */}
-                <div className="p-6 border-t border-gray-100 flex justify-end space-x-2 flex-shrink-0">
+                {/* Footer */}
+                <div className="p-6 border-t border-gray-100 flex justify-end space-x-2">
                     <button
                         onClick={onClose}
                         className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
@@ -317,7 +382,7 @@ export default function StudentParentForm({
                     </button>
                     <button
                         onClick={handleSubmit}
-                        className="px-4 py-2 bg-black text-white rounded disabled:opacity-50 hover:bg-gray-800"
+                        className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
                     >
                         Simpan
                     </button>

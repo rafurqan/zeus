@@ -120,14 +120,16 @@ export const useProspectiveStudent = () => {
       setLoadingOverlay(true);
       await prospectiveStudentService.approve(id);
       setLoadingOverlay(false);
-      toast.success("Berhasil approve data.");
+      toast.success("Berhasil menyetujui data calon siswa menjadi siswa.");
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
         toast.error(
-          err.response?.data.message ?? "Terjadi kesalahan saat approve data."
+          err.response?.data.message ??
+            "Terjadi kesalahan saat menyetujui data."
         );
         setError(
-          err.response?.data.message || "Terjadi kesalahan saat approve data."
+          err.response?.data.message ||
+            "Terjadi kesalahan saat menyetujui data."
         );
       }
     } finally {
