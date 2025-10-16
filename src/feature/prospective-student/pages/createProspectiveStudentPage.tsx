@@ -438,7 +438,6 @@ export default function CreateProspectiveStudentsPage() {
         if (!form.birth_place) newErrors.birth_place = "Tempat Lahir wajib dipilih";
         if (!form.birth_date) newErrors.birth_date = "Tanggal Lahir  wajib diisi";
         if (!form.religion) newErrors.religion = "Agama wajib diisi";
-        if (!form.entry_year) newErrors.entry_year = "Tahun Masuk wajib diisi";
         if (!form.nationality) newErrors.nationality = "Kewarganegaraan wajib diisi";
         if (!form.village) newErrors.village = "kelurahan wajib diisi";
         if (!form.street) newErrors.street = "Jalan wajib diisi";
@@ -595,11 +594,10 @@ export default function CreateProspectiveStudentsPage() {
                                                 placeholder="Masukkan nisn"
                                             />
                                             <FormSelect
-                                                label={<FormLabel text="Tahun Masuk" required />}
+                                                label={<FormLabel text="Tahun Masuk" />}
                                                 name="entry_year"
                                                 value={form.entry_year ?? ''}
                                                 onChange={handleChange}
-                                                error={errors.entry_year}
                                                 options={Array.from({ length: 10 }, (_, i) => {
                                                     const year = new Date().getFullYear() - 4 + i;
                                                     return { label: `${year.toString()}`, value: `${year.toString()}` };

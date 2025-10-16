@@ -160,7 +160,6 @@ export default function StudentParentForm({
         const newErrors: Record<string, string> = {};
 
         if (!form.full_name) newErrors.full_name = "Nama wajib diisi";
-        if (!form.nik) newErrors.nik = "NIK wajib diisi";
         if (!form.parent_type) newErrors.parent_type = "Hubungan keluarga wajib dipilih";
         if (!form.income_range) newErrors.income_range = "Rentang penghasilan wajib dipilih";
         if (!form.occupation) newErrors.occupation = "Pekerjaan wajib dipilih";
@@ -237,13 +236,12 @@ export default function StudentParentForm({
                     />
 
                     <FormInput
-                        label={<FormLabel text="NIK" required />}
+                        label={<FormLabel text="NIK" />}
                         name="nik"
                         value={form.nik ?? ""}
                         onChange={handleChange}
                         onlyNumbers
                         placeholder="12345"
-                        error={errors.nik}
                     />
 
                     <FormSelect
